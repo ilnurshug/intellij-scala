@@ -22,6 +22,10 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.elements.signatures.{ScClassPa
  */
 object ScalaElementTypes {
 
+  val SEMI = new ScalaElementType("semi")
+
+  val PROGRAM = new ScalaElementType("program")
+
   val DUMMY_ELEMENT = new ScalaElementType("Dummy Elemnet")
 
 
@@ -206,6 +210,12 @@ object ScalaElementTypes {
   val EXPRS = new ScalaElementType("list of expressions")
   val ARG_EXPRS = new ScalaElementType("arguments of function")
   val BLOCK_EXPR = new ScCodeBlockElementType
+
+  val BLOCK_STAT = new ScalaElementType("block statement")
+  val TOP_STAT = new ScalaElementType("top statement")
+  val TOP_STAT_SEQ = new ScalaElementType("top statement sequence")
+  val COMP_UNIT = new ScalaElementType("compilation unit")
+
   val CONSTR_BLOCK = new ScalaElementType("constructor block")
   val ERROR_STMT = new ScalaElementType("error statement")
   val BLOCK = new ScalaElementType("block")

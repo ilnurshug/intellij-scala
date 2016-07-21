@@ -327,6 +327,12 @@ class SyntheticClasses(project: Project) extends PsiElementFinder with ProjectCo
     }
 
     registerObject(
+      """
+        {def f()={}}
+      """
+    )
+
+    registerObject(
 """
 package scala
 

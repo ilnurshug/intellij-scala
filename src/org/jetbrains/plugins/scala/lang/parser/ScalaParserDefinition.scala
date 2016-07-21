@@ -27,8 +27,9 @@ class ScalaParserDefinition extends ScalaParserDefinitionWrapper {
   }
 
   def createParser(project: Project): ScalaParser = {
+    val parser: ScalaLangParser = new ScalaLangParser(null)
     hasDotty = project.hasDotty
-    if (hasDotty) new DottyParser else new ScalaParser
+    if (hasDotty) new DottyParser else new ANTLRScalaLangParserAdaptor(ScalaLanguage.Instance, parser) //ScalaParser
   }
 
   def getFileNodeType: IFileElementType = ScalaElementTypes.FILE
