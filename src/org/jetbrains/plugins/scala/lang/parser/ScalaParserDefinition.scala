@@ -39,7 +39,7 @@ class ScalaParserDefinition extends ScalaParserDefinitionWrapper {
       new DottyParser
     else  {
       if (useOldParser) new ScalaParser
-      else new ANTLRScalaLangParserAdaptor(ScalaLanguage.Instance, parser) //ScalaParser
+      else new ANTLRScalaLangParserAdaptor(parser) //ScalaParser
     }
   }
 

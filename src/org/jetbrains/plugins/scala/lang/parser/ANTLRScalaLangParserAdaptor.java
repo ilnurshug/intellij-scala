@@ -8,6 +8,7 @@ import com.intellij.psi.tree.IFileElementType;
 import org.antlr.jetbrains.adaptor.parser.ANTLRParserAdaptor;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.jetbrains.plugins.scala.ScalaLanguage;
 import org.jetbrains.plugins.scala.lang.ScalaLangParser;
 
 /**
@@ -16,8 +17,8 @@ import org.jetbrains.plugins.scala.lang.ScalaLangParser;
 public class ANTLRScalaLangParserAdaptor extends ScalaParser {
     private final ScalaLangParserAdaptor parserAdaptor;
 
-    public ANTLRScalaLangParserAdaptor(Language language, Parser parser) {
-        parserAdaptor = new ScalaLangParserAdaptor(language, parser);
+    public ANTLRScalaLangParserAdaptor(Parser parser) {
+        parserAdaptor = new ScalaLangParserAdaptor(ScalaLanguage.Instance, parser);
     }
 
     @Override

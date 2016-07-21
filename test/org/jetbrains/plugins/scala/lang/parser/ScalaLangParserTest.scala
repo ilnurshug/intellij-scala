@@ -9,6 +9,7 @@ import org.jetbrains.plugins.scala.base.SimpleTestCase
 import org.jetbrains.plugins.scala.lang.ScalaLangParser
 import org.jetbrains.plugins.scala.lang.lexer.ScalaLexer
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilderImpl
+import org.jetbrains.plugins.scala.lang.parser.stress.ASTTreeToDot
 import org.junit.Assert
 
 /**
@@ -26,8 +27,11 @@ class ScalaLangParserTest extends SimpleTestCase
         ScalaFileType.SCALA_LANGUAGE, s)
     )
 
-    val parser : ANTLRScalaLangParserAdaptor = new ANTLRScalaLangParserAdaptor(ScalaLanguage.Instance, new ScalaLangParser(null))
+    val parser : ANTLRScalaLangParserAdaptor = new ANTLRScalaLangParserAdaptor(new ScalaLangParser(null))
     val node = parser.parse(ScalaElementTypes.BLOCK_EXPR, builder)
+
+    val converter = new ASTTreeToDot()
+    println(converter.convert(node))
 
     holder.rawAddChildren(node.asInstanceOf[TreeElement])
 

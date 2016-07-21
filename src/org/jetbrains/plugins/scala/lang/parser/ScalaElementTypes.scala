@@ -22,9 +22,9 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.elements.signatures.{ScClassPa
  */
 object ScalaElementTypes {
 
-  val SEMI = new ScalaElementType("semi")
+  //val SEMI = new ScalaElementType("semi")
 
-  val PROGRAM = new ScalaElementType("program")
+  //val PROGRAM = new ScalaElementType("program")
 
   val DUMMY_ELEMENT = new ScalaElementType("Dummy Elemnet")
 
@@ -106,7 +106,7 @@ object ScalaElementTypes {
   /*********************************** IDENTIFIER **************************************/
   /** ***********************************************************************************/
 
-    val IDENTIFIER = new ScalaElementType("identifier")
+  //val IDENTIFIER = new ScalaElementType("identifier")
 
   val UNIT_EXPR = new ScalaElementType("unit expression")
   val IDENTIFIER_LIST = new ScIdListElementType
@@ -140,7 +140,7 @@ object ScalaElementTypes {
   /** ***********************************************************************************/
   /************************************ DEFINITION *************************************/
   /** ***********************************************************************************/
-    val DEF = new ScalaElementType("definition")
+  //val DEF = new ScalaElementType("definition")
 
   val PATTERN_DEFINITION : ScValueElementType[_ <: ScValue] = new ScValueDefinitionElementType
   val PATTERN_LIST = new ScPatternListElementType
@@ -151,7 +151,7 @@ object ScalaElementTypes {
   /**************** functions *************************/
   val FUNCTION_DEFINITION = new ScFunctionDefinitionElementType
   val MACRO_DEFINITION = new ScMacroDefinitionElementType
-  val FUN_SIG = new ScalaElementType("function signature")
+  val FUN_SIG = new ScalaElementType("function signature")          // never used?
   val CONSTR_EXPR = new ScalaElementType("constructor expression")
   val SELF_INVOCATION = new ScalaElementType("self invocation")
 
@@ -214,10 +214,10 @@ object ScalaElementTypes {
   val ARG_EXPRS = new ScalaElementType("arguments of function")
   val BLOCK_EXPR = new ScCodeBlockElementType
 
-  val BLOCK_STAT = new ScalaElementType("block statement")
-  val TOP_STAT = new ScalaElementType("top statement")
-  val TOP_STAT_SEQ = new ScalaElementType("top statement sequence")
-  val COMP_UNIT = new ScalaElementType("compilation unit")
+  //val BLOCK_STAT = new ScalaElementType("block statement")
+  //val TOP_STAT = new ScalaElementType("top statement")
+  //val TOP_STAT_SEQ = new ScalaElementType("top statement sequence")
+  //val COMP_UNIT = new ScalaElementType("compilation unit")
 
   val CONSTR_BLOCK = new ScalaElementType("constructor block")
   val ERROR_STMT = new ScalaElementType("error statement")

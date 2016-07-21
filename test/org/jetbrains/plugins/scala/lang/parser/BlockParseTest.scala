@@ -9,6 +9,7 @@ import org.jetbrains.plugins.scala.base.SimpleTestCase
 import org.jetbrains.plugins.scala.lang.lexer.ScalaLexer
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilderImpl
 import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.BlockExpr
+import org.jetbrains.plugins.scala.lang.parser.stress.ASTTreeToDot
 import org.junit.Assert
 
 /**
@@ -26,6 +27,10 @@ class BlockParseTest extends SimpleTestCase {
     )
     BlockExpr.parse(builder)
     val node = builder.getTreeBuilt
+
+    val converter = new ASTTreeToDot()
+    println(converter.convert(node))
+
     holder.rawAddChildren(node.asInstanceOf[TreeElement])
     node.getPsi
   }

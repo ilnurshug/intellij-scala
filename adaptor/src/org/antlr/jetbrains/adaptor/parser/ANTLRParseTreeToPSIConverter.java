@@ -165,22 +165,35 @@ public class ANTLRParseTreeToPSIConverter implements ParseTreeListener {
 		PsiBuilder.Marker marker = markers.pop();
 		//marker.done(getRuleElementTypes().get(ctx.getRuleIndex()));
 		int i = ctx.getRuleIndex();
-		marker.done(convertRuleIndexToScalaElementType(i));
+		if (canDropMarker(i)) {
+			marker.drop();
+		}
+		else {
+			marker.done(convertRuleIndexToScalaElementType(i));
+		}
+	}
+
+	private Boolean canDropMarker(int i) {
+		switch (i) {
+			case ScalaLangParser.RULE_program:
+			case ScalaLangParser.RULE_blockStat:
+			case ScalaLangParser.RULE_semi:
+			case ScalaLangParser.RULE_topStat:
+			case ScalaLangParser.RULE_topStatSeq:
+			case ScalaLangParser.RULE_compilationUnit:
+			case ScalaLangParser.RULE_def:
+			case ScalaLangParser.RULE_id:
+			case ScalaLangParser.RULE_funSig:
+				return true;
+			default:
+				return false;
+		}
 	}
 
 	private IElementType convertRuleIndexToScalaElementType(int i) {
 		if (i == ScalaLangParser.RULE_blockExpr) return ScalaElementTypes.BLOCK_EXPR();
-		else if (i == ScalaLangParser.RULE_program) return ScalaElementTypes.PROGRAM();
 		else if (i == ScalaLangParser.RULE_block) return ScalaElementTypes.BLOCK();
-		else if (i == ScalaLangParser.RULE_blockStat) return ScalaElementTypes.BLOCK_STAT();
-		else if (i == ScalaLangParser.RULE_semi) return ScalaElementTypes.SEMI();
-		else if (i == ScalaLangParser.RULE_topStat) return ScalaElementTypes.TOP_STAT();
-		else if (i == ScalaLangParser.RULE_topStatSeq) return ScalaElementTypes.TOP_STAT_SEQ();
-		else if (i == ScalaLangParser.RULE_compilationUnit) return ScalaElementTypes.COMP_UNIT();
-		else if (i == ScalaLangParser.RULE_def) return ScalaElementTypes.DEF();
 		else if (i == ScalaLangParser.RULE_funDef) return ScalaElementTypes.FUNCTION_DEFINITION();
-		else if (i == ScalaLangParser.RULE_funSig) return ScalaElementTypes.FUN_SIG();
-		else if (i == ScalaLangParser.RULE_id) return ScalaElementTypes.IDENTIFIER();
 		else if (i == ScalaLangParser.RULE_paramClauses) return ScalaElementTypes.PARAM_CLAUSES();
 		else if (i == ScalaLangParser.RULE_paramClause) return ScalaElementTypes.PARAM_CLAUSE();
 		else if (i == ScalaLangParser.RULE_prefixExpr) return ScalaElementTypes.PREFIX_EXPR();
