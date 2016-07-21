@@ -177,6 +177,17 @@ public class ANTLRParseTreeToPSIConverter implements ParseTreeListener {
 		else if (i == ScalaLangParser.RULE_topStat) return ScalaElementTypes.TOP_STAT();
 		else if (i == ScalaLangParser.RULE_topStatSeq) return ScalaElementTypes.TOP_STAT_SEQ();
 		else if (i == ScalaLangParser.RULE_compilationUnit) return ScalaElementTypes.COMP_UNIT();
+		else if (i == ScalaLangParser.RULE_def) return ScalaElementTypes.DEF();
+		else if (i == ScalaLangParser.RULE_funDef) return ScalaElementTypes.FUNCTION_DEFINITION();
+		else if (i == ScalaLangParser.RULE_funSig) return ScalaElementTypes.FUN_SIG();
+		else if (i == ScalaLangParser.RULE_id) return ScalaElementTypes.IDENTIFIER();
+		else if (i == ScalaLangParser.RULE_paramClauses) return ScalaElementTypes.PARAM_CLAUSES();
+		else if (i == ScalaLangParser.RULE_paramClause) return ScalaElementTypes.PARAM_CLAUSE();
+		else if (i == ScalaLangParser.RULE_prefixExpr) return ScalaElementTypes.PREFIX_EXPR();
+		else if (i == ScalaLangParser.RULE_infixExpr) return ScalaElementTypes.INFIX_EXPR();
+		else if (i == ScalaLangParser.RULE_postfixExpr) return ScalaElementTypes.POSTFIX_EXPR();
+		else if (i == ScalaLangParser.RULE_expr1) return ScalaElementTypes.EXPR1();
+		else if (i == ScalaLangParser.RULE_expr) return ScalaElementTypes.FUNCTION_EXPR();
 		else return ScalaElementTypes.DUMMY_ELEMENT();
 	}
 }

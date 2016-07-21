@@ -17,8 +17,7 @@ import org.junit.Assert
 class ScalaLangParserTest extends SimpleTestCase
 {
 
-  /*def parseProgram(s: String) : PsiElement = {
-    println("here")
+  def parseProgram(s: String) : PsiElement = {
     val fileFactory = PsiFileFactory.getInstance(fixture.getProject)
     val context = parseText("")
     val holder: FileElement = DummyHolderFactory.createHolder(context.getManager, context).getTreeElement
@@ -27,30 +26,24 @@ class ScalaLangParserTest extends SimpleTestCase
         ScalaFileType.SCALA_LANGUAGE, s)
     )
 
-    println("here2")
-
     val parser : ANTLRScalaLangParserAdaptor = new ANTLRScalaLangParserAdaptor(ScalaLanguage.Instance, new ScalaLangParser(null))
-    parser.parse(ScalaElementTypes.BLOCK_EXPR, builder)
+    val node = parser.parse(ScalaElementTypes.BLOCK_EXPR, builder)
 
-    println("here3")
-
-    val node = builder.getTreeBuilt
     holder.rawAddChildren(node.asInstanceOf[TreeElement])
 
-    println("here4")
     node.getPsi
-  }*/
+  }
 
   def doTest(s: String): Unit = {
-    //val elem = parseProgram(s)
-    //Assert.assertEquals(s, elem.getText)
-    Assert.assertEquals(true, true)
+    val elem = parseProgram(s)
+    Assert.assertEquals(s, elem.getText)
+    //Assert.assertEquals(true, true)
   }
 
 
   def testProgram(): Unit = {
     doTest(
-      """{;}"""
+      """{def f()={}}"""
     )
   }
 }

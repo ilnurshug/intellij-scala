@@ -46,7 +46,7 @@ literal           : '-'? IntegerLiteral
                   
 qualId            : id ('.' id)* ;
 
-ids               : id (WHITE_SPACE_IN_LINE*  ',' WHITE_SPACE_IN_LINE* id)* ;
+ids               : id (  ','  id)* ;
 
 path              :  stableId
                   |  (id '.')? 'this' ;
@@ -71,184 +71,184 @@ stableId1         :  '.' id stableId1
 
 classQualifier    : '[' id ']' ;
 
-type              : functionArgTypes WHITE_SPACE_IN_LINE* '=>' WHITE_SPACE_IN_LINE* type
-                  | infixType WHITE_SPACE_IN_LINE* existentialClause
-                  | infixType WHITE_SPACE_IN_LINE*;
+type              : functionArgTypes  '=>'  type
+                  | infixType  existentialClause
+                  | infixType ;
 
 functionArgTypes  : infixType
-                  | '(' WHITE_SPACE_IN_LINE* ( paramType (WHITE_SPACE_IN_LINE* ',' WHITE_SPACE_IN_LINE* paramType )* )? WHITE_SPACE_IN_LINE* ')' ;
+                  | '('  ( paramType ( ','  paramType )* )?  ')' ;
 
-existentialClause : 'forSome' WHITE_SPACE_IN_LINE* '{' WHITE_SPACE_IN_LINE* existentialDcl (WHITE_SPACE_IN_LINE* semi WHITE_SPACE_IN_LINE* existentialDcl)* WHITE_SPACE_IN_LINE* '}';
+existentialClause : 'forSome'  '{'  existentialDcl ( semi  existentialDcl)*  '}';
 
-existentialDcl    : 'type' WHITE_SPACE_IN_LINE+ typeDcl
-                  | 'val' WHITE_SPACE_IN_LINE+ valDcl;
+existentialDcl    : 'type'  typeDcl
+                  | 'val'  valDcl;
 
-infixType         : compoundType ( WHITE_SPACE_IN_LINE* id WHITE_SPACE_IN_LINE* Nl? WHITE_SPACE_IN_LINE* compoundType)*;
+infixType         : compoundType (  id  Nl?  compoundType)*;
 
-compoundType      : annotType (WHITE_SPACE_IN_LINE+ 'with' WHITE_SPACE_IN_LINE+ annotType)* WHITE_SPACE_IN_LINE* refinement?
+compoundType      : annotType ( 'with'  annotType)*  refinement?
                   | refinement;
 
-annotType         : simpleType WHITE_SPACE_IN_LINE* annotation*;
+annotType         : simpleType  annotation*;
 
-simpleType        : simpleType WHITE_SPACE_IN_LINE* typeArgs
+simpleType        : simpleType  typeArgs
                   | simpleType '#' id
                   | stableId
                   | (stableId | (id '.')? 'this') '.' 'type'
-                  | '(' WHITE_SPACE_IN_LINE* types WHITE_SPACE_IN_LINE* ')';
+                  | '('  types  ')';
 
-typeArgs          : '[' WHITE_SPACE_IN_LINE* types WHITE_SPACE_IN_LINE* ']';
+typeArgs          : '['  types  ']';
 
-types             : type (WHITE_SPACE_IN_LINE* ',' WHITE_SPACE_IN_LINE* type)*;
+types             : type ( ','  type)*;
 
-refinement        : Nl? '{' WHITE_SPACE_IN_LINE* refineStat (WHITE_SPACE_IN_LINE* semi WHITE_SPACE_IN_LINE* refineStat)* WHITE_SPACE_IN_LINE* '}';
+refinement        : Nl? '{'  refineStat ( semi  refineStat)*  '}';
 
 refineStat        : dcl
-                  | 'type' WHITE_SPACE_IN_LINE+ typeDef
+                  | 'type'  typeDef
                   | ;
 
 typePat           : type;
 
-ascription        : ':' WHITE_SPACE_IN_LINE* infixType
-                  | ':' WHITE_SPACE_IN_LINE* annotation+
+ascription        : ':'  infixType
+                  | ':'  annotation+
                   | ':' '_' '*';
 
-expr              : (bindings | ('implicit' WHITE_SPACE_IN_LINE+|WHITE_SPACE_IN_LINE*) id | '_') WHITE_SPACE_IN_LINE* '=>' WHITE_SPACE_IN_LINE* expr
+expr              : (bindings | ('implicit' |) id | '_')  '=>'  expr
                   | expr1 ;
 
-expr1             : 'if' WHITE_SPACE_IN_LINE* '(' WHITE_SPACE_IN_LINE* expr WHITE_SPACE_IN_LINE* ')' WHITE_SPACE_IN_LINE* Nl* WHITE_SPACE_IN_LINE* expr (WHITE_SPACE_IN_LINE* semi? WHITE_SPACE_IN_LINE* 'else' WHITE_SPACE_IN_LINE* expr)?
-                  | 'while' WHITE_SPACE_IN_LINE* '(' WHITE_SPACE_IN_LINE* expr WHITE_SPACE_IN_LINE* ')' WHITE_SPACE_IN_LINE* Nl* WHITE_SPACE_IN_LINE* expr
-                  | 'try' (WHITE_SPACE_IN_LINE* '{' WHITE_SPACE_IN_LINE* block WHITE_SPACE_IN_LINE* '}' WHITE_SPACE_IN_LINE* | WHITE_SPACE_IN_LINE* expr) ( WHITE_SPACE_IN_LINE*'catch' WHITE_SPACE_IN_LINE* '{' WHITE_SPACE_IN_LINE* caseClauses WHITE_SPACE_IN_LINE* '}')? (WHITE_SPACE_IN_LINE* 'finally' WHITE_SPACE_IN_LINE* expr)?
-                  | 'do' WHITE_SPACE_IN_LINE* expr WHITE_SPACE_IN_LINE* semi? WHITE_SPACE_IN_LINE* 'while' WHITE_SPACE_IN_LINE* '(' WHITE_SPACE_IN_LINE* expr WHITE_SPACE_IN_LINE* ')'
-                  | 'for' WHITE_SPACE_IN_LINE* ('(' WHITE_SPACE_IN_LINE* enumerators WHITE_SPACE_IN_LINE* ')' | '{' WHITE_SPACE_IN_LINE* enumerators WHITE_SPACE_IN_LINE* '}') WHITE_SPACE_IN_LINE* Nl* WHITE_SPACE_IN_LINE* 'yield'? WHITE_SPACE_IN_LINE* expr
-                  | 'throw' WHITE_SPACE_IN_LINE* expr
-                  | 'return' WHITE_SPACE_IN_LINE* expr?
-                  | (('new' WHITE_SPACE_IN_LINE* (classTemplate | templateBody)| blockExpr | simpleExpr1  '_'?) '.')  id WHITE_SPACE_IN_LINE* '=' WHITE_SPACE_IN_LINE* expr
-                  | simpleExpr1 WHITE_SPACE_IN_LINE* argumentExprs WHITE_SPACE_IN_LINE* '=' WHITE_SPACE_IN_LINE* expr
+expr1             : 'if'  '('  expr  ')'  Nl*  expr ( semi?  'else'  expr)?
+                  | 'while'  '('  expr  ')'  Nl*  expr
+                  | 'try' ( '{'  block  '}'  |  expr) ( 'catch'  '{'  caseClauses  '}')? ( 'finally'  expr)?
+                  | 'do'  expr  semi?  'while'  '('  expr  ')'
+                  | 'for'  ('('  enumerators  ')' | '{'  enumerators  '}')  Nl*  'yield'?  expr
+                  | 'throw'  expr
+                  | 'return'  expr?
+                  | (('new'  (classTemplate | templateBody)| blockExpr | simpleExpr1  '_'?) '.')  id  '='  expr
+                  | simpleExpr1  argumentExprs  '='  expr
                   | postfixExpr
-                  | postfixExpr WHITE_SPACE_IN_LINE* ascription
-                  | postfixExpr WHITE_SPACE_IN_LINE* 'match' WHITE_SPACE_IN_LINE* '{' WHITE_SPACE_IN_LINE* caseClauses WHITE_SPACE_IN_LINE* '}' ;
+                  | postfixExpr  ascription
+                  | postfixExpr  'match'  '{'  caseClauses  '}' ;
 
-postfixExpr       : infixExpr (WHITE_SPACE_IN_LINE* id WHITE_SPACE_IN_LINE* Nl?)? ;
+postfixExpr       : infixExpr ( id  Nl?)? ;
 
 infixExpr         : prefixExpr
-                  | infixExpr WHITE_SPACE_IN_LINE* id WHITE_SPACE_IN_LINE* Nl? WHITE_SPACE_IN_LINE* infixExpr ;
+                  | infixExpr  id  Nl?  infixExpr ;
 
-prefixExpr        : ('-' | '+' | '~' | '!')? WHITE_SPACE_IN_LINE*
-                    ('new' WHITE_SPACE_IN_LINE+ (classTemplate | templateBody)| blockExpr | simpleExpr1 '_'?) ;
+prefixExpr        : ('-' | '+' | '~' | '!')? 
+                    ('new'  (classTemplate | templateBody)| blockExpr | simpleExpr1 '_'?) ;
 
-simpleExpr1       :	literal WHITE_SPACE_IN_LINE* simpleExpr2
+simpleExpr1       :	literal  simpleExpr2
                   |	literal
-                  |	path WHITE_SPACE_IN_LINE* simpleExpr2
+                  |	path  simpleExpr2
                   |	path
-                  |	'_' WHITE_SPACE_IN_LINE* simpleExpr2
+                  |	'_'  simpleExpr2
                   |	'_'
-                  |	'(' WHITE_SPACE_IN_LINE* ')' WHITE_SPACE_IN_LINE* simpleExpr2
-                  |	'(' WHITE_SPACE_IN_LINE* ')'
-                  |	'(' WHITE_SPACE_IN_LINE* exprs WHITE_SPACE_IN_LINE* ')' WHITE_SPACE_IN_LINE* simpleExpr2
-                  |	'(' WHITE_SPACE_IN_LINE* exprs WHITE_SPACE_IN_LINE* ')'
-                  |	'new' (WHITE_SPACE_IN_LINE* classTemplate WHITE_SPACE_IN_LINE* '.' WHITE_SPACE_IN_LINE* id | WHITE_SPACE_IN_LINE* 'new' (WHITE_SPACE_IN_LINE* classTemplate WHITE_SPACE_IN_LINE* '.' WHITE_SPACE_IN_LINE* id WHITE_SPACE_IN_LINE* simpleExpr2 | WHITE_SPACE_IN_LINE* templateBody) WHITE_SPACE_IN_LINE* '.' WHITE_SPACE_IN_LINE* id WHITE_SPACE_IN_LINE* | WHITE_SPACE_IN_LINE* templateBody) WHITE_SPACE_IN_LINE* '.' WHITE_SPACE_IN_LINE* id WHITE_SPACE_IN_LINE* simpleExpr2
-                  |	blockExpr WHITE_SPACE_IN_LINE* '.' WHITE_SPACE_IN_LINE* id WHITE_SPACE_IN_LINE* simpleExpr2
-                  |	blockExpr WHITE_SPACE_IN_LINE* '.' WHITE_SPACE_IN_LINE* id
-                  |	'new' (WHITE_SPACE_IN_LINE* classTemplate WHITE_SPACE_IN_LINE* typeArgs WHITE_SPACE_IN_LINE* |	WHITE_SPACE_IN_LINE* 'new' (WHITE_SPACE_IN_LINE* classTemplate WHITE_SPACE_IN_LINE* typeArgs WHITE_SPACE_IN_LINE* simpleExpr2 WHITE_SPACE_IN_LINE* | WHITE_SPACE_IN_LINE* templateBody) WHITE_SPACE_IN_LINE* typeArgs | WHITE_SPACE_IN_LINE* templateBody) WHITE_SPACE_IN_LINE* typeArgs WHITE_SPACE_IN_LINE* simpleExpr2
-                  |	blockExpr WHITE_SPACE_IN_LINE* typeArgs WHITE_SPACE_IN_LINE* simpleExpr2
-                  |	blockExpr WHITE_SPACE_IN_LINE* typeArgs ;
+                  |	'('  ')'  simpleExpr2
+                  |	'('  ')'
+                  |	'('  exprs  ')'  simpleExpr2
+                  |	'('  exprs  ')'
+                  |	'new' ( classTemplate  '.'  id |  'new' ( classTemplate  '.'  id  simpleExpr2 |  templateBody)  '.'  id  |  templateBody)  '.'  id  simpleExpr2
+                  |	blockExpr  '.'  id  simpleExpr2
+                  |	blockExpr  '.'  id
+                  |	'new' ( classTemplate  typeArgs  |	 'new' ( classTemplate  typeArgs  simpleExpr2  |  templateBody)  typeArgs |  templateBody)  typeArgs  simpleExpr2
+                  |	blockExpr  typeArgs  simpleExpr2
+                  |	blockExpr  typeArgs ;
 
-simpleExpr2       :  '.' id  WHITE_SPACE_IN_LINE* simpleExpr2
+simpleExpr2       :  '.' id   simpleExpr2
                   |	'.' id
-                  |	'_' '.' id  WHITE_SPACE_IN_LINE* simpleExpr2
+                  |	'_' '.' id   simpleExpr2
                   |	'_' '.' id
-                  |	typeArgs  WHITE_SPACE_IN_LINE* simpleExpr2
+                  |	typeArgs   simpleExpr2
                   |	typeArgs
-                  |	'_'  WHITE_SPACE_IN_LINE* typeArgs WHITE_SPACE_IN_LINE*  simpleExpr2
-                  |	'_' WHITE_SPACE_IN_LINE*  typeArgs
-                  |	argumentExprs  WHITE_SPACE_IN_LINE* simpleExpr2
+                  |	'_'   typeArgs   simpleExpr2
+                  |	'_'   typeArgs
+                  |	argumentExprs   simpleExpr2
                   |	argumentExprs ;
                   
-exprs             : expr ( WHITE_SPACE_IN_LINE* ',' WHITE_SPACE_IN_LINE* expr)* ;
+exprs             : expr (  ','  expr)* ;
 
-argumentExprs     : '(' WHITE_SPACE_IN_LINE* exprs? WHITE_SPACE_IN_LINE* ')' WHITE_SPACE_IN_LINE*
-                  | '(' WHITE_SPACE_IN_LINE* (exprs WHITE_SPACE_IN_LINE* ',' WHITE_SPACE_IN_LINE*)? postfixExpr WHITE_SPACE_IN_LINE* ':' '_' '*' ')' WHITE_SPACE_IN_LINE*
-                  | Nl? WHITE_SPACE_IN_LINE* blockExpr WHITE_SPACE_IN_LINE*;
+argumentExprs     : '('  exprs?  ')' 
+                  | '('  (exprs  ',' )? postfixExpr  ':' '_' '*' ')' 
+                  | Nl?  blockExpr ;
                   
-blockExpr         : '{' WHITE_SPACE_IN_LINE* caseClauses WHITE_SPACE_IN_LINE* '}'
-                  | '{' WHITE_SPACE_IN_LINE* block WHITE_SPACE_IN_LINE* '}' ;
-block             : blockStat (WHITE_SPACE_IN_LINE* semi WHITE_SPACE_IN_LINE* blockStat)* WHITE_SPACE_IN_LINE* resultExpr? ;
+blockExpr         : '{'  caseClauses  '}'
+                  | '{'  block  '}' ;
+block             : blockStat ( semi  blockStat)*  resultExpr? ;
 
 blockStat         : import_
-                  | annotation* WHITE_SPACE_IN_LINE* ('implicit' | 'lazy')? WHITE_SPACE_IN_LINE* def
-                  | annotation* WHITE_SPACE_IN_LINE* (localModifier WHITE_SPACE_IN_LINE*)* WHITE_SPACE_IN_LINE* tmplDef
+                  | annotation*  ('implicit' | 'lazy')?  def
+                  | annotation*  (localModifier )*  tmplDef
                   | expr1
                   | ;
 
 resultExpr        : expr1
-                  | (bindings | ('implicit'? WHITE_SPACE_IN_LINE* id | '_') WHITE_SPACE_IN_LINE* ':' WHITE_SPACE_IN_LINE* compoundType) WHITE_SPACE_IN_LINE* '=>' WHITE_SPACE_IN_LINE* block ;
+                  | (bindings | ('implicit'?  id | '_')  ':'  compoundType)  '=>'  block ;
 
-enumerators       : generator WHITE_SPACE_IN_LINE* (WHITE_SPACE_IN_LINE* semi WHITE_SPACE_IN_LINE* generator)* ;
+enumerators       : generator  ( semi  generator)* ;
 
-generator         : pattern1 WHITE_SPACE_IN_LINE* '<-' WHITE_SPACE_IN_LINE* expr (WHITE_SPACE_IN_LINE* semi? WHITE_SPACE_IN_LINE* guard | WHITE_SPACE_IN_LINE* semi WHITE_SPACE_IN_LINE* pattern1 WHITE_SPACE_IN_LINE* '=' WHITE_SPACE_IN_LINE* expr)* ;
+generator         : pattern1  '<-'  expr ( semi?  guard |  semi  pattern1  '='  expr)* ;
 
 caseClauses       : caseClause+ ;
 
-caseClause        : 'case' WHITE_SPACE_IN_LINE* pattern WHITE_SPACE_IN_LINE* guard? WHITE_SPACE_IN_LINE* '=>' WHITE_SPACE_IN_LINE* block ;
+caseClause        : 'case'  pattern  guard?  '=>'  block ;
   
-guard             : 'if' WHITE_SPACE_IN_LINE* postfixExpr ;
+guard             : 'if'  postfixExpr ;
 
-pattern           : pattern1 (WHITE_SPACE_IN_LINE* '|' WHITE_SPACE_IN_LINE* pattern1 )* ;
+pattern           : pattern1 ( '|'  pattern1 )* ;
 
-pattern1          : ID WHITE_SPACE_IN_LINE* ':' WHITE_SPACE_IN_LINE* typePat
-                  | '_' WHITE_SPACE_IN_LINE* ':' WHITE_SPACE_IN_LINE* typePat
+pattern1          : ID  ':'  typePat
+                  | '_'  ':'  typePat
                   | pattern2 ;
 
-pattern2          : ID WHITE_SPACE_IN_LINE* ('@' pattern3)?
+pattern2          : ID  ('@' pattern3)?
                   | pattern3 ;
 
 pattern3          : simplePattern
-                  | simplePattern (WHITE_SPACE_IN_LINE* id WHITE_SPACE_IN_LINE* Nl? WHITE_SPACE_IN_LINE* simplePattern)* ;
+                  | simplePattern ( id  Nl?  simplePattern)* ;
                   
 simplePattern     : '_'
                   | ID
                   | literal 
-                  | stableId (WHITE_SPACE_IN_LINE* '(' WHITE_SPACE_IN_LINE* patterns WHITE_SPACE_IN_LINE* ')')?
-                  | stableId WHITE_SPACE_IN_LINE* '(' WHITE_SPACE_IN_LINE* (patterns WHITE_SPACE_IN_LINE* ',' WHITE_SPACE_IN_LINE*)? (ID WHITE_SPACE_IN_LINE* '@')? WHITE_SPACE_IN_LINE* '_' WHITE_SPACE_IN_LINE* '*' WHITE_SPACE_IN_LINE* ')'
-                  | '(' WHITE_SPACE_IN_LINE* patterns? WHITE_SPACE_IN_LINE* ')' ;
+                  | stableId ( '('  patterns  ')')?
+                  | stableId  '('  (patterns  ',' )? (ID  '@')?  '_'  '*'  ')'
+                  | '('  patterns?  ')' ;
 
-patterns          : pattern (WHITE_SPACE_IN_LINE* ',' WHITE_SPACE_IN_LINE* patterns)*
-                  | ('_' WHITE_SPACE_IN_LINE*) * ;
+patterns          : pattern ( ','  patterns)*
+                  | ('_' ) * ;
 
-typeParamClause   : '[' WHITE_SPACE_IN_LINE* variantTypeParam (WHITE_SPACE_IN_LINE* ',' WHITE_SPACE_IN_LINE* variantTypeParam)* WHITE_SPACE_IN_LINE* ']' ;
+typeParamClause   : '['  variantTypeParam ( ','  variantTypeParam)*  ']' ;
 
-funTypeParamClause: '[' WHITE_SPACE_IN_LINE* typeParam (WHITE_SPACE_IN_LINE* ',' WHITE_SPACE_IN_LINE* typeParam)* WHITE_SPACE_IN_LINE* ']' ;
+funTypeParamClause: '['  typeParam ( ','  typeParam)*  ']' ;
 
-variantTypeParam  : annotation? WHITE_SPACE_IN_LINE* ('+' | '-')? WHITE_SPACE_IN_LINE* typeParam ;
+variantTypeParam  : annotation?  ('+' | '-')?  typeParam ;
 
-typeParam         : (id | '_') WHITE_SPACE_IN_LINE* typeParamClause? (WHITE_SPACE_IN_LINE* '>:' WHITE_SPACE_IN_LINE* type)? (WHITE_SPACE_IN_LINE* '<:' WHITE_SPACE_IN_LINE* type)?
-                    ('<%' WHITE_SPACE_IN_LINE* type)* (WHITE_SPACE_IN_LINE* ':' WHITE_SPACE_IN_LINE* type)* ;
+typeParam         : (id | '_')  typeParamClause? ( '>:'  type)? ( '<:'  type)?
+                    ('<%'  type)* ( ':'  type)* ;
                          
-paramClauses      : paramClause* (WHITE_SPACE_IN_LINE* Nl? WHITE_SPACE_IN_LINE* '(' WHITE_SPACE_IN_LINE* 'implicit' WHITE_SPACE_IN_LINE* params WHITE_SPACE_IN_LINE* ')')? ;
+paramClauses      : paramClause* ( Nl?  '('  'implicit'  params  ')')? ;
 
-paramClause       : Nl? WHITE_SPACE_IN_LINE* '(' WHITE_SPACE_IN_LINE* params? WHITE_SPACE_IN_LINE*')' WHITE_SPACE_IN_LINE* ;
+paramClause       : Nl?  '('  params? ')'  ;
 
-params            : param (WHITE_SPACE_IN_LINE* ',' WHITE_SPACE_IN_LINE* param)* ;
+params            : param ( ','  param)* ;
 
-param             : annotation* WHITE_SPACE_IN_LINE* id  (WHITE_SPACE_IN_LINE* ':' WHITE_SPACE_IN_LINE* paramType)? (WHITE_SPACE_IN_LINE* '=' WHITE_SPACE_IN_LINE* expr)? ;
+param             : annotation*  id  ( ':'  paramType)? ( '='  expr)? ;
 
 paramType         : type 
-                  | '=>' WHITE_SPACE_IN_LINE* type
-                  | type WHITE_SPACE_IN_LINE* '*';
+                  | '=>'  type
+                  | type  '*';
 
 classParamClauses : classParamClause* 
-                    (WHITE_SPACE_IN_LINE* Nl? WHITE_SPACE_IN_LINE* '(' WHITE_SPACE_IN_LINE* 'implicit' WHITE_SPACE_IN_LINE* classParams WHITE_SPACE_IN_LINE* ')')? ;
+                    ( Nl?  '('  'implicit'  classParams  ')')? ;
                          
-classParamClause  : Nl? WHITE_SPACE_IN_LINE* '(' WHITE_SPACE_IN_LINE* classParams? WHITE_SPACE_IN_LINE* ')' WHITE_SPACE_IN_LINE* ;
+classParamClause  : Nl?  '('  classParams?  ')'  ;
 
-classParams       : classParam (WHITE_SPACE_IN_LINE* ',' WHITE_SPACE_IN_LINE* classParam)* ;
+classParams       : classParam ( ','  classParam)* ;
 
-classParam        : annotation* WHITE_SPACE_IN_LINE* (modifier WHITE_SPACE_IN_LINE*)*  (WHITE_SPACE_IN_LINE* 'val' | WHITE_SPACE_IN_LINE* 'var')? WHITE_SPACE_IN_LINE*
-                    id WHITE_SPACE_IN_LINE* ':' WHITE_SPACE_IN_LINE* paramType (WHITE_SPACE_IN_LINE* '=' WHITE_SPACE_IN_LINE* expr)? ;
+classParam        : annotation*  (modifier )*  ( 'val' |  'var')? 
+                    id  ':'  paramType ( '='  expr)? ;
                     
-bindings          : '(' WHITE_SPACE_IN_LINE* binding (WHITE_SPACE_IN_LINE* ',' WHITE_SPACE_IN_LINE* binding )* WHITE_SPACE_IN_LINE* ')' ;
+bindings          : '('  binding ( ','  binding )*  ')' ;
 
-binding           : (id | '_') (WHITE_SPACE_IN_LINE* ':' WHITE_SPACE_IN_LINE* type)? ;
+binding           : (id | '_') ( ':'  type)? ;
 
 modifier          : localModifier 
                   | accessModifier
@@ -260,117 +260,117 @@ localModifier     : 'abstract'
                   | 'implicit'
                   | 'lazy' ;
                   
-accessModifier    : ('private' WHITE_SPACE_IN_LINE* | 'protected' WHITE_SPACE_IN_LINE*)  accessQualifier? ;
+accessModifier    : ('private'  | 'protected' )  accessQualifier? ;
 
-accessQualifier   : '[' WHITE_SPACE_IN_LINE* (id | 'this') WHITE_SPACE_IN_LINE* ']' ;
+accessQualifier   : '['  (id | 'this')  ']' ;
 
-annotation        : '@' simpleType WHITE_SPACE_IN_LINE* argumentExprs* WHITE_SPACE_IN_LINE*;
+annotation        : '@' simpleType  argumentExprs* ;
 
-constrAnnotation  : '@' simpleType WHITE_SPACE_IN_LINE* argumentExprs ;
+constrAnnotation  : '@' simpleType  argumentExprs ;
 
-templateBody      : Nl? WHITE_SPACE_IN_LINE* '{' WHITE_SPACE_IN_LINE* selfType? WHITE_SPACE_IN_LINE* templateStat (WHITE_SPACE_IN_LINE* semi WHITE_SPACE_IN_LINE* templateStat)* WHITE_SPACE_IN_LINE* '}' ;
+templateBody      : Nl?  '{'  selfType?  templateStat ( semi  templateStat)*  '}' ;
 
 templateStat      : import_
-                  | (annotation Nl?)* ((modifier WHITE_SPACE_IN_LINE*)+ | WHITE_SPACE_IN_LINE*) def
-                  | (annotation Nl?)* ((modifier WHITE_SPACE_IN_LINE*)+ | WHITE_SPACE_IN_LINE*) dcl
+                  | (annotation Nl?)* ((modifier )+ | ) def
+                  | (annotation Nl?)* ((modifier )+ | ) dcl
                   |  expr
                   | ;
                   
-selfType          : id (WHITE_SPACE_IN_LINE* ':' WHITE_SPACE_IN_LINE* type)? WHITE_SPACE_IN_LINE* '=>' WHITE_SPACE_IN_LINE*
-                  | 'this' WHITE_SPACE_IN_LINE* ':' WHITE_SPACE_IN_LINE* type WHITE_SPACE_IN_LINE* '=>' ;
+selfType          : id ( ':'  type)?  '=>' 
+                  | 'this'  ':'  type  '=>' ;
 
-import_           : 'import' WHITE_SPACE_IN_LINE+ importExpr (WHITE_SPACE_IN_LINE* ',' WHITE_SPACE_IN_LINE* importExpr)* ;
+import_           : 'import'  importExpr ( ','  importExpr)* ;
 
 importExpr        : stableId '.' (id | '_' | importSelectors) ;
 
-importSelectors   : '{' WHITE_SPACE_IN_LINE* (WHITE_SPACE_IN_LINE* importSelector WHITE_SPACE_IN_LINE* ',')* (WHITE_SPACE_IN_LINE* importSelector | WHITE_SPACE_IN_LINE* '_') WHITE_SPACE_IN_LINE* '}' ;
+importSelectors   : '{'  ( importSelector  ',')* ( importSelector |  '_')  '}' ;
 
-importSelector    : id (WHITE_SPACE_IN_LINE* '=>' WHITE_SPACE_IN_LINE* id | WHITE_SPACE_IN_LINE* '=>' WHITE_SPACE_IN_LINE* '_')? ;
+importSelector    : id ( '=>'  id |  '=>'  '_')? ;
  
-dcl               : 'val' WHITE_SPACE_IN_LINE+ valDcl
-                  | 'var' WHITE_SPACE_IN_LINE+ varDcl
-                  | 'def' WHITE_SPACE_IN_LINE+ funDcl
-                  | 'type' WHITE_SPACE_IN_LINE* Nl* WHITE_SPACE_IN_LINE* typeDcl ;
+dcl               : 'val'  valDcl
+                  | 'var'  varDcl
+                  | 'def'  funDcl
+                  | 'type'  Nl*  typeDcl ;
 
-valDcl            : ids WHITE_SPACE_IN_LINE* ':' WHITE_SPACE_IN_LINE* type ;
+valDcl            : ids  ':'  type ;
 
-varDcl            : ids WHITE_SPACE_IN_LINE* ':' WHITE_SPACE_IN_LINE* type ;
+varDcl            : ids  ':'  type ;
 
-funDcl            : funSig (WHITE_SPACE_IN_LINE* ':' WHITE_SPACE_IN_LINE* type)? ;
+funDcl            : funSig ( ':'  type)? ;
 
-funSig            : id WHITE_SPACE_IN_LINE* funTypeParamClause? WHITE_SPACE_IN_LINE* paramClauses ;
+funSig            : id  funTypeParamClause?  paramClauses ;
 
-typeDcl           : id WHITE_SPACE_IN_LINE* typeParamClause? WHITE_SPACE_IN_LINE* ('>:' WHITE_SPACE_IN_LINE* type)? (WHITE_SPACE_IN_LINE* '<:' WHITE_SPACE_IN_LINE* type)? ;
+typeDcl           : id  typeParamClause?  ('>:'  type)? ( '<:'  type)? ;
 
-patVarDef         : 'val' WHITE_SPACE_IN_LINE+ patDef
-                  | 'var' WHITE_SPACE_IN_LINE+ varDef ;
+patVarDef         : 'val'  patDef
+                  | 'var'  varDef ;
 
 def               : patVarDef
-                  | 'def' WHITE_SPACE_IN_LINE* funDef
-                  | 'type' WHITE_SPACE_IN_LINE* Nl* WHITE_SPACE_IN_LINE* typeDef
+                  | 'def'  funDef
+                  | 'type'  Nl*  typeDef
                   | tmplDef ;
                   
-patDef            : pattern2 (WHITE_SPACE_IN_LINE* ',' WHITE_SPACE_IN_LINE* pattern2)* (WHITE_SPACE_IN_LINE* ':' WHITE_SPACE_IN_LINE* type)* WHITE_SPACE_IN_LINE* '=' WHITE_SPACE_IN_LINE* expr ;
+patDef            : pattern2 ( ','  pattern2)* ( ':'  type)*  '='  expr ;
 
 varDef            : patDef
-                  | ids WHITE_SPACE_IN_LINE* ':' WHITE_SPACE_IN_LINE* type WHITE_SPACE_IN_LINE* '=' WHITE_SPACE_IN_LINE* '_' ;
+                  | ids  ':'  type  '='  '_' ;
                   
-funDef            : funSig (WHITE_SPACE_IN_LINE* ':' WHITE_SPACE_IN_LINE* type)? WHITE_SPACE_IN_LINE* '=' WHITE_SPACE_IN_LINE* expr
-                  | funSig WHITE_SPACE_IN_LINE* Nl? WHITE_SPACE_IN_LINE* '{' WHITE_SPACE_IN_LINE* block WHITE_SPACE_IN_LINE* '}'
-                  | 'this' WHITE_SPACE_IN_LINE* paramClause WHITE_SPACE_IN_LINE* paramClauses
-                    ('=' WHITE_SPACE_IN_LINE* constrExpr | WHITE_SPACE_IN_LINE* Nl WHITE_SPACE_IN_LINE* constrBlock) ;
+funDef            : funSig ( ':'  type)?  '='  expr
+                  | funSig  Nl?  '{'  block  '}'
+                  | 'this'  paramClause  paramClauses
+                    ('='  constrExpr |  Nl  constrBlock) ;
 
-typeDef           :  id WHITE_SPACE_IN_LINE* typeParamClause? WHITE_SPACE_IN_LINE* '=' WHITE_SPACE_IN_LINE* type ;
+typeDef           :  id  typeParamClause?  '='  type ;
 
-tmplDef           : 'case'? WHITE_SPACE_IN_LINE* 'class' WHITE_SPACE_IN_LINE+ classDef
-                  | 'case'? WHITE_SPACE_IN_LINE* 'object' WHITE_SPACE_IN_LINE+ objectDef
-                  | 'trait' WHITE_SPACE_IN_LINE+ traitDef ;
+tmplDef           : 'case'?  'class'  classDef
+                  | 'case'?  'object'  objectDef
+                  | 'trait'  traitDef ;
 
-classDef          : id WHITE_SPACE_IN_LINE* typeParamClause? WHITE_SPACE_IN_LINE* (constrAnnotation WHITE_SPACE_IN_LINE*)* WHITE_SPACE_IN_LINE* accessModifier?
-                    classParamClauses WHITE_SPACE_IN_LINE* classTemplateOpt ;
+classDef          : id  typeParamClause?  (constrAnnotation )*  accessModifier?
+                    classParamClauses  classTemplateOpt ;
                       
-traitDef          : id WHITE_SPACE_IN_LINE* typeParamClause? WHITE_SPACE_IN_LINE* traitTemplateOpt ;
+traitDef          : id  typeParamClause?  traitTemplateOpt ;
 
-objectDef         : id WHITE_SPACE_IN_LINE* classTemplateOpt ;
+objectDef         : id  classTemplateOpt ;
 
-classTemplateOpt  : 'extends' WHITE_SPACE_IN_LINE+ classTemplate | ('extends'? WHITE_SPACE_IN_LINE* templateBody)? ;
+classTemplateOpt  : 'extends'  classTemplate | ('extends'?  templateBody)? ;
 
-traitTemplateOpt  : ('extends' WHITE_SPACE_IN_LINE+ traitTemplate)
-                  | ('extends'? WHITE_SPACE_IN_LINE* templateBody)? ;
+traitTemplateOpt  : ('extends'  traitTemplate)
+                  | ('extends'?  templateBody)? ;
 
-classTemplate     : earlyDefs? WHITE_SPACE_IN_LINE* classParents WHITE_SPACE_IN_LINE* templateBody? ;
+classTemplate     : earlyDefs?  classParents  templateBody? ;
 
-traitTemplate     : earlyDefs? WHITE_SPACE_IN_LINE* traitParents WHITE_SPACE_IN_LINE* templateBody? ;
+traitTemplate     : earlyDefs?  traitParents  templateBody? ;
 
-classParents      : constr (WHITE_SPACE_IN_LINE+ 'with' WHITE_SPACE_IN_LINE+ annotType)* ;
+classParents      : constr ( 'with'  annotType)* ;
 
-traitParents      : annotType (WHITE_SPACE_IN_LINE+ 'with' WHITE_SPACE_IN_LINE+ annotType)* ;
+traitParents      : annotType ( 'with'  annotType)* ;
 
-constr            : annotType WHITE_SPACE_IN_LINE* argumentExprs* ;
+constr            : annotType  argumentExprs* ;
 
-earlyDefs         : '{' WHITE_SPACE_IN_LINE* (earlyDef (WHITE_SPACE_IN_LINE* semi WHITE_SPACE_IN_LINE* earlyDef)*)? WHITE_SPACE_IN_LINE* '}' WHITE_SPACE_IN_LINE* 'with' ;
+earlyDefs         : '{'  (earlyDef ( semi  earlyDef)*)?  '}'  'with' ;
 
-earlyDef          : (annotation WHITE_SPACE_IN_LINE* Nl?)* WHITE_SPACE_IN_LINE* (modifier WHITE_SPACE_IN_LINE*)* WHITE_SPACE_IN_LINE* patVarDef ;
+earlyDef          : (annotation  Nl?)*  (modifier )*  patVarDef ;
 
 constrExpr        : selfInvocation 
                   | constrBlock ;
                   
-constrBlock       : '{' WHITE_SPACE_IN_LINE* selfInvocation (WHITE_SPACE_IN_LINE* semi WHITE_SPACE_IN_LINE* blockStat)* WHITE_SPACE_IN_LINE* '}' ;
-selfInvocation    : 'this' WHITE_SPACE_IN_LINE* argumentExprs+ ;
+constrBlock       : '{'  selfInvocation ( semi  blockStat)*  '}' ;
+selfInvocation    : 'this'  argumentExprs+ ;
 
-topStatSeq        : topStat (WHITE_SPACE_IN_LINE* semi WHITE_SPACE_IN_LINE* topStat)* ;
+topStatSeq        : topStat ( semi  topStat)* ;
 
-topStat           : (annotation WHITE_SPACE_IN_LINE* Nl?)* WHITE_SPACE_IN_LINE* (modifier WHITE_SPACE_IN_LINE*)* WHITE_SPACE_IN_LINE* tmplDef
+topStat           : (annotation  Nl?)*  (modifier )*  tmplDef
                   | import_
                   | packaging
                   | packageObject
                   | ;
                     
-packaging         : 'package' WHITE_SPACE_IN_LINE+ qualId WHITE_SPACE_IN_LINE* Nl? WHITE_SPACE_IN_LINE* '{' WHITE_SPACE_IN_LINE* topStatSeq WHITE_SPACE_IN_LINE* '}' ;
+packaging         : 'package'  qualId  Nl?  '{'  topStatSeq  '}' ;
 
-packageObject     : 'package' WHITE_SPACE_IN_LINE+ 'object' WHITE_SPACE_IN_LINE+ objectDef ;
+packageObject     : 'package'  'object'  objectDef ;
 
-compilationUnit   : ('package' WHITE_SPACE_IN_LINE+ qualId WHITE_SPACE_IN_LINE* semi)* WHITE_SPACE_IN_LINE* topStatSeq ;
+compilationUnit   : ('package'  qualId  semi)*  topStatSeq ;
 
 id                : ID
                   | '\'' StringLiteral '\''

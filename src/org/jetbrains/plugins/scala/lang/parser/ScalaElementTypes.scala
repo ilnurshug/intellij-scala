@@ -106,6 +106,8 @@ object ScalaElementTypes {
   /*********************************** IDENTIFIER **************************************/
   /** ***********************************************************************************/
 
+    val IDENTIFIER = new ScalaElementType("identifier")
+
   val UNIT_EXPR = new ScalaElementType("unit expression")
   val IDENTIFIER_LIST = new ScIdListElementType
   val FIELD_ID = new ScFieldIdElementType
@@ -138,6 +140,8 @@ object ScalaElementTypes {
   /** ***********************************************************************************/
   /************************************ DEFINITION *************************************/
   /** ***********************************************************************************/
+    val DEF = new ScalaElementType("definition")
+
   val PATTERN_DEFINITION : ScValueElementType[_ <: ScValue] = new ScValueDefinitionElementType
   val PATTERN_LIST = new ScPatternListElementType
   val VARIABLE_DEFINITION : ScVariableElementType[_ <: ScVariable] = new ScVariableDefinitionElementType
@@ -199,7 +203,6 @@ object ScalaElementTypes {
   val THIS_REFERENCE = new ScalaElementType("This reference")
   val SUPER_REFERENCE = new ScalaElementType("Super reference")
   val GENERIC_CALL = new ScalaElementType("Generified call")
-
   val EXPR1 = new ScalaElementType("composite expression ")
   val FUNCTION_EXPR = new ScalaElementType("expression")
   val AN_FUN = new ScalaElementType("anonymous function")

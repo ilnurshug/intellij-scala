@@ -17,9 +17,15 @@ import org.jetbrains.plugins.scala.settings._
 /**
  * @author ilyas
  */
+/*object ScalaParserDefinition {
+  var useOldParser = false
+}*/
+
 class ScalaParserDefinition extends ScalaParserDefinitionWrapper {
 
   private var hasDotty = false
+
+  var useOldParser = true
 
   def createLexer(project: Project): ScalaLexer = {
     val treatDocCommentAsBlockComment = ScalaProjectSettings.getInstance(project).isTreatDocCommentAsBlockComment
@@ -29,7 +35,12 @@ class ScalaParserDefinition extends ScalaParserDefinitionWrapper {
   def createParser(project: Project): ScalaParser = {
     val parser: ScalaLangParser = new ScalaLangParser(null)
     hasDotty = project.hasDotty
-    if (hasDotty) new DottyParser else new ANTLRScalaLangParserAdaptor(ScalaLanguage.Instance, parser) //ScalaParser
+    if (hasDotty)
+      new DottyParser
+    else  {
+      if (useOldParser) new ScalaParser
+      else new ANTLRScalaLangParserAdaptor(ScalaLanguage.Instance, parser) //ScalaParser
+    }
   }
 
   def getFileNodeType: IFileElementType = ScalaElementTypes.FILE

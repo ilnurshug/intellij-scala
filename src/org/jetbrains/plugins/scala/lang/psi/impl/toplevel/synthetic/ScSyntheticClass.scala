@@ -326,11 +326,11 @@ class SyntheticClasses(project: Project) extends PsiElementFinder with ProjectCo
       syntheticObjects += obj
     }
 
-    registerObject(
+    /*registerObject(
       """
         {def f()={}}
       """
-    )
+    )*/
 
     registerObject(
 """
