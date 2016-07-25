@@ -18,11 +18,7 @@ import org.jetbrains.plugins.scala.lang.ScalaLangParser;
 import org.jetbrains.plugins.scala.lang.lexer.ScalaElementType;
 import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /** This is how we build an intellij PSI tree from an ANTLR parse tree.
  *  We let the ANTLR parser build its kind of ParseTree and then
@@ -42,6 +38,8 @@ public class ANTLRParseTreeToPSIConverter implements ParseTreeListener {
 
 	/** Map an error's start char index (usually start of a token) to the error object. */
 	protected Map<Integer, SyntaxError> tokenToErrorMap = new HashMap<Integer, SyntaxError>();
+
+	//private HashMap<Integer, ArrayList<Integer>> tokenPositions = new HashMap<Integer, ArrayList<Integer>>();
 
 	public ANTLRParseTreeToPSIConverter(Language language, Parser parser, PsiBuilder builder) {
 		this.language = language;
@@ -86,6 +84,15 @@ public class ANTLRParseTreeToPSIConverter implements ParseTreeListener {
 
 	@Override
 	public void visitTerminal(TerminalNode node) {
+		//int type = node.getSymbol().getType();
+		//int pos = node.getSymbol().getStartIndex();
+
+		//System.out.println(node.getSymbol().getText() + " " + type + " " + pos);
+
+//		if (!tokenPositions.containsKey(type)) tokenPositions.put(type, new ArrayList<Integer>());
+//		ArrayList<Integer> arr = tokenPositions.get(type);
+//		arr.add(pos);
+
 		builder.advanceLexer();
 	}
 
@@ -165,7 +172,7 @@ public class ANTLRParseTreeToPSIConverter implements ParseTreeListener {
 		PsiBuilder.Marker marker = markers.pop();
 		//marker.done(getRuleElementTypes().get(ctx.getRuleIndex()));
 		int i = ctx.getRuleIndex();
-		if (canDropMarker(i)) {
+		if (canDropMarker(ctx, i)) {
 			marker.drop();
 		}
 		else {
@@ -173,7 +180,7 @@ public class ANTLRParseTreeToPSIConverter implements ParseTreeListener {
 		}
 	}
 
-	private Boolean canDropMarker(int i) {
+	private Boolean canDropMarker(ParserRuleContext ctx, int i) {
 		switch (i) {
 			case ScalaLangParser.RULE_program:
 			case ScalaLangParser.RULE_blockStat:
@@ -182,25 +189,47 @@ public class ANTLRParseTreeToPSIConverter implements ParseTreeListener {
 			case ScalaLangParser.RULE_topStatSeq:
 			case ScalaLangParser.RULE_compilationUnit:
 			case ScalaLangParser.RULE_def:
-			case ScalaLangParser.RULE_id:
+			case ScalaLangParser.RULE_id:				// ???
 			case ScalaLangParser.RULE_funSig:
+			case ScalaLangParser.RULE_expr1:
+			case ScalaLangParser.RULE_simpleExpr1:
 				return true;
+			case ScalaLangParser.RULE_expr:
+				//for (int j = 0; j < ctx.getChildCount(); j++)
+				//	System.out.println(ctx.getChild(j).getText());
+				return false;
+			case ScalaLangParser.RULE_prefixExpr:
+				String c = ctx.getChild(0).getText();
+				return !(c.compareTo("+") == 0 || c.compareTo("-") == 0 || c.compareTo("!") == 0 || c.compareTo("~") == 0);
 			default:
 				return false;
 		}
 	}
 
 	private IElementType convertRuleIndexToScalaElementType(int i) {
-		if (i == ScalaLangParser.RULE_blockExpr) return ScalaElementTypes.BLOCK_EXPR();
-		else if (i == ScalaLangParser.RULE_block) return ScalaElementTypes.BLOCK();
-		else if (i == ScalaLangParser.RULE_funDef) return ScalaElementTypes.FUNCTION_DEFINITION();
-		else if (i == ScalaLangParser.RULE_paramClauses) return ScalaElementTypes.PARAM_CLAUSES();
-		else if (i == ScalaLangParser.RULE_paramClause) return ScalaElementTypes.PARAM_CLAUSE();
-		else if (i == ScalaLangParser.RULE_prefixExpr) return ScalaElementTypes.PREFIX_EXPR();
-		else if (i == ScalaLangParser.RULE_infixExpr) return ScalaElementTypes.INFIX_EXPR();
-		else if (i == ScalaLangParser.RULE_postfixExpr) return ScalaElementTypes.POSTFIX_EXPR();
-		else if (i == ScalaLangParser.RULE_expr1) return ScalaElementTypes.EXPR1();
-		else if (i == ScalaLangParser.RULE_expr) return ScalaElementTypes.FUNCTION_EXPR();
-		else return ScalaElementTypes.DUMMY_ELEMENT();
+		switch (i) {
+			case ScalaLangParser.RULE_blockExpr:
+				return ScalaElementTypes.BLOCK_EXPR();
+			case ScalaLangParser.RULE_block:
+				return ScalaElementTypes.BLOCK();
+			case ScalaLangParser.RULE_funDef:
+				return ScalaElementTypes.FUNCTION_DEFINITION();
+			case ScalaLangParser.RULE_paramClauses:
+				return ScalaElementTypes.PARAM_CLAUSES();
+			case ScalaLangParser.RULE_paramClause:
+				return ScalaElementTypes.PARAM_CLAUSE();
+			case ScalaLangParser.RULE_prefixExpr:
+				return ScalaElementTypes.PREFIX_EXPR();
+			case ScalaLangParser.RULE_infixExpr:
+				return ScalaElementTypes.INFIX_EXPR();
+			case ScalaLangParser.RULE_postfixExpr:
+				return ScalaElementTypes.POSTFIX_EXPR();
+			case ScalaLangParser.RULE_expr:
+				return ScalaElementTypes.FUNCTION_EXPR();
+			case ScalaLangParser.RULE_literal:
+				return ScalaElementTypes.LITERAL();
+			default:
+				return ScalaElementTypes.DUMMY_ELEMENT();
+		}
 	}
 }

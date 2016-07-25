@@ -5,6 +5,7 @@ import com.intellij.util.containers.HashMap;
 
 /**
  * Created by user on 7/21/16.
+ * converts AST tree to dot format graph
  */
 public class ASTTreeToDot {
 

@@ -112,7 +112,7 @@ ascription        : ':'  infixType
                   | ':'  annotation+
                   | ':' '_' '*';
 
-expr              : (bindings | ('implicit' |) id | '_')  '=>'  expr
+expr              : (bindings | ('implicit')? id | '_')  '=>'  expr
                   | expr1 ;
 
 expr1             : 'if'  '('  expr  ')'  Nl*  expr ( semi?  'else'  expr)?
@@ -271,8 +271,8 @@ constrAnnotation  : '@' simpleType  argumentExprs ;
 templateBody      : Nl?  '{'  selfType?  templateStat ( semi  templateStat)*  '}' ;
 
 templateStat      : import_
-                  | (annotation Nl?)* ((modifier )+ | ) def
-                  | (annotation Nl?)* ((modifier )+ | ) dcl
+                  | (annotation Nl?)* (modifier )* def
+                  | (annotation Nl?)* (modifier )* dcl
                   |  expr
                   | ;
                   

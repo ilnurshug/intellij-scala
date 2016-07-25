@@ -59,7 +59,8 @@ public class PSITokenSource implements TokenSource {
 		 */
 		//TokenIElementType ideaTType = (TokenIElementType)builder.getTokenType();
 		//int type = ideaTType!=null ? ideaTType.getANTLRTokenType() : Token.EOF;
-		int type = convertScalaTokenTypeToInt(builder.getTokenType());
+
+		int type = convertScalaTokenTypeToInt(builder.getTokenType(), builder.getTokenText());
 
 		int channel = Token.DEFAULT_CHANNEL;
 		Pair<TokenSource, CharStream> source = new Pair<TokenSource, CharStream>(this, null);
@@ -76,21 +77,24 @@ public class PSITokenSource implements TokenSource {
 		return t;
 	}
 
-	private int convertScalaTokenTypeToInt(IElementType t) {
+	private int convertScalaTokenTypeToInt(IElementType t, String tokenText) {
 		if (t == null) return Token.EOF;
-		else if (t == ScalaTokenTypes.tSEMICOLON) return ScalaLangParser.SEMICOLON;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////// Braces ///////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		else if (t == ScalaTokenTypes.tLBRACE) return ScalaLangParser.LBRACE;
 		else if (t == ScalaTokenTypes.tRBRACE) return ScalaLangParser.RBRACE;
 		else if (t == ScalaTokenTypes.tLSQBRACKET) return ScalaLangParser.LSQBRACKET;
 		else if (t == ScalaTokenTypes.tRSQBRACKET) return ScalaLangParser.RSQBRACKET;
 		else if (t == ScalaTokenTypes.tLPARENTHESIS) return ScalaLangParser.LPARENTHESIS;
 		else if (t == ScalaTokenTypes.tRPARENTHESIS) return ScalaLangParser.RPARENTHESIS;
+
 		else if (t == ScalaTokenTypes.tDOT) return ScalaLangParser.DOT;
 		else if (t == ScalaTokenTypes.tCOMMA) return ScalaLangParser.COMMA;
-		//else if (t == ScalaTokenTypes.tRBRACE) return 10;
-		//else if (t == ScalaTokenTypes.tRBRACE) return 11;
-		else if (t == ScalaTokenTypes.tCOLON) return ScalaLangParser.COLON;
+		else if (t == ScalaTokenTypes.tSEMICOLON) return ScalaLangParser.SEMICOLON;
+
 		else if (t == ScalaTokenTypes.tUNDER) return ScalaLangParser.UNDER;
+		else if (t == ScalaTokenTypes.tCOLON) return ScalaLangParser.COLON;
 		else if (t == ScalaTokenTypes.tASSIGN) return ScalaLangParser.ASSIGN;
 		else if (t == ScalaTokenTypes.tFUNTYPE) return ScalaLangParser.FUNTYPE;
 		else if (t == ScalaTokenTypes.tCHOOSE) return ScalaLangParser.CHOOSE;
@@ -99,19 +103,81 @@ public class PSITokenSource implements TokenSource {
 		else if (t == ScalaTokenTypes.tINNER_CLASS) return ScalaLangParser.INNER_CLASS;
 		else if (t == ScalaTokenTypes.tAT) return ScalaLangParser.AT;
 		else if (t == ScalaTokenTypes.tVIEW) return ScalaLangParser.VIEW;
-		//else if (t == ScalaTokenTypes.tSLASH) return 23;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////// Strings & chars //////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		else if (t == ScalaTokenTypes.tSTRING) return ScalaLangParser.StringLiteral;
+		else if (t == ScalaTokenTypes.tCHAR) return ScalaLangParser.CharacterLiteral;
+
+		else if (t == ScalaTokenTypes.tSYMBOL) return ScalaLangParser.SymbolLiteral;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////// integer and float literals ///////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		else if (t == ScalaTokenTypes.tINTEGER) return ScalaLangParser.IntegerLiteral;
+		else if (t == ScalaTokenTypes.tFLOAT) return ScalaLangParser.FloatingPointLiteral;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////// White spaces in line /////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		else if (t == ScalaTokenTypes.tWHITE_SPACE_IN_LINE) return ScalaLangParser.WHITE_SPACE_IN_LINE;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////// keywords /////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		else if (t == ScalaTokenTypes.kABSTRACT) return ScalaLangParser.ABSTRACT;
 		else if (t == ScalaTokenTypes.kCASE) return ScalaLangParser.CASE;
 		else if (t == ScalaTokenTypes.kCATCH) return ScalaLangParser.CATCH;
 		else if (t == ScalaTokenTypes.kCLASS) return ScalaLangParser.CLASS;
 		else if (t == ScalaTokenTypes.kDEF) return ScalaLangParser.DEF;
 		else if (t == ScalaTokenTypes.kDO) return ScalaLangParser.DO;
-		else if (t == ScalaTokenTypes.kOBJECT) return ScalaLangParser.OBJECT;
-		else if (t == ScalaTokenTypes.kPACKAGE) return ScalaLangParser.PACKAGE;
-		else if (t == ScalaTokenTypes.kTHROW) return ScalaLangParser.THROW;
+		else if (t == ScalaTokenTypes.kELSE) return ScalaLangParser.ELSE;
+		else if (t == ScalaTokenTypes.kEXTENDS) return ScalaLangParser.EXTENDS;
+		else if (t == ScalaTokenTypes.kFALSE || t == ScalaTokenTypes.kTRUE) return ScalaLangParser.BooleanLiteral;
+		else if (t == ScalaTokenTypes.kFINAL) return ScalaLangParser.FINAL;
+		else if (t == ScalaTokenTypes.kFINALLY) return ScalaLangParser.FINALLY;
+		else if (t == ScalaTokenTypes.kFOR) return ScalaLangParser.FOR;
+		else if (t == ScalaTokenTypes.kFOR_SOME) return ScalaLangParser.FOR_SOME;
+		else if (t == ScalaTokenTypes.kIF) return ScalaLangParser.IF;
+		else if (t == ScalaTokenTypes.kIMPLICIT) return ScalaLangParser.IMPLICIT;
+		else if (t == ScalaTokenTypes.kIMPORT) return ScalaLangParser.IMPORT;
+		else if (t == ScalaTokenTypes.kLAZY) return ScalaLangParser.LAZY;
+		else if (t == ScalaTokenTypes.kMATCH) return ScalaLangParser.MATCH;
 		else if (t == ScalaTokenTypes.kNEW) return ScalaLangParser.NEW;
-		else if (t == ScalaTokenTypes.tIDENTIFIER) return ScalaLangParser.ID;
+		else if (t == ScalaTokenTypes.kNULL) return ScalaLangParser.NULL;
+		else if (t == ScalaTokenTypes.kOBJECT) return ScalaLangParser.OBJECT;
+		else if (t == ScalaTokenTypes.kOVERRIDE) return ScalaLangParser.OVERRIDE;
+		else if (t == ScalaTokenTypes.kPACKAGE) return ScalaLangParser.PACKAGE;
+		else if (t == ScalaTokenTypes.kPRIVATE) return ScalaLangParser.PRIVATE;
+		else if (t == ScalaTokenTypes.kPROTECTED) return ScalaLangParser.PROTECTED;
+		else if (t == ScalaTokenTypes.kRETURN) return ScalaLangParser.RETURN;
+		else if (t == ScalaTokenTypes.kSEALED) return ScalaLangParser.SEALED;
+		else if (t == ScalaTokenTypes.kSUPER) return ScalaLangParser.SUPER;
+		else if (t == ScalaTokenTypes.kTHIS) return ScalaLangParser.THIS;
+		else if (t == ScalaTokenTypes.kTHROW) return ScalaLangParser.THROW;
+		else if (t == ScalaTokenTypes.kTRAIT) return ScalaLangParser.TRAIT;
+		else if (t == ScalaTokenTypes.kTRY) return ScalaLangParser.TRY;
+		else if (t == ScalaTokenTypes.kTYPE) return ScalaLangParser.TYPE;
+		else if (t == ScalaTokenTypes.kVAL) return ScalaLangParser.VAL;
+		else if (t == ScalaTokenTypes.kVAR) return ScalaLangParser.VAR;
+		else if (t == ScalaTokenTypes.kWHILE) return ScalaLangParser.WHILE;
+		else if (t == ScalaTokenTypes.kWITH) return ScalaLangParser.WITH;
+		else if (t == ScalaTokenTypes.kYIELD) return ScalaLangParser.YIELD;
+		else if (t == ScalaTokenTypes.kMACRO) return ScalaLangParser.MACRO;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////// variables and constants //////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		else if (t == ScalaTokenTypes.tIDENTIFIER) return identifierTextToTokenType(tokenText);
 		else return 1;
+	}
+
+	private int identifierTextToTokenType(String tokenText) {
+		if 		(tokenText.compareTo("+") == 0) return ScalaLangParser.OP_1;
+		else if (tokenText.compareTo("-") == 0) return ScalaLangParser.OP_2;
+		else if (tokenText.compareTo("*") == 0) return ScalaLangParser.OP_3;
+		else if (tokenText.compareTo("!") == 0) return ScalaLangParser.EPT;
+		else if (tokenText.compareTo("~") == 0) return ScalaLangParser.TLD;
+		else if (tokenText.compareTo("=") == 0) return ScalaLangParser.ASSIGN;
+		else if (tokenText.compareTo("_") == 0) return ScalaLangParser.UNDER;
+		else if (tokenText.compareTo("=>") == 0) return ScalaLangParser.FUNTYPE;
+		else return ScalaLangParser.ID;
 	}
 
 	@Override
