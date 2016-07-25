@@ -9,7 +9,7 @@ import org.jetbrains.plugins.scala.base.SimpleTestCase
 import org.jetbrains.plugins.scala.lang.ScalaLangParser
 import org.jetbrains.plugins.scala.lang.lexer.ScalaLexer
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilderImpl
-import org.jetbrains.plugins.scala.lang.parser.stress.ASTTreeToDot
+import org.jetbrains.plugins.scala.lang.parser.ASTTreeToDot
 import org.junit.Assert
 
 /**

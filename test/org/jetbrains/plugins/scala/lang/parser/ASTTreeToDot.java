@@ -1,4 +1,4 @@
-package org.jetbrains.plugins.scala.lang.parser.stress;
+package org.jetbrains.plugins.scala.lang.parser;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.util.containers.HashMap;

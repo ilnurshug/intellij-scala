@@ -17,15 +17,10 @@ import org.jetbrains.plugins.scala.settings._
 /**
  * @author ilyas
  */
-/*object ScalaParserDefinition {
-  var useOldParser = false
-}*/
 
 class ScalaParserDefinition extends ScalaParserDefinitionWrapper {
 
   private var hasDotty = false
-
-  var useOldParser = true
 
   def createLexer(project: Project): ScalaLexer = {
     val treatDocCommentAsBlockComment = ScalaProjectSettings.getInstance(project).isTreatDocCommentAsBlockComment
@@ -38,7 +33,7 @@ class ScalaParserDefinition extends ScalaParserDefinitionWrapper {
     if (hasDotty)
       new DottyParser
     else  {
-      if (useOldParser) new ScalaParser
+      if (ScalaParserDefinition.useOldParser) new ScalaParser
       else new ANTLRScalaLangParserAdaptor(parser) //ScalaParser
     }
   }
@@ -73,4 +68,10 @@ class ScalaParserDefinition extends ScalaParserDefinitionWrapper {
       case _ => super.spaceExistanceTypeBetweenTokens(leftNode, rightNode)
     }
   }
+}
+
+object ScalaParserDefinition {
+  var useOldParser = true
+
+  def setUseOldParser(f : Boolean) = useOldParser = f
 }

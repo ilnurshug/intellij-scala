@@ -24,22 +24,37 @@ import org.jetbrains.plugins.scala.util.TestUtils;
 import org.junit.runner.RunWith;
 import org.junit.runners.AllTests;
 
+import java.io.File;
+
 @RunWith(AllTests.class)
 public class ParserTest extends BaseScalaFileSetTestCase {
   @NonNls
   private static final String DATA_PATH = "/parser/data";
 
   public ParserTest() {
-    super(System.getProperty("path") != null ?         
+    super("/home/user/Documents/intellij-scala/testdata" + DATA_PATH + "/expressions/simpleexpr");
+    /*super(System.getProperty("path") != null ?
             System.getProperty("path") :
             TestUtils.getTestDataPath() + DATA_PATH
-    );
+    );*/
+    /*try {
+      runTest(new File(System.getProperty("path") != null ?
+              System.getProperty("path") :
+              TestUtils.getTestDataPath() + DATA_PATH + "/expressions/simpleexpr/blockExpr.test"));
+    }
+    catch (Throwable e) {
+
+    }*/
   }
 
 
   public String transform(String testName, String[] data) throws Exception {
+    ScalaParserDefinition.setUseOldParser(false);
+
     String fileText = data[0];
     PsiFile psiFile = TestUtils.createPseudoPhysicalScalaFile(getProject(), fileText);
+
+    ScalaParserDefinition.setUseOldParser(true);
 
     return DebugUtil.psiToString(psiFile, false).replace(":" + psiFile.getName(), "");
 
