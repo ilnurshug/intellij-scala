@@ -18,6 +18,8 @@ import org.junit.Assert
 
 class BlockParseTest extends SimpleTestCase {
   def parseBlock(s: String): PsiElement = {
+    ScalaParserDefinition.setUseOldParser(true)
+
     val fileFactory = PsiFileFactory.getInstance(fixture.getProject)
     val context = parseText("")
     val holder: FileElement = DummyHolderFactory.createHolder(context.getManager, context).getTreeElement
@@ -149,6 +151,21 @@ class BlockParseTest extends SimpleTestCase {
     }
 
     def testBlock5(): Unit = {
-      doTest("{def f() = _ => 1}")
+      doTest("{def f(){};f(A)}")
+    }
+
+    def testBlock6():Unit = {
+      doTest(
+        """{
+        def f[A](n: Int)(body: => A): Option[A] = {
+          try
+            return Some(body)
+          catch {
+            case e: Exception if n == 0 => return None
+          }
+          f[A](n - 1)(body)
+        }
+        }"""
+      )
     }
 }

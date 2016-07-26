@@ -7,6 +7,7 @@ import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures._
 import org.intellij.lang.annotations.Language
 import org.jetbrains.plugins.scala.extensions._
+import org.jetbrains.plugins.scala.lang.parser.ScalaParserDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.junit.Assert
 
@@ -25,7 +26,9 @@ abstract class SimpleTestCase extends UsefulTestCase with AssertMatches {
       IdeaTestFixtureFactory.getFixtureFactory.createFixtureBuilder("SimpleTestCase")
 
     fixture = IdeaTestFixtureFactory.getFixtureFactory.createCodeInsightFixture(fixtureBuilder.getFixture)
+    ScalaParserDefinition.setUseOldParser(true)
     fixture.setUp()
+    ScalaParserDefinition.setUseOldParser(false)
   }
 
   override def tearDown() {

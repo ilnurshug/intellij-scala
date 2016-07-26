@@ -47,7 +47,22 @@ class ScalaLangParserTest extends SimpleTestCase
 
   def testProgram(): Unit = {
     doTest(
-      """{def f() = _ => 1}"""
+      """{def f(){};f(A)}"""
+    )
+  }
+
+  def testProgram1(): Unit = {
+    doTest(
+      """{
+         def f[A](n: Int)(body: => A): Option[A] = {
+          try
+            return Some(body)
+          catch {
+            case e: Exception if n == 0 => return None
+          }
+          f[A](n - 1)(body)
+        }
+        }"""
     )
   }
 }

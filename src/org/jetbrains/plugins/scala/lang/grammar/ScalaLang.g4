@@ -34,7 +34,8 @@
 grammar ScalaLang;
 
 program           : blockExpr
-                  | compilationUnit ;
+                  | compilationUnit
+                  | block;
 
 literal           : '-'? IntegerLiteral
                   | '-'? FloatingPointLiteral
