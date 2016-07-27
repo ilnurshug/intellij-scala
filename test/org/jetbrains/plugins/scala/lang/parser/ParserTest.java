@@ -32,8 +32,8 @@ public class ParserTest extends BaseScalaFileSetTestCase {
   private static final String DATA_PATH = "/parser/data";
 
   public ParserTest() {
-    //super("/home/user/Documents/intellij-scala/testdata" + DATA_PATH + "/expressions/simpleexpr");
-    super("/home/user/Documents/intellij-scala/testdata" + DATA_PATH + "/tmpldef/class");
+    super("/home/user/Documents/intellij-scala/testdata" + DATA_PATH + "/expressions/simpleexpr");
+    //super("/home/user/Documents/intellij-scala/testdata" + DATA_PATH + "/tmpldef/class");
     /*super(System.getProperty("path") != null ?
             System.getProperty("path") :
             TestUtils.getTestDataPath() + DATA_PATH

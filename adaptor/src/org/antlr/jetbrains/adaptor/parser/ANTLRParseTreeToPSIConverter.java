@@ -92,8 +92,10 @@ public class ANTLRParseTreeToPSIConverter implements ParseTreeListener {
 		switch (((RuleNode) node.getParent()).getRuleContext().getRuleIndex()) {
 			case ScalaLangParser.RULE_expr1:
 				helpers.get("Expr1Helper").visitTerminal(node, builder);
+				break;
 			case ScalaLangParser.RULE_funDef:
 				helpers.get("FunDefHelper").visitTerminal(node, builder);
+				break;
 		}
 
 
