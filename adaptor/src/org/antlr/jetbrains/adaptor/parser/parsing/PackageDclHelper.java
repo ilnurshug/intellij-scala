@@ -10,16 +10,11 @@ import org.antlr.jetbrains.adaptor.parser.parsing.Helper;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-public class CompilationUnitHelper implements Helper {
+public class PackageDclHelper implements Helper {
     @Override
     public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
     @Override
     public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
-        if (ctx.getChild(0).getText().compareTo("package") == 0) {
-            marker.done(ScalaElementTypes.PACKAGING());
-        }
-        else {
-            marker.drop();
-        }
+        marker.done(ScalaElementTypes.PACKAGING());
     }
 }

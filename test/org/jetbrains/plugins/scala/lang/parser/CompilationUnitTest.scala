@@ -42,7 +42,9 @@ class CompilationUnitTest extends SimpleTestCase {
 
   def testCompilationUnit() {
     doTest(
-      """package a.b.c"""
+      """package a
+         package b
+         package c"""
     )
   }
 }

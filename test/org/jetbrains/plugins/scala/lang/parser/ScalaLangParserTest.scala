@@ -67,6 +67,10 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testProgram2(): Unit = {
-    doTest("""package a.b.c""")
+    doTest(
+      """package a
+         package b
+         package c"""
+    )
   }
 }
