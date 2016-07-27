@@ -16,6 +16,11 @@ public class InfixExprHelper implements Helper {
     public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
     @Override
     public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
-        marker.done(ScalaElementTypes.INFIX_EXPR());
+        if (ctx.getChildCount() < 2) {
+            marker.drop();
+        }
+        else {
+            marker.done(ScalaElementTypes.INFIX_EXPR());
+        }
     }
 }
