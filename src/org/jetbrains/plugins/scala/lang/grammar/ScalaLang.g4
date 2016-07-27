@@ -384,7 +384,7 @@ packaging         : 'package'  qualId  Nl?  '{'  topStatSeq  '}' ;
 
 packageObject     : 'package'  'object'  objectDef ;
 
-compilationUnit   : ('package'  qualId  semi)*  topStatSeq ;
+compilationUnit   : ('package'  qualId  semi?)*  topStatSeq ;
 
 id                : ID
                   | '\'' StringLiteral '\''
