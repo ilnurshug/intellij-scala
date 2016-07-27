@@ -13,7 +13,7 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
  */
 
 /*
- * Annmotation ::= '@' AnnotationExpr [nl]
+ * Annotation ::= '@' AnnotationExpr [nl]
  */
 object Annotation extends Annotation {
   override protected val annotationExpr = AnnotationExpr

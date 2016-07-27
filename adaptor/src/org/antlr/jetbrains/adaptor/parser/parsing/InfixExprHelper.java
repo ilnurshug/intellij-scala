@@ -16,6 +16,7 @@ public class InfixExprHelper implements Helper {
     public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
     @Override
     public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
+        // some parts of the logic is in the IdHelper, it's ugly but ...
         if (ctx.getChildCount() < 2) {
             marker.drop();
         }

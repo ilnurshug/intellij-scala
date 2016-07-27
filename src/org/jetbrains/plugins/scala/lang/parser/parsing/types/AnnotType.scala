@@ -13,7 +13,7 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.expressions._
 */
 
 /*
- * AnnotType ::= {Annotation} SimpleType
+ * AnnotType ::= SimpleType {Annotation}
  */
 object AnnotType extends AnnotType {
   override protected val annotation = Annotation
