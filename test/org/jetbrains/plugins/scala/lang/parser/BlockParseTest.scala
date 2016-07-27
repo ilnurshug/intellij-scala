@@ -151,7 +151,7 @@ class BlockParseTest extends SimpleTestCase {
     }
 
     def testBlock5(): Unit = {
-      doTest("{def f(){};f(A)}")
+      doTest("{def f(){};f(A)(B)}")
     }
 
     def testBlock6():Unit = {

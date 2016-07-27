@@ -123,7 +123,7 @@ expr1             : 'if'  '('  expr  ')'  Nl*  expr ( semi?  'else'  expr)?
                   | 'for'  ('('  enumerators  ')' | '{'  enumerators  '}')  Nl*  'yield'?  expr
                   | 'throw'  expr
                   | 'return'  expr?
-                  | (('new'  (classTemplate | templateBody)| blockExpr | simpleExpr1  '_'?) '.')  id  '='  expr
+                  | (simpleExpr '.')?  id  '='  expr
                   | simpleExpr1  argumentExprs  '='  expr
                   | postfixExpr
                   | postfixExpr  ascription
@@ -134,8 +134,21 @@ postfixExpr       : infixExpr ( id  Nl?)? ;
 infixExpr         : prefixExpr
                   | infixExpr  id  Nl?  infixExpr ;
 
-prefixExpr        : ('-' | '+' | '~' | '!')? 
-                    ('new'  (classTemplate | templateBody)| blockExpr | simpleExpr1 '_'?) ;
+prefixExpr        : ('-' | '+' | '~' | '!')? simpleExpr ;
+
+simpleExpr        : 'new' (classTemplate | templateBody) | blockExpr | simpleExpr1 '_'?;
+
+simpleExpr1       : literal
+                  | path
+                  | '_'
+                  | '(' (exprs ','?)? ')'
+                  | ('new' (classTemplate | templateBody) | blockExpr) '.' id
+                  | simpleExpr1 '_'? '.' id
+                  | ('new' (classTemplate | templateBody) | blockExpr) typeArgs
+                  | simpleExpr1 '_'? typeArgs
+                  | simpleExpr1 argumentExprs ;
+
+/*simpleExpr        : 'new' (classTemplate | templateBody)| blockExpr | simpleExpr1 '_'? ;
 
 simpleExpr1       :	literal  simpleExpr2
                   |	literal
@@ -164,7 +177,7 @@ simpleExpr2       :  '.' id   simpleExpr2
                   |	'_'   typeArgs
                   |	argumentExprs   simpleExpr2
                   |	argumentExprs ;
-                  
+*/
 exprs             : expr (  ','  expr)* ;
 
 argumentExprs     : '('  exprs?  ')' 
