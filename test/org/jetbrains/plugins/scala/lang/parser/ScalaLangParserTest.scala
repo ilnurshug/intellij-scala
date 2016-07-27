@@ -73,4 +73,8 @@ class ScalaLangParserTest extends SimpleTestCase
          package c"""
     )
   }
+
+  def testProgram3(): Unit = {
+    doTest("""{def f(n: Int): Int = return f(n + 1)}""")
+  }
 }

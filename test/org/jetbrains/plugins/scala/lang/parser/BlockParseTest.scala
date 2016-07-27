@@ -168,4 +168,8 @@ class BlockParseTest extends SimpleTestCase {
         }"""
       )
     }
+
+    def testBlock7(): Unit = {
+      doTest("""{def f(n: Int): Int = return f(n + 1)}""")
+    }
 }
