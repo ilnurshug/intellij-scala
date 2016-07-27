@@ -11,10 +11,25 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class FunDefHelper implements Helper {
-@Override
-public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
-@Override
-public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
-marker.drop();
-}
+    private final Deque<PsiBuilder.Marker> braceMarkers = new ArrayDeque<PsiBuilder.Marker>();
+
+    @Override
+    public void visitTerminal(TerminalNode node, PsiBuilder builder) {
+        int type = node.getSymbol().getType();
+        if (type == ScalaLangParser.LBRACE) {
+            braceMarkers.push(builder.mark());
+        }
+        else if (type == ScalaLangParser.RBRACE) {
+
+        }
+    }
+    @Override
+    public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
+        int childCount = ctx.getChildCount();
+        if (childCount > 1 && ctx.getChild(childCount - 1).getText().compareTo("}") == 0) {
+            if (!braceMarkers.isEmpty()) braceMarkers.pop().done(ScalaElementTypes.BLOCK_EXPR());
+        }
+
+        marker.drop();
+    }
 }

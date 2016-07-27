@@ -8,6 +8,7 @@ import org.antlr.jetbrains.adaptor.lexer.PSIElementTypeFactory;
 import org.antlr.jetbrains.adaptor.lexer.RuleIElementType;
 import org.antlr.jetbrains.adaptor.lexer.TokenIElementType;
 import org.antlr.jetbrains.adaptor.parser.parsing.Expr1Helper;
+import org.antlr.jetbrains.adaptor.parser.parsing.FunDefHelper;
 import org.antlr.jetbrains.adaptor.parser.parsing.Helper;
 import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.Parser;
@@ -63,6 +64,7 @@ public class ANTLRParseTreeToPSIConverter implements ParseTreeListener {
 		}
 
 		helpers.put("Expr1Helper", new Expr1Helper());
+		helpers.put("FunDefHelper", new FunDefHelper());
 	}
 
 	protected final Language getLanguage() {
@@ -87,8 +89,14 @@ public class ANTLRParseTreeToPSIConverter implements ParseTreeListener {
 
 	@Override
 	public void visitTerminal(TerminalNode node) {
-		if (((RuleNode) node.getParent()).getRuleContext().getRuleIndex() == ScalaLangParser.RULE_expr1)
-			helpers.get("Expr1Helper").visitTerminal(node, builder);
+		switch (((RuleNode) node.getParent()).getRuleContext().getRuleIndex()) {
+			case ScalaLangParser.RULE_expr1:
+				helpers.get("Expr1Helper").visitTerminal(node, builder);
+			case ScalaLangParser.RULE_funDef:
+				helpers.get("FunDefHelper").visitTerminal(node, builder);
+		}
+
+
 
 		//System.out.println(node.getSymbol().getText() + " " + type + " " + pos);
 
