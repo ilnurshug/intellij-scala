@@ -93,4 +93,15 @@ class ScalaLangParserTest extends SimpleTestCase
                a.b.c
              }""")
   }
+
+  // IMPORTANT: ANTLR's parser generates ParseTree which differ from expected (antlr5)
+  def testProgram7(): Unit = {
+    doTest( """{
+              |def f(n: Int): Boolean =
+              |  n >=0 && n match {
+              |    case 1234 => f(n - 1)
+              |    case _ => 1234
+              |  }
+            }""".stripMargin)
+  }
 }

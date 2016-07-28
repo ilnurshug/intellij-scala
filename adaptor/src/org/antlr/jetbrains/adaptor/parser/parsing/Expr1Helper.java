@@ -11,7 +11,7 @@ import org.antlr.jetbrains.adaptor.parser.parsing.Helper;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-public class Expr1Helper implements Helper {
+public class Expr1Helper extends ParserRuleNodeContextHelper implements Helper {
     protected final Deque<PsiBuilder.Marker> tryStmtMarkers = new ArrayDeque<PsiBuilder.Marker>();
     protected final Deque<IElementType> tryStmtMarkerTypes = new ArrayDeque<IElementType>();
 
@@ -75,6 +75,10 @@ public class Expr1Helper implements Helper {
             p.done(ScalaElementTypes.THROW_STMT());
         else if (ctx.getChild(0).getText().compareTo("return") == 0)
             p.done(ScalaElementTypes.RETURN_STMT());
+        else if (hasTerminalNode(ctx, ScalaLangParser.MATCH))
+            p.done(ScalaElementTypes.MATCH_STMT());
+        else if (hasRuleNode(ctx, ScalaLangParser.RULE_ascription))
+            p.done(ScalaElementTypes.TYPED_EXPR_STMT());
         else {
             p.drop();
         }

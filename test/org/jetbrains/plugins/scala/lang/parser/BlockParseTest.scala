@@ -172,4 +172,14 @@ class BlockParseTest extends SimpleTestCase {
     def testBlock7(): Unit = {
       doTest("""{@a @b lazy def f(n: Int): Int = return f(n + 1)}""")
     }
+
+    def testBlock8(): Unit = {
+      doTest( """{
+                |def f(n: Int): Boolean =
+                |  n >=0 && n match {
+                |    case 1234 => f(n - 1)
+                |    case _ => 1234
+                |  }
+              }""".stripMargin)
+    }
 }
