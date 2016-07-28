@@ -17,8 +17,12 @@ public class StableIdHelper implements Helper {
     @Override
     public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
         RuleNode parent = (RuleNode)ctx.getParent();
-        if (parent.getRuleContext().getRuleIndex() == ScalaLangParser.RULE_simpleType) {
+        int r = parent.getRuleContext().getRuleIndex();
+        if (r == ScalaLangParser.RULE_simpleType) {
             marker.done(ScalaElementTypes.REFERENCE());
+        }
+        else if (r == ScalaLangParser.RULE_stableId) {
+            marker.done(ScalaElementTypes.REFERENCE_EXPRESSION());
         }
         else {
             marker.drop();

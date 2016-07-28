@@ -52,23 +52,10 @@ ids               : id (  ','  id)* ;
 path              :  stableId
                   |  (id '.')? 'this' ;
 
-stableId          :  id stableId1
-                  |	 id '.' 'this' '.' id stableId1
-                  |	 'this' '.' id stableId1
-                  |	 id '.' 'super' classQualifier '.' id stableId1
-                  |	 'super' classQualifier '.' id stableId1
-                  |	 id '.' 'super' '.' id stableId1
-                  |	 'super' '.' id stableId1
-                  |	 id '.' 'this' '.' id
-                  |	 'this' '.' id
-                  |	 id '.' 'super' classQualifier '.' id
-                  |	 'super' classQualifier '.' id
-                  |	 id '.' 'super' '.' id
-                  |	 'super' '.' id
-                  |  id ;
-
-stableId1         :  '.' id stableId1
-                  |  '.' id ;
+stableId          :  id
+                  |  stableId '.' id
+                  |  (id '.')? 'this' '.' id
+                  |  (id '.')? 'super' (classQualifier)? '.' id ;
 
 classQualifier    : '[' id ']' ;
 

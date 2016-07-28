@@ -57,4 +57,10 @@ class CompilationUnitTest extends SimpleTestCase {
   def testCompilationUnit3(): Unit = {
     doTest(Header)
   }
+
+  def testCompilationUnit4(): Unit = {
+    doTest("""class a {
+               a.b.c
+             }""")
+  }
 }

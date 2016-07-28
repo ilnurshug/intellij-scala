@@ -87,4 +87,10 @@ class ScalaLangParserTest extends SimpleTestCase
   def testProgram5(): Unit = {
     doTest(Header)
   }
+
+  def testProgram6() {
+    doTest("""class a {
+               a.b.c
+             }""")
+  }
 }
