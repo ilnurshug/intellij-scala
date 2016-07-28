@@ -11,10 +11,11 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class ClassDefHelper implements Helper {
-@Override
-public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
-@Override
-public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
-marker.done(ScalaElementTypes.CLASS_DEF());
-}
+    @Override
+    public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
+    @Override
+    public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
+        //marker.done(ScalaElementTypes.CLASS_DEF());
+        marker.drop();
+    }
 }

@@ -11,10 +11,12 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class ObjectDefHelper implements Helper {
-@Override
-public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
-@Override
-public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
-marker.done(ScalaElementTypes.OBJECT_DEF());
-}
+    @Override
+    public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
+    @Override
+    public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
+        //marker.done(ScalaElementTypes.OBJECT_DEF());
+        // don't forget about packageObject
+        marker.drop();
+    }
 }

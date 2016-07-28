@@ -10,12 +10,11 @@ import org.antlr.jetbrains.adaptor.parser.parsing.Helper;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-public class TraitDefHelper implements Helper {
+public class PrimaryConstructorHelper implements Helper {
     @Override
     public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
     @Override
     public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
-        //marker.done(ScalaElementTypes.TRAIT_DEF());
-        marker.drop();
+        marker.done(ScalaElementTypes.PRIMARY_CONSTRUCTOR());
     }
 }

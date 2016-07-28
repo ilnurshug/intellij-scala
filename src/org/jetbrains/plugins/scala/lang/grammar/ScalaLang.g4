@@ -336,8 +336,9 @@ tmplDef           : (annotation Nl?)* (modifier )* ('case'?  'class'  classDef
                   | 'case'?  'object'  objectDef
                   | 'trait'  traitDef) ;
 
-classDef          : id  typeParamClause?  (annotation)*  accessModifier?
-                    classParamClauses  classTemplateOpt ;
+classDef          : id  typeParamClause?  primaryConstructor classTemplateOpt ;
+
+primaryConstructor: (annotation)*  accessModifier? classParamClauses ;
                       
 traitDef          : id  typeParamClause?  traitTemplateOpt ;
 
