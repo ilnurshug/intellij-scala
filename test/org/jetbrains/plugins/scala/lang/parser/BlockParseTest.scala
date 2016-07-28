@@ -170,6 +170,6 @@ class BlockParseTest extends SimpleTestCase {
     }
 
     def testBlock7(): Unit = {
-      doTest("""{@a @b def f(n: Int): Int = return f(n + 1)}""")
+      doTest("""{@a @b lazy def f(n: Int): Int = return f(n + 1)}""")
     }
 }
