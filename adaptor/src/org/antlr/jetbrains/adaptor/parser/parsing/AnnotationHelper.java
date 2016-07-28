@@ -11,10 +11,10 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class AnnotationHelper implements Helper {
-@Override
-public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
-@Override
-public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
-marker.done(ScalaElementTypes.ANNOTATION());
-}
+    @Override
+    public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
+    @Override
+    public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
+        marker.done(ScalaElementTypes.ANNOTATION());
+    }
 }

@@ -189,8 +189,8 @@ blockExpr         : '{'  caseClauses  '}'
 block             : blockStat ( semi  blockStat)*  resultExpr? ;
 
 blockStat         : import_
-                  | annotation*  ('implicit' | 'lazy')?  def
-                  | annotation*  (localModifier )*  tmplDef
+                  | 'implicit'? def
+                  | tmplDef
                   | expr1
                   | ;
 
@@ -229,13 +229,11 @@ simplePattern     : '_'
 patterns          : pattern ( ','  patterns)*
                   | ('_' ) * ;
 
-typeParamClause   : '['  variantTypeParam ( ','  variantTypeParam)*  ']' ;
+typeParamClause   : '['  typeParam ( ','  typeParam)*  ']' ;
 
 funTypeParamClause: '['  typeParam ( ','  typeParam)*  ']' ;
 
-variantTypeParam  : annotation?  ('+' | '-')?  typeParam ;
-
-typeParam         : (id | '_')  typeParamClause? ( '>:'  type)? ( '<:'  type)?
+typeParam         : annotation* (id | '_')  typeParamClause? ( '>:'  type)? ( '<:'  type)?
                     ('<%'  type)* ( ':'  type)* ;
                          
 paramClauses      : paramClause* ( Nl?  '('  'implicit'  params  ')')? ;
@@ -280,14 +278,14 @@ accessQualifier   : '['  (id | 'this')  ']' ;
 
 annotation        : '@' simpleType  argumentExprs* ;
 
-constrAnnotation  : '@' simpleType  argumentExprs ;
+//constrAnnotation  : '@' simpleType  argumentExprs ;
 
 templateBody      : Nl?  '{'  selfType?  templateStat ( semi  templateStat)*  '}' ;
 
 templateStat      : import_
-                  | (annotation Nl?)* (modifier )* def
-                  | (annotation Nl?)* (modifier )* dcl
-                  |  expr
+                  | def
+                  | dcl
+                  | expr
                   | ;
                   
 selfType          : id ( ':'  type)?  '=>' 
@@ -301,10 +299,10 @@ importSelectors   : '{'  ( importSelector  ',')* ( importSelector |  '_')  '}' ;
 
 importSelector    : id ( '=>'  id |  '=>'  '_')? ;
  
-dcl               : 'val'  valDcl
+dcl               : (annotation Nl?)* (modifier )* ('val'  valDcl
                   | 'var'  varDcl
                   | 'def'  funDcl
-                  | 'type'  Nl*  typeDcl ;
+                  | 'type'  Nl*  typeDcl) ;
 
 valDcl            : ids  ':'  type ;
 
@@ -316,12 +314,10 @@ funSig            : id  funTypeParamClause?  paramClauses ;
 
 typeDcl           : id  typeParamClause?  ('>:'  type)? ( '<:'  type)? ;
 
-patVarDef         : 'val'  patDef
-                  | 'var'  varDef ;
+patVarDef         : (annotation)* (modifier)* ('val'  patDef
+                  | 'var'  varDef );
 
-def               : patVarDef
-                  | 'def'  funDef
-                  | 'type'  Nl*  typeDef
+def               : (annotation)* (modifier)* ('val'  patDef | 'var'  varDef | 'def'  funDef | 'type'  Nl*  typeDef)
                   | tmplDef ;
                   
 patDef            : pattern2 ( ','  pattern2)* ( ':'  type)*  '='  expr ;
@@ -336,11 +332,11 @@ funDef            : funSig ( ':'  type)?  '='  expr
 
 typeDef           :  id  typeParamClause?  '='  type ;
 
-tmplDef           : 'case'?  'class'  classDef
+tmplDef           : (annotation Nl?)* (modifier )* ('case'?  'class'  classDef
                   | 'case'?  'object'  objectDef
-                  | 'trait'  traitDef ;
+                  | 'trait'  traitDef) ;
 
-classDef          : id  typeParamClause?  (constrAnnotation )*  accessModifier?
+classDef          : id  typeParamClause?  (annotation)*  accessModifier?
                     classParamClauses  classTemplateOpt ;
                       
 traitDef          : id  typeParamClause?  traitTemplateOpt ;
@@ -364,7 +360,7 @@ constr            : annotType  argumentExprs* ;
 
 earlyDefs         : '{'  (earlyDef ( semi  earlyDef)*)?  '}'  'with' ;
 
-earlyDef          : (annotation  Nl?)*  (modifier )*  patVarDef ;
+earlyDef          : patVarDef ;
 
 constrExpr        : selfInvocation 
                   | constrBlock ;
@@ -374,7 +370,7 @@ selfInvocation    : 'this'  argumentExprs+ ;
 
 topStatSeq        : topStat ( semi  topStat)* ;
 
-topStat           : (annotation  Nl?)*  (modifier )*  tmplDef
+topStat           : tmplDef
                   | import_
                   | packaging
                   | packageObject

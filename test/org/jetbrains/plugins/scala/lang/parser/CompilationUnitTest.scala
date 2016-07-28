@@ -47,4 +47,8 @@ class CompilationUnitTest extends SimpleTestCase {
          package c"""
     )
   }
+
+  def testCompilationUnit2(): Unit = {
+    doTest("""class C{}""")
+  }
 }
