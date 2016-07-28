@@ -12,7 +12,7 @@ import org.antlr.jetbrains.adaptor.parser.parsing.Helper;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-public class BlockStatHelper implements Helper {
+public class BlockStatHelper extends ParserRuleNodeContextHelper implements Helper {
     @Override
     public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
     @Override
@@ -25,11 +25,16 @@ public class BlockStatHelper implements Helper {
             RuleNode lastChild = (RuleNode)ctx.getChild(childCount-1);
             int ri = lastChild.getRuleContext().getRuleIndex();
             if (ri == ScalaLangParser.RULE_def) {
-                ParseTree c = lastChild.getChild(0);
-                if (c.getText().compareTo("def") == 0) marker.done(ScalaElementTypes.FUNCTION_DEFINITION());
-                else if (c.getText().compareTo("val") == 0) marker.done(ScalaElementTypes.PATTERN_DEFINITION());
-                else if (c.getText().compareTo("type") == 0) marker.done(ScalaElementTypes.TYPE_DEFINITION());
-                else if (c.getText().compareTo("var") == 0) marker.done(ScalaElementTypes.VARIABLE_DEFINITION());
+                // 'val'  patDef | 'var'  varDef | 'def'  funDef | 'type'  Nl*  typeDef
+                ParserRuleContext lastChildContext = (ParserRuleContext)lastChild.getRuleContext();
+                if (hasRuleNode(lastChildContext, ScalaLangParser.RULE_funDef))
+                    marker.done(ScalaElementTypes.FUNCTION_DEFINITION());
+                else if (hasRuleNode(lastChildContext, ScalaLangParser.RULE_patDef))
+                    marker.done(ScalaElementTypes.PATTERN_DEFINITION());
+                else if (hasRuleNode(lastChildContext, ScalaLangParser.RULE_typeDef))
+                    marker.done(ScalaElementTypes.TYPE_DEFINITION());
+                else if (hasRuleNode(lastChildContext, ScalaLangParser.RULE_varDef))
+                    marker.done(ScalaElementTypes.VARIABLE_DEFINITION());
                 else assert false;
             }
             else {
