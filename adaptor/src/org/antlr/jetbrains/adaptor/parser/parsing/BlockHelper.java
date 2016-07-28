@@ -24,8 +24,9 @@ public class BlockHelper implements Helper {
         {
             // можно не проверять на наличае у родителя в качестве ребенка терминального узла '=>'
             // так как в правилах resultExpr и caseClause символ block всегда находится после '=>'
-            if (ctx.getChildCount() > 1) marker.done(ScalaElementTypes.BLOCK());
-            else marker.drop();
+            //if (ctx.getChildCount() > 1) marker.done(ScalaElementTypes.BLOCK());
+            //else marker.drop();
+            marker.done(ScalaElementTypes.BLOCK());
         }
         else if (parentRule == ScalaLangParser.RULE_blockExpr
                 || parentRule == ScalaLangParser.RULE_funDef

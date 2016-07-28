@@ -118,8 +118,8 @@ expr1             : 'if'  '('  expr  ')'  Nl*  expr ( semi?  'else'  expr)?
 
 postfixExpr       : infixExpr ( id  Nl?)? ;
 
-infixExpr         : prefixExpr
-                  | infixExpr  id  Nl?  infixExpr ;
+infixExpr         : infixExpr  id  Nl?  infixExpr
+                  | prefixExpr ;
 
 prefixExpr        : ('-' | '+' | '~' | '!')? simpleExpr ;
 
@@ -173,7 +173,8 @@ argumentExprs     : '('  exprs?  ')'
                   
 blockExpr         : '{'  caseClauses  '}'
                   | '{'  block  '}' ;
-block             : blockStat ( semi  blockStat)*  resultExpr? ;
+block             : blockStat ( semi  blockStat)*
+                  | blockStat ( semi  blockStat)* resultExpr ;
 
 blockStat         : import_
                   | 'implicit'? def
