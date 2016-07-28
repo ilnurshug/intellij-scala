@@ -14,7 +14,7 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.Program
 import org.junit.Assert
 
 class CompilationUnitTest extends SimpleTestCase {
-  def parseBlock(s: String): PsiElement = {
+  def parseCompilationUnit(s: String): PsiElement = {
     ScalaParserDefinition.setUseOldParser(true)
 
     val fileFactory = PsiFileFactory.getInstance(fixture.getProject)
@@ -36,7 +36,7 @@ class CompilationUnitTest extends SimpleTestCase {
   }
 
   def doTest(s: String) {
-    val elem = parseBlock(s)
+    val elem = parseCompilationUnit(s)
     Assert.assertEquals(s, elem.getText)
   }
 
@@ -50,5 +50,11 @@ class CompilationUnitTest extends SimpleTestCase {
 
   def testCompilationUnit2(): Unit = {
     doTest("""class C{}""")
+  }
+
+  private val Header = "class Seq[+A]\nobject Seq { def apply[A](a: A) = new Seq[A] }\ntrait L;\ntrait A; trait B; trait C;\nobject A extends L with A"
+  // why scala's parser crashes??
+  def testCompilationUnit3(): Unit = {
+    doTest(Header)
   }
 }

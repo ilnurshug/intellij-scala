@@ -89,7 +89,7 @@ infixType         : compoundType (  id  Nl?  compoundType)*;
 compoundType      : annotType ( 'with'  annotType)*  refinement?
                   | refinement;
 
-annotType         : simpleType  annotation*;
+annotType         : simpleType  annotationsNonEmpty?;
 
 simpleType        : simpleType  typeArgs
                   | simpleType '#' id
@@ -110,7 +110,7 @@ refineStat        : dcl
 typePat           : type;
 
 ascription        : ':'  infixType
-                  | ':'  annotation+
+                  | ':'  annotationsNonEmpty
                   | ':' '_' '*';
 
 expr              : (bindings | ('implicit')? id | '_')  '=>'  expr
@@ -233,7 +233,7 @@ typeParamClause   : '['  typeParam ( ','  typeParam)*  ']' ;
 
 funTypeParamClause: '['  typeParam ( ','  typeParam)*  ']' ;
 
-typeParam         : annotation* (id | '_')  typeParamClause? ( '>:'  type)? ( '<:'  type)?
+typeParam         : annotations (id | '_')  typeParamClause? ( '>:'  type)? ( '<:'  type)?
                     ('<%'  type)* ( ':'  type)* ;
                          
 paramClauses      : paramClause* ( Nl?  '('  'implicit'  params  ')')? ;
@@ -242,7 +242,7 @@ paramClause       : Nl?  '('  params? ')'  ;
 
 params            : param ( ','  param)* ;
 
-param             : annotation*  id  ( ':'  paramType)? ( '='  expr)? ;
+param             : annotations  id  ( ':'  paramType)? ( '='  expr)? ;
 
 paramType         : type 
                   | '=>'  type
@@ -255,7 +255,7 @@ classParamClause  : Nl?  '('  classParams?  ')'  ;
 
 classParams       : classParam ( ','  classParam)* ;
 
-classParam        : annotation*  (modifier )*  ( 'val' |  'var')? 
+classParam        : annotations  (modifier )*  ( 'val' |  'var')?
                     id  ':'  paramType ( '='  expr)? ;
                     
 bindings          : '('  binding ( ','  binding )*  ')' ;
@@ -278,6 +278,10 @@ accessQualifier   : '['  (id | 'this')  ']' ;
 
 annotation        : '@' simpleType  argumentExprs* ;
 
+annotations       : annotation* ;
+annotationsNonEmpty
+                  : annotation+ ;
+
 //constrAnnotation  : '@' simpleType  argumentExprs ;
 
 templateBody      : Nl?  '{'  selfType?  templateStat ( semi  templateStat)*  '}' ;
@@ -299,7 +303,7 @@ importSelectors   : '{'  ( importSelector  ',')* ( importSelector |  '_')  '}' ;
 
 importSelector    : id ( '=>'  id |  '=>'  '_')? ;
  
-dcl               : (annotation Nl?)* (modifier )* ('val'  valDcl
+dcl               : annotations (modifier )* ('val'  valDcl
                   | 'var'  varDcl
                   | 'def'  funDcl
                   | 'type'  Nl*  typeDcl) ;
@@ -314,10 +318,10 @@ funSig            : id  funTypeParamClause?  paramClauses ;
 
 typeDcl           : id  typeParamClause?  ('>:'  type)? ( '<:'  type)? ;
 
-patVarDef         : (annotation)* (modifier)* ('val'  patDef
+patVarDef         : annotations (modifier)* ('val'  patDef
                   | 'var'  varDef );
 
-def               : (annotation)* (modifier)* ('val'  patDef | 'var'  varDef | 'def'  funDef | 'type'  Nl*  typeDef)
+def               : annotations (modifier)* ('val'  patDef | 'var'  varDef | 'def'  funDef | 'type'  Nl*  typeDef)
                   | tmplDef ;
                   
 patDef            : pattern2 ( ','  pattern2)* ( ':'  type)*  '='  expr ;
@@ -332,13 +336,13 @@ funDef            : funSig ( ':'  type)?  '='  expr
 
 typeDef           :  id  typeParamClause?  '='  type ;
 
-tmplDef           : (annotation Nl?)* (modifier )* ('case'?  'class'  classDef
+tmplDef           : annotations (modifier )* ('case'?  'class'  classDef
                   | 'case'?  'object'  objectDef
                   | 'trait'  traitDef) ;
 
 classDef          : id  typeParamClause?  primaryConstructor classTemplateOpt ;
 
-primaryConstructor: (annotation)*  accessModifier? classParamClauses ;
+primaryConstructor: annotations  accessModifier? classParamClauses ;
                       
 traitDef          : id  typeParamClause?  traitTemplateOpt ;
 

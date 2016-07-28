@@ -14,13 +14,13 @@ import java.util.Deque;
 
 public class AnnotationHelper implements Helper {
 
-    private final Deque<PsiBuilder.Marker> hMarkers = new ArrayDeque<PsiBuilder.Marker>();
+    //private final Deque<PsiBuilder.Marker> hMarkers = new ArrayDeque<PsiBuilder.Marker>();
 
     @Override
     public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
     @Override
     public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
-        int countOfAnnotationChild = 0;
+        /*int countOfAnnotationChild = 0;
         int pos = -1;
 
         RuleNode parent = ctx.getParent();
@@ -46,6 +46,7 @@ public class AnnotationHelper implements Helper {
         }
         if (pos == countOfAnnotationChild - 1) {
             hMarkers.pop().done(ScalaElementTypes.ANNOTATIONS());
-        }
+        }*/
+        marker.done(ScalaElementTypes.ANNOTATION());
     }
 }
