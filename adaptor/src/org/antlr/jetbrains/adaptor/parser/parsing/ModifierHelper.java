@@ -13,14 +13,14 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class ModifierHelper implements Helper {
-    private final Deque<PsiBuilder.Marker> hMarkers = new ArrayDeque<PsiBuilder.Marker>();
+    //private final Deque<PsiBuilder.Marker> hMarkers = new ArrayDeque<PsiBuilder.Marker>();
 
     @Override
     public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
     @Override
     public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
 
-        int countOfModifierChild = 0;
+        /*int countOfModifierChild = 0;
         int pos = -1;
 
         RuleNode parent = ctx.getParent();
@@ -47,6 +47,7 @@ public class ModifierHelper implements Helper {
         }
 
         marker.drop();
-        //marker.done(ScalaElementTypes.MODIFIERS());
+        //marker.done(ScalaElementTypes.MODIFIERS());*/
+        marker.drop();
     }
 }

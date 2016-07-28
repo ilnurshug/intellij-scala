@@ -242,7 +242,7 @@ paramClause       : Nl?  '('  params? ')'  ;
 
 params            : param ( ','  param)* ;
 
-param             : annotations  id  ( ':'  paramType)? ( '='  expr)? ;
+param             : annotations modifiersOrEmpty id  ( ':'  paramType)? ( '='  expr)? ;
 
 paramType         : type 
                   | '=>'  type
@@ -255,7 +255,7 @@ classParamClause  : Nl?  '('  classParams?  ')'  ;
 
 classParams       : classParam ( ','  classParam)* ;
 
-classParam        : annotations  (modifier )*  ( 'val' |  'var')?
+classParam        : annotations  modifiersOrEmpty  ( 'val' |  'var')?
                     id  ':'  paramType ( '='  expr)? ;
                     
 bindings          : '('  binding ( ','  binding )*  ')' ;
@@ -265,6 +265,8 @@ binding           : (id | '_') ( ':'  type)? ;
 modifier          : localModifier 
                   | accessModifier
                   | 'override' ;
+
+modifiersOrEmpty         : modifier* ;
                   
 localModifier     : 'abstract'
                   | 'final'
@@ -303,7 +305,7 @@ importSelectors   : '{'  ( importSelector  ',')* ( importSelector |  '_')  '}' ;
 
 importSelector    : id ( '=>'  id |  '=>'  '_')? ;
  
-dcl               : annotations (modifier )* ('val'  valDcl
+dcl               : annotations modifiersOrEmpty ('val'  valDcl
                   | 'var'  varDcl
                   | 'def'  funDcl
                   | 'type'  Nl*  typeDcl) ;
@@ -318,10 +320,10 @@ funSig            : id  funTypeParamClause?  paramClauses ;
 
 typeDcl           : id  typeParamClause?  ('>:'  type)? ( '<:'  type)? ;
 
-patVarDef         : annotations (modifier)* ('val'  patDef
+patVarDef         : annotations modifiersOrEmpty ('val'  patDef
                   | 'var'  varDef );
 
-def               : annotations (modifier)* ('val'  patDef | 'var'  varDef | 'def'  funDef | 'type'  Nl*  typeDef)
+def               : annotations modifiersOrEmpty ('val'  patDef | 'var'  varDef | 'def'  funDef | 'type'  Nl*  typeDef)
                   | tmplDef ;
                   
 patDef            : pattern2 ( ','  pattern2)* ( ':'  type)*  '='  expr ;
@@ -336,13 +338,16 @@ funDef            : funSig ( ':'  type)?  '='  expr
 
 typeDef           :  id  typeParamClause?  '='  type ;
 
-tmplDef           : annotations (modifier )* ('case'?  'class'  classDef
+tmplDef           : annotations modifiersOrEmpty ('case'?  'class'  classDef
                   | 'case'?  'object'  objectDef
                   | 'trait'  traitDef) ;
 
 classDef          : id  typeParamClause?  primaryConstructor classTemplateOpt ;
 
-primaryConstructor: annotations  accessModifier? classParamClauses ;
+primaryConstructor: annotations  accessModifierOrEmpty classParamClauses ;
+
+accessModifierOrEmpty
+                  : accessModifier ? ;
                       
 traitDef          : id  typeParamClause?  traitTemplateOpt ;
 
