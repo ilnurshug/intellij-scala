@@ -56,7 +56,8 @@ class CompilationUnitTest extends SimpleTestCase {
   private val line = "def f(a: A){}; f(A)"
   // why scala's parser crashes??
   def testCompilationUnit3(): Unit = {
-    doTest("object Seq { def apply[A](a: A) = new Seq[A] }")
+    doTest("object A extends L with A")
+    //doTest("object Seq { def apply[A](a: A) = new Seq[A] }")
     //doTest(Header + "\n" + line)
   }
 

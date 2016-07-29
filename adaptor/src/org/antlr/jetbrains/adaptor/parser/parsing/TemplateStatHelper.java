@@ -34,6 +34,8 @@ public class TemplateStatHelper extends ParserRuleNodeContextHelper implements H
                     marker.done(ScalaElementTypes.TYPE_DEFINITION());
                 else if (hasRuleNode(lastChildContext, ScalaLangParser.RULE_varDef))
                     marker.done(ScalaElementTypes.VARIABLE_DEFINITION());
+                else if (hasRuleNode(lastChildContext, ScalaLangParser.RULE_tmplDef))
+                    marker.drop();
                 else assert false;
             }
             else {

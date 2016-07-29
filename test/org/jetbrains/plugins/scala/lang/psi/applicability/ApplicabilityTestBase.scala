@@ -3,6 +3,7 @@ package lang.psi.applicability
 
 import org.jetbrains.plugins.scala.base.SimpleTestCase
 import org.jetbrains.plugins.scala.extensions._
+import org.jetbrains.plugins.scala.lang.parser.ScalaParserDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScAssignStmt, ScExpression}
@@ -17,10 +18,10 @@ import org.junit.Assert
 
 abstract class ApplicabilityTestBase extends SimpleTestCase {
   private val Header = """
-  class Seq[+A] 
-  object Seq { def apply[A](a: A) = new Seq[A] } 
-  trait L; 
-  trait A; trait B; trait C; 
+  class Seq[+A]
+  object Seq { def apply[A](a: A) = new Seq[A] }
+  trait L;
+  trait A; trait B; trait C;
   object A extends L with A
   object B extends L with B
   object C extends L with C
@@ -104,7 +105,7 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
   private def assertProblemsAre(preface: String, code: String)
                     (pattern: PartialFunction[List[ApplicabilityProblem], Unit]) {
     val line = if(preface.isEmpty) code else preface + "; " + code
-    val file = (Header + "\n" + line).parse
+    val file = if (ScalaParserDefinition.useOldParser) (Header + "\n" + line).parse else ("class TC {" + Header.replace('\n', ';') + ";" + line + "}").parse
     Compatibility.seqClass = file.depthFirst.findByType(classOf[ScClass])
     try {
       val message = "\n\n             code: " + line +
