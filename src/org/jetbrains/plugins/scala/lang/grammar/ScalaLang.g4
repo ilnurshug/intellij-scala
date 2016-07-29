@@ -217,7 +217,9 @@ simplePattern     : '_'
 patterns          : pattern ( ','  patterns)*
                   | ('_' ) * ;
 
-typeParamClause   : '['  typeParam ( ','  typeParam)*  ']' ;
+typeParamClause   : '['  variantTypeParam ( ','  variantTypeParam)*  ']' ;
+
+variantTypeParam  : annotations ('+'|'-')? (id | '_')  typeParamClause? ( '>:'  type)? ( '<:'  type)? ('<%'  type)* ( ':'  type)* ;
 
 funTypeParamClause: '['  typeParam ( ','  typeParam)*  ']' ;
 

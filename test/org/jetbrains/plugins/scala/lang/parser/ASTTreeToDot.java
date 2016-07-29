@@ -35,14 +35,20 @@ public class ASTTreeToDot {
         for (ASTNode ch = t.getFirstChildNode(); ch != null; ch = ch.getTreeNext()) {
             s += dfs(ch);
 
-            s += t.getElementType().toString().replace(' ', '_') + tmp
+            s += name(t.getElementType().toString()) + tmp
                     + " -> "
-                    + ch.getElementType().toString().replace(' ', '_') + map.get(ch)
+                    + name(ch.getElementType().toString()) + map.get(ch)
                     + ";\n";
 
         }
 
         return s;
+    }
+
+    private String name(String s) {
+        String res = s.replace(' ', '_');
+        if (!Character.isLetter(res.charAt(0))) return "T";
+        else return res;
     }
 
     private int time;
