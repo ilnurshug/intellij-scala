@@ -11,14 +11,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 public class ParserRuleNodeContextHelper {
 
     boolean hasRuleNode(ParserRuleContext ctx, int ruleType) {
-        boolean f = false;
-
-        for (int i = 0; i < ctx.getChildCount(); i++)
-        {
-            ParseTree c = ctx.getChild(i);
-            if (c instanceof RuleNode && ((RuleNode) c).getRuleContext().getRuleIndex() == ruleType) f = true;
-        }
-        return f;
+        return findRuleNode(ctx, ruleType) != null;
     }
 
     boolean hasTerminalNode(ParserRuleContext ctx, int tokenType) {
@@ -30,5 +23,18 @@ public class ParserRuleNodeContextHelper {
             if (c instanceof TerminalNode && ((TerminalNode)c).getSymbol().getType() == tokenType) f = true;
         }
         return f;
+    }
+
+    RuleNode findRuleNode(ParserRuleContext ctx, int ruleType) {
+        RuleNode t = null;
+        for (int i = 0; i < ctx.getChildCount(); i++)
+        {
+            ParseTree c = ctx.getChild(i);
+            if (c instanceof RuleNode && ((RuleNode) c).getRuleContext().getRuleIndex() == ruleType) {
+                t = (RuleNode) c;
+                break;
+            }
+        }
+        return t;
     }
 }

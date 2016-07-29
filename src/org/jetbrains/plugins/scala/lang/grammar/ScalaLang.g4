@@ -35,7 +35,8 @@ grammar ScalaLang;
 
 program           : blockExpr
                   | compilationUnit
-                  | block;
+                  | selfType?  templateStat ( semi  templateStat)*    // for debug purposes
+                  | block;                                            // for debug purposes
 
 literal           : '-'? IntegerLiteral
                   | '-'? FloatingPointLiteral

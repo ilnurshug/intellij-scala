@@ -89,7 +89,7 @@ class ScalaLangParserTest extends SimpleTestCase
     //doTest("trait L;\ntrait A; trait B; trait C;\nobject A extends L with A")
     //doTest("object Seq { def apply[A](a: A) = new Seq[A] }")
     //doTest("class Seq[+A]\nobject Seq { def apply[A](a: A) = new Seq[A] }")
-    doTest("class TC{"+Header + ";" + line + "}")
+    doTest(Header + ";" + line)
   }
 
   def testProgram6() {
