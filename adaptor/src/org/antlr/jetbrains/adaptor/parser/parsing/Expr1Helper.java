@@ -41,6 +41,14 @@ public class Expr1Helper extends ParserRuleNodeContextHelper implements Helper {
     public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
         if (canDropMarker(ctx)) {
             ifCanDrop(ctx, marker, markers);
+
+            /*if (hasTerminalNode(ctx, ScalaLangParser.ASSIGN)) {
+                marker.done(ScalaElementTypes.ASSIGN_STMT());
+            }
+            else {
+                marker.drop();
+            }*/
+
             marker.drop();
         }
         else {
@@ -49,9 +57,7 @@ public class Expr1Helper extends ParserRuleNodeContextHelper implements Helper {
     }
 
     private Boolean canDropMarker(ParserRuleContext ctx) {
-        for (int j = 0; j < ctx.getChildCount(); j++)
-            if (ctx.getChild(j).getText().compareTo("=>") == 0) return false;
-        return true;
+        return !hasTerminalNode(ctx, ScalaLangParser.FUNTYPE);
     }
 
     private void ifCanDrop(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {

@@ -11,10 +11,15 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class AscriptionHelper implements Helper {
-@Override
-public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
-@Override
-public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
-marker.drop();
-}
+    @Override
+    public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
+    @Override
+    public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
+        if (ctx.getParent().getRuleIndex() == ScalaLangParser.RULE_expr1) {
+            marker.done(ScalaElementTypes.TYPED_EXPR_STMT());
+        }
+        else {
+            marker.drop();
+        }
+    }
 }
