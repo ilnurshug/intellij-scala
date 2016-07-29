@@ -10,12 +10,15 @@ import org.antlr.jetbrains.adaptor.parser.parsing.Helper;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-public class TypesHelper implements Helper {
+public class TypesHelper extends ParserRuleNodeContextHelper implements Helper {
     @Override
     public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
     @Override
     public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
-        if (ctx.getChildCount() > 1) {
+        if (ctx.getParent().getRuleIndex() == ScalaLangParser.RULE_typeArgs) {
+            marker.drop();
+        }
+        else if (hasTerminalNode(ctx, ScalaLangParser.DOT)) {
             marker.done(ScalaElementTypes.TYPES());
         }
         else {

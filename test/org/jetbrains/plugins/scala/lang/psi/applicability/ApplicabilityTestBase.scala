@@ -91,7 +91,9 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
     val typified = typify(definition, application)
 
     assertProblemsAre(auxiliary, formatFunction(definition, application))(pattern)
-    assertProblemsAre(auxiliary, formatFunction(typified._1, typified._2))(pattern)
+    //
+    //if (ScalaParserDefinition.useOldParser)
+      assertProblemsAre(auxiliary, formatFunction(typified._1, typified._2))(pattern)
   }
 
   def assertProblemsConstructor(auxiliary: String, definition: String, application: String)
@@ -107,6 +109,7 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
     val line = if(preface.isEmpty) code else preface + "; " + code
     val file = if (ScalaParserDefinition.useOldParser) (Header + "\n" + line).parse else (Header.replace('\n', ';') + ";" + line).parse
 
+    println(line)
     val converter = new ASTTreeToDot()
     println(converter.convert(file.getNode))
 
