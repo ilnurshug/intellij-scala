@@ -16,6 +16,6 @@ public class VariantTypeParamHelper implements Helper {
     @Override
     public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
         //marker.done(ScalaElementTypes.VARIANT_TYPE_PARAM());
-        marker.drop();
+        marker.done(ScalaElementTypes.TYPE_PARAM());
     }
 }

@@ -10,11 +10,17 @@ import org.antlr.jetbrains.adaptor.parser.parsing.Helper;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-public class SimpleExprHelper implements Helper {
+public class SimpleExprHelper extends ParserRuleNodeContextHelper implements Helper {
     @Override
     public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
     @Override
     public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
-        marker.drop();
+        // TODO: see details in SimpleExpr.scala
+        if (hasTerminalNode(ctx, ScalaLangParser.NEW)) {
+            marker.done(ScalaElementTypes.NEW_TEMPLATE());
+        }
+        else {
+            marker.drop();
+        }
     }
 }

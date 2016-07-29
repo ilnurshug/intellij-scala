@@ -219,11 +219,11 @@ patterns          : pattern ( ','  patterns)*
 
 typeParamClause   : '['  variantTypeParam ( ','  variantTypeParam)*  ']' ;
 
-variantTypeParam  : annotations ('+'|'-')? (id | '_')  typeParamClause? ( '>:'  type)? ( '<:'  type)? ('<%'  type)* ( ':'  type)* ;
+variantTypeParam  : annotationsNonEmpty? (OP_1|OP_2)? (id | '_')  typeParamClause? ( '>:'  type)? ( '<:'  type)? ('<%'  type)* ( ':'  type)* ;
 
 funTypeParamClause: '['  typeParam ( ','  typeParam)*  ']' ;
 
-typeParam         : annotations (id | '_')  typeParamClause? ( '>:'  type)? ( '<:'  type)?
+typeParam         : annotationsNonEmpty? (id | '_')  typeParamClause? ( '>:'  type)? ( '<:'  type)?
                     ('<%'  type)* ( ':'  type)* ;
                          
 paramClauses      : paramClause* ( Nl?  '('  'implicit'  params  ')')? ;

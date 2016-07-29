@@ -182,4 +182,8 @@ class BlockParseTest extends SimpleTestCase {
                 |  }
               }""".stripMargin)
     }
+
+    def testBlock9(): Unit = {
+      doTest("{def f(a:Int*){}}")
+    }
 }
