@@ -291,7 +291,7 @@ selfType          : id ( ':'  type)?  '=>'
 
 import_           : 'import'  importExpr ( ','  importExpr)* ;
 
-importExpr        : stableId '.' (id | '_' | importSelectors) ;
+importExpr        : stableId ('.' '_' | '.' importSelectors)? ;
 
 importSelectors   : '{'  ( importSelector  ',')* ( importSelector |  '_')  '}' ;
 
@@ -330,9 +330,11 @@ funDef            : funSig ( ':'  type)?  '='  expr
 
 typeDef           :  id  typeParamClause?  '='  type ;
 
-tmplDef           : annotations modifiersOrEmpty ('case'?  'class'  classDef
-                  | 'case'?  'object'  objectDef
-                  | 'trait'  traitDef) ;
+tmplDef           : annotations (modifiersOrCase  'class'  classDef
+                  | modifiersOrCase  'object'  objectDef
+                  | modifiersOrEmpty 'trait'  traitDef) ;
+
+modifiersOrCase   : modifier* 'case'? ;
 
 classDef          : id  typeParamClause?  primaryConstructor classTemplateOpt ;
 

@@ -11,10 +11,10 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class ImportExprHelper implements Helper {
-@Override
-public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
-@Override
-public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
-marker.done(ScalaElementTypes.IMPORT_EXPR());
-}
+    @Override
+    public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
+    @Override
+    public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
+        marker.done(ScalaElementTypes.IMPORT_EXPR());
+    }
 }

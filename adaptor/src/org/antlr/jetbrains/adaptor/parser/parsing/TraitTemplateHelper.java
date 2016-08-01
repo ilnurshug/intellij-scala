@@ -11,10 +11,11 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class TraitTemplateHelper implements Helper {
-@Override
-public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
-@Override
-public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
-marker.done(ScalaElementTypes.EXTENDS_BLOCK());
-}
+    @Override
+    public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
+    @Override
+    public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
+        marker.drop();
+        //marker.done(ScalaElementTypes.EXTENDS_BLOCK());
+    }
 }

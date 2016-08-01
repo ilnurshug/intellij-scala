@@ -22,7 +22,10 @@ public class StableIdHelper implements Helper {
             marker.done(ScalaElementTypes.REFERENCE());
         }
         else if (r == ScalaLangParser.RULE_stableId) {
-            marker.done(ScalaElementTypes.REFERENCE_EXPRESSION());
+            marker.done(ScalaElementTypes.REFERENCE());
+        }
+        else if (r == ScalaLangParser.RULE_importExpr) {
+            marker.done(ScalaElementTypes.REFERENCE());
         }
         else {
             marker.drop();
