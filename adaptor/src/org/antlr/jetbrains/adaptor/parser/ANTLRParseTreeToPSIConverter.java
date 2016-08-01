@@ -7,10 +7,7 @@ import com.intellij.psi.tree.IElementType;
 import org.antlr.jetbrains.adaptor.lexer.PSIElementTypeFactory;
 import org.antlr.jetbrains.adaptor.lexer.RuleIElementType;
 import org.antlr.jetbrains.adaptor.lexer.TokenIElementType;
-import org.antlr.jetbrains.adaptor.parser.parsing.Expr1Helper;
-import org.antlr.jetbrains.adaptor.parser.parsing.FunDefHelper;
-import org.antlr.jetbrains.adaptor.parser.parsing.Helper;
-import org.antlr.jetbrains.adaptor.parser.parsing.QualIdHelper;
+import org.antlr.jetbrains.adaptor.parser.parsing.*;
 import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -67,6 +64,7 @@ public class ANTLRParseTreeToPSIConverter implements ParseTreeListener {
 		helpers.put("Expr1Helper", new Expr1Helper());
 		helpers.put("FunDefHelper", new FunDefHelper());
 		helpers.put("QualIdHelper", new QualIdHelper());
+		helpers.put("AscriptionHelper", new AscriptionHelper());
 	}
 
 	protected final Language getLanguage() {
@@ -110,6 +108,9 @@ public class ANTLRParseTreeToPSIConverter implements ParseTreeListener {
 				if (gParentRule == ScalaLangParser.RULE_qualId) {
 					helpers.get("QualIdHelper").visitTerminal(node, builder);
 				}
+				break;
+			case ScalaLangParser.RULE_ascription:
+				helpers.get("AscriptionHelper").visitTerminal(node, builder);
 				break;
 		}
 
