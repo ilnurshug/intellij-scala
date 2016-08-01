@@ -111,8 +111,9 @@ expr1             : 'if'  '('  expr  ')'  Nl*  expr ( semi?  'else'  expr)?
                   | 'for'  ('('  enumerators  ')' | '{'  enumerators  '}')  Nl*  'yield'?  expr
                   | 'throw'  expr
                   | 'return'  expr?
-                  | (simpleExpr '.')?  id  '='  expr
-                  | simpleExpr1  argumentExprs  '='  expr
+                  //| (simpleExpr '.')?  id  '='  expr
+                  //| simpleExpr1  argumentExprs  '='  expr
+                  | postfixExpr '=' expr
                   | postfixExpr
                   | postfixExpr  ascription
                   | postfixExpr  'match'  '{'  caseClauses  '}' ;

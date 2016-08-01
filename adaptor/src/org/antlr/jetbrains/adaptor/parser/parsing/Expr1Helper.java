@@ -42,14 +42,14 @@ public class Expr1Helper extends ParserRuleNodeContextHelper implements Helper {
         if (canDropMarker(ctx)) {
             ifCanDrop(ctx, marker, markers);
 
-            /*if (hasTerminalNode(ctx, ScalaLangParser.ASSIGN)) {
+            if (hasTerminalNode(ctx, ScalaLangParser.ASSIGN)) {
                 marker.done(ScalaElementTypes.ASSIGN_STMT());
             }
             else {
                 marker.drop();
-            }*/
+            }
 
-            marker.drop();
+            //marker.drop();
         }
         else {
             marker.done(ScalaElementTypes.DUMMY_ELEMENT());
