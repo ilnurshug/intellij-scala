@@ -48,7 +48,7 @@ public class ASTTreeToDot {
     private String name(String s) {
         String res = s.replace(' ', '_');
         if (!Character.isLetter(res.charAt(0))) return "T";
-        else return res;
+        else return res.replace('.', '_');
     }
 
     private int time;

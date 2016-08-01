@@ -71,7 +71,7 @@ class ScalaParserDefinition extends ScalaParserDefinitionWrapper {
 }
 
 object ScalaParserDefinition {
-  var useOldParser = true
+  var useOldParser = false
 
   def setUseOldParser(f : Boolean) = useOldParser = f
 }

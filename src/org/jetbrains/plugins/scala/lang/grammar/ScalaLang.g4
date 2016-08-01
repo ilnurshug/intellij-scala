@@ -243,7 +243,7 @@ paramType         : type
 classParamClauses : classParamClause* 
                     ( Nl?  '('  'implicit'  classParams  ')')? ;
                          
-classParamClause  : Nl?  '('  classParams?  ')'  ;
+classParamClause  : Nl?  '(' 'implicit'? classParams?  ')'  ;
 
 classParams       : classParam ( ','  classParam)* ;
 
