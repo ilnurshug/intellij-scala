@@ -108,4 +108,10 @@ class ScalaLangParserTest extends SimpleTestCase
               |  }
             }""".stripMargin)
   }
+
+  def testProgram8(): Unit = {
+    doTest("""object main{
+               def whileLoop (cond: => Boolean) (stat: => Unit): Unit
+             }""")
+  }
 }

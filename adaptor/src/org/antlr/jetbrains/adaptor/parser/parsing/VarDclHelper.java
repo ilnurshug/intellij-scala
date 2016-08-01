@@ -11,10 +11,11 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class VarDclHelper implements Helper {
-@Override
-public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
-@Override
-public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
-marker.done(ScalaElementTypes.VARIABLE_DECLARATION());
-}
+    @Override
+    public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
+    @Override
+    public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
+        //marker.done(ScalaElementTypes.VARIABLE_DECLARATION());
+        marker.drop();
+    }
 }
