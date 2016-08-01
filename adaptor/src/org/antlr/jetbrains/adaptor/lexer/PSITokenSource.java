@@ -5,6 +5,7 @@ import com.intellij.lang.PsiBuilder;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.util.containers.HashMap;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenFactory;
 import org.antlr.v4.runtime.Token;
@@ -27,8 +28,80 @@ public class PSITokenSource implements TokenSource {
 	protected PsiBuilder builder;
 	protected TokenFactory tokenFactory = CommonTokenFactory.DEFAULT;
 
+	private final HashMap<IElementType, Integer> map = new HashMap<IElementType, Integer>();
+
 	public PSITokenSource(PsiBuilder builder) {
 		this.builder = builder;
+
+		fillMap();
+	}
+
+	private void fillMap() {
+		map.put(ScalaTokenTypes.tLBRACE, ScalaLangParser.LBRACE);
+		map.put(ScalaTokenTypes.tRBRACE, ScalaLangParser.RBRACE);
+		map.put(ScalaTokenTypes.tLSQBRACKET, ScalaLangParser.LSQBRACKET);
+		map.put(ScalaTokenTypes.tRSQBRACKET, ScalaLangParser.RSQBRACKET);
+		map.put(ScalaTokenTypes.tLPARENTHESIS, ScalaLangParser.LPARENTHESIS);
+		map.put(ScalaTokenTypes.tRPARENTHESIS, ScalaLangParser.RPARENTHESIS);
+		map.put(ScalaTokenTypes.tDOT, ScalaLangParser.DOT);
+		map.put(ScalaTokenTypes.tCOMMA, ScalaLangParser.COMMA);
+		map.put(ScalaTokenTypes.tSEMICOLON, ScalaLangParser.SEMICOLON);
+		map.put(ScalaTokenTypes.tUNDER, ScalaLangParser.UNDER);
+		map.put(ScalaTokenTypes.tCOLON, ScalaLangParser.COLON);
+		map.put(ScalaTokenTypes.tASSIGN, ScalaLangParser.ASSIGN);
+		map.put(ScalaTokenTypes.tFUNTYPE, ScalaLangParser.FUNTYPE);
+		map.put(ScalaTokenTypes.tCHOOSE, ScalaLangParser.CHOOSE);
+		map.put(ScalaTokenTypes.tUPPER_BOUND, ScalaLangParser.UPPER_BOUND);
+		map.put(ScalaTokenTypes.tLOWER_BOUND, ScalaLangParser.LOWER_BOUND);
+		map.put(ScalaTokenTypes.tINNER_CLASS, ScalaLangParser.INNER_CLASS);
+		map.put(ScalaTokenTypes.tAT, ScalaLangParser.AT);
+		map.put(ScalaTokenTypes.tVIEW, ScalaLangParser.VIEW);
+		map.put(ScalaTokenTypes.tSTRING, ScalaLangParser.StringLiteral);
+		map.put(ScalaTokenTypes.tCHAR, ScalaLangParser.CharacterLiteral);
+		map.put(ScalaTokenTypes.tSYMBOL, ScalaLangParser.SymbolLiteral);
+		map.put(ScalaTokenTypes.tINTEGER, ScalaLangParser.IntegerLiteral);
+		map.put(ScalaTokenTypes.tFLOAT, ScalaLangParser.FloatingPointLiteral);
+		map.put(ScalaTokenTypes.tWHITE_SPACE_IN_LINE, ScalaLangParser.WHITE_SPACE_IN_LINE);
+		map.put(ScalaTokenTypes.kABSTRACT, ScalaLangParser.ABSTRACT);
+		map.put(ScalaTokenTypes.kCASE, ScalaLangParser.CASE);
+		map.put(ScalaTokenTypes.kCATCH, ScalaLangParser.CATCH);
+		map.put(ScalaTokenTypes.kCLASS, ScalaLangParser.CLASS);
+		map.put(ScalaTokenTypes.kDEF, ScalaLangParser.DEF);
+		map.put(ScalaTokenTypes.kDO, ScalaLangParser.DO);
+		map.put(ScalaTokenTypes.kELSE, ScalaLangParser.ELSE);
+		map.put(ScalaTokenTypes.kEXTENDS, ScalaLangParser.EXTENDS);
+		map.put(ScalaTokenTypes.kFALSE, ScalaLangParser.BooleanLiteral);
+		map.put(ScalaTokenTypes.kTRUE, ScalaLangParser.BooleanLiteral);
+		map.put(ScalaTokenTypes.kFINAL, ScalaLangParser.FINAL);
+		map.put(ScalaTokenTypes.kFINALLY, ScalaLangParser.FINALLY);
+		map.put(ScalaTokenTypes.kFOR, ScalaLangParser.FOR);
+		map.put(ScalaTokenTypes.kFOR_SOME, ScalaLangParser.FOR_SOME);
+		map.put(ScalaTokenTypes.kIF, ScalaLangParser.IF);
+		map.put(ScalaTokenTypes.kIMPLICIT, ScalaLangParser.IMPLICIT);
+		map.put(ScalaTokenTypes.kIMPORT, ScalaLangParser.IMPORT);
+		map.put(ScalaTokenTypes.kLAZY, ScalaLangParser.LAZY);
+		map.put(ScalaTokenTypes.kMATCH, ScalaLangParser.MATCH);
+		map.put(ScalaTokenTypes.kNEW, ScalaLangParser.NEW);
+		map.put(ScalaTokenTypes.kNULL, ScalaLangParser.NULL);
+		map.put(ScalaTokenTypes.kOBJECT, ScalaLangParser.OBJECT);
+		map.put(ScalaTokenTypes.kOVERRIDE, ScalaLangParser.OVERRIDE);
+		map.put(ScalaTokenTypes.kPACKAGE, ScalaLangParser.PACKAGE);
+		map.put(ScalaTokenTypes.kPRIVATE, ScalaLangParser.PRIVATE);
+		map.put(ScalaTokenTypes.kPROTECTED, ScalaLangParser.PROTECTED);
+		map.put(ScalaTokenTypes.kRETURN, ScalaLangParser.RETURN);
+		map.put(ScalaTokenTypes.kSEALED, ScalaLangParser.SEALED);
+		map.put(ScalaTokenTypes.kSUPER, ScalaLangParser.SUPER);
+		map.put(ScalaTokenTypes.kTHIS, ScalaLangParser.THIS);
+		map.put(ScalaTokenTypes.kTHROW, ScalaLangParser.THROW);
+		map.put(ScalaTokenTypes.kTRAIT, ScalaLangParser.TRAIT);
+		map.put(ScalaTokenTypes.kTRY, ScalaLangParser.TRY);
+		map.put(ScalaTokenTypes.kTYPE, ScalaLangParser.TYPE);
+		map.put(ScalaTokenTypes.kVAL, ScalaLangParser.VAL);
+		map.put(ScalaTokenTypes.kVAR, ScalaLangParser.VAR);
+		map.put(ScalaTokenTypes.kWHILE, ScalaLangParser.WHILE);
+		map.put(ScalaTokenTypes.kWITH, ScalaLangParser.WITH);
+		map.put(ScalaTokenTypes.kYIELD, ScalaLangParser.YIELD);
+		map.put(ScalaTokenTypes.kMACRO, ScalaLangParser.MACRO);
 	}
 
 	@Override
@@ -79,93 +152,11 @@ public class PSITokenSource implements TokenSource {
 
 	private int convertScalaTokenTypeToInt(IElementType t, String tokenText) {
 		if (t == null) return Token.EOF;
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////// Braces ///////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		else if (t == ScalaTokenTypes.tLBRACE) return ScalaLangParser.LBRACE;
-		else if (t == ScalaTokenTypes.tRBRACE) return ScalaLangParser.RBRACE;
-		else if (t == ScalaTokenTypes.tLSQBRACKET) return ScalaLangParser.LSQBRACKET;
-		else if (t == ScalaTokenTypes.tRSQBRACKET) return ScalaLangParser.RSQBRACKET;
-		else if (t == ScalaTokenTypes.tLPARENTHESIS) return ScalaLangParser.LPARENTHESIS;
-		else if (t == ScalaTokenTypes.tRPARENTHESIS) return ScalaLangParser.RPARENTHESIS;
-
-		else if (t == ScalaTokenTypes.tDOT) return ScalaLangParser.DOT;
-		else if (t == ScalaTokenTypes.tCOMMA) return ScalaLangParser.COMMA;
-		else if (t == ScalaTokenTypes.tSEMICOLON) return ScalaLangParser.SEMICOLON;
-
-		else if (t == ScalaTokenTypes.tUNDER) return ScalaLangParser.UNDER;
-		else if (t == ScalaTokenTypes.tCOLON) return ScalaLangParser.COLON;
-		else if (t == ScalaTokenTypes.tASSIGN) return ScalaLangParser.ASSIGN;
-		else if (t == ScalaTokenTypes.tFUNTYPE) return ScalaLangParser.FUNTYPE;
-		else if (t == ScalaTokenTypes.tCHOOSE) return ScalaLangParser.CHOOSE;
-		else if (t == ScalaTokenTypes.tUPPER_BOUND) return ScalaLangParser.UPPER_BOUND;
-		else if (t == ScalaTokenTypes.tLOWER_BOUND) return ScalaLangParser.LOWER_BOUND;
-		else if (t == ScalaTokenTypes.tINNER_CLASS) return ScalaLangParser.INNER_CLASS;
-		else if (t == ScalaTokenTypes.tAT) return ScalaLangParser.AT;
-		else if (t == ScalaTokenTypes.tVIEW) return ScalaLangParser.VIEW;
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////// Strings & chars //////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		else if (t == ScalaTokenTypes.tSTRING) return ScalaLangParser.StringLiteral;
-		else if (t == ScalaTokenTypes.tCHAR) return ScalaLangParser.CharacterLiteral;
-
-		else if (t == ScalaTokenTypes.tSYMBOL) return ScalaLangParser.SymbolLiteral;
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////// integer and float literals ///////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		else if (t == ScalaTokenTypes.tINTEGER) return ScalaLangParser.IntegerLiteral;
-		else if (t == ScalaTokenTypes.tFLOAT) return ScalaLangParser.FloatingPointLiteral;
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////// White spaces in line /////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		else if (t == ScalaTokenTypes.tWHITE_SPACE_IN_LINE) return ScalaLangParser.WHITE_SPACE_IN_LINE;
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////// keywords /////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		else if (t == ScalaTokenTypes.kABSTRACT) return ScalaLangParser.ABSTRACT;
-		else if (t == ScalaTokenTypes.kCASE) return ScalaLangParser.CASE;
-		else if (t == ScalaTokenTypes.kCATCH) return ScalaLangParser.CATCH;
-		else if (t == ScalaTokenTypes.kCLASS) return ScalaLangParser.CLASS;
-		else if (t == ScalaTokenTypes.kDEF) return ScalaLangParser.DEF;
-		else if (t == ScalaTokenTypes.kDO) return ScalaLangParser.DO;
-		else if (t == ScalaTokenTypes.kELSE) return ScalaLangParser.ELSE;
-		else if (t == ScalaTokenTypes.kEXTENDS) return ScalaLangParser.EXTENDS;
-		else if (t == ScalaTokenTypes.kFALSE || t == ScalaTokenTypes.kTRUE) return ScalaLangParser.BooleanLiteral;
-		else if (t == ScalaTokenTypes.kFINAL) return ScalaLangParser.FINAL;
-		else if (t == ScalaTokenTypes.kFINALLY) return ScalaLangParser.FINALLY;
-		else if (t == ScalaTokenTypes.kFOR) return ScalaLangParser.FOR;
-		else if (t == ScalaTokenTypes.kFOR_SOME) return ScalaLangParser.FOR_SOME;
-		else if (t == ScalaTokenTypes.kIF) return ScalaLangParser.IF;
-		else if (t == ScalaTokenTypes.kIMPLICIT) return ScalaLangParser.IMPLICIT;
-		else if (t == ScalaTokenTypes.kIMPORT) return ScalaLangParser.IMPORT;
-		else if (t == ScalaTokenTypes.kLAZY) return ScalaLangParser.LAZY;
-		else if (t == ScalaTokenTypes.kMATCH) return ScalaLangParser.MATCH;
-		else if (t == ScalaTokenTypes.kNEW) return ScalaLangParser.NEW;
-		else if (t == ScalaTokenTypes.kNULL) return ScalaLangParser.NULL;
-		else if (t == ScalaTokenTypes.kOBJECT) return ScalaLangParser.OBJECT;
-		else if (t == ScalaTokenTypes.kOVERRIDE) return ScalaLangParser.OVERRIDE;
-		else if (t == ScalaTokenTypes.kPACKAGE) return ScalaLangParser.PACKAGE;
-		else if (t == ScalaTokenTypes.kPRIVATE) return ScalaLangParser.PRIVATE;
-		else if (t == ScalaTokenTypes.kPROTECTED) return ScalaLangParser.PROTECTED;
-		else if (t == ScalaTokenTypes.kRETURN) return ScalaLangParser.RETURN;
-		else if (t == ScalaTokenTypes.kSEALED) return ScalaLangParser.SEALED;
-		else if (t == ScalaTokenTypes.kSUPER) return ScalaLangParser.SUPER;
-		else if (t == ScalaTokenTypes.kTHIS) return ScalaLangParser.THIS;
-		else if (t == ScalaTokenTypes.kTHROW) return ScalaLangParser.THROW;
-		else if (t == ScalaTokenTypes.kTRAIT) return ScalaLangParser.TRAIT;
-		else if (t == ScalaTokenTypes.kTRY) return ScalaLangParser.TRY;
-		else if (t == ScalaTokenTypes.kTYPE) return ScalaLangParser.TYPE;
-		else if (t == ScalaTokenTypes.kVAL) return ScalaLangParser.VAL;
-		else if (t == ScalaTokenTypes.kVAR) return ScalaLangParser.VAR;
-		else if (t == ScalaTokenTypes.kWHILE) return ScalaLangParser.WHILE;
-		else if (t == ScalaTokenTypes.kWITH) return ScalaLangParser.WITH;
-		else if (t == ScalaTokenTypes.kYIELD) return ScalaLangParser.YIELD;
-		else if (t == ScalaTokenTypes.kMACRO) return ScalaLangParser.MACRO;
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////// variables and constants //////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		else if (t == ScalaTokenTypes.tIDENTIFIER) return identifierTextToTokenType(tokenText);
-		else return 1;
+		else {
+			if (map.containsKey(t)) return map.get(t);
+			else return 1;
+		}
 	}
 
 	private int identifierTextToTokenType(String tokenText) {
