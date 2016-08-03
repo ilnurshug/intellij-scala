@@ -18,8 +18,12 @@ public class IdHelper implements Helper {
     @Override
     public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
         RuleNode p = (RuleNode)ctx.getParent();
-        if (p.getRuleContext().getRuleIndex() == ScalaLangParser.RULE_infixExpr) {
+        int r = p.getRuleContext().getRuleIndex();
+        if (r == ScalaLangParser.RULE_infixExpr) {
             marker.done(ScalaElementTypes.REFERENCE_EXPRESSION());
+        }
+        else if (r == ScalaLangParser.RULE_pattern3) {
+            marker.done(ScalaElementTypes.REFERENCE());
         }
         else {
             marker.drop();

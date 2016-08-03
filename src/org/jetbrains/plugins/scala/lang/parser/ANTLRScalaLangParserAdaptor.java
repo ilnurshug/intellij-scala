@@ -12,6 +12,9 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.jetbrains.plugins.scala.ScalaLanguage;
 import org.jetbrains.plugins.scala.lang.ScalaLangParser;
 
+import java.lang.reflect.Method;
+import java.util.concurrent.Callable;
+
 /**
  * Created by user on 7/20/16.
  */
@@ -27,14 +30,27 @@ public class ANTLRScalaLangParserAdaptor extends ScalaParser {
         return parserAdaptor.parse(root, builder);
     }
 
+    public void setStartRule(String startRule) {
+        parserAdaptor.startRule = startRule;
+    }
+
     private class ScalaLangParserAdaptor extends ANTLRParserAdaptor {
+        public String startRule = "program";
+
         public ScalaLangParserAdaptor(Language language, Parser parser) {
             super(language, parser);
         }
 
         @Override
         protected ParseTree parse(Parser parser, IElementType root) {
-            return ((ScalaLangParser) parser).program();
+            try {
+                Method m = ((ScalaLangParser) parser).getClass().getMethod(startRule);
+                return (ParseTree) m.invoke((ScalaLangParser) parser);
+            }
+            catch (Exception e) {
+                System.out.print(e.getMessage());
+                return null;
+            }
         }
     }
 }

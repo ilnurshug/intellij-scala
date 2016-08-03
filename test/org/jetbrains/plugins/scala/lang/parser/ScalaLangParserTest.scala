@@ -4,6 +4,7 @@ import com.intellij.lang.PsiBuilderFactory
 import com.intellij.psi.impl.source.DummyHolderFactory
 import com.intellij.psi.impl.source.tree.{FileElement, TreeElement}
 import com.intellij.psi.{PsiElement, PsiFileFactory}
+import org.antlr.v4.runtime.tree.ParseTree
 import org.jetbrains.plugins.scala.{ScalaFileType, ScalaLanguage}
 import org.jetbrains.plugins.scala.base.SimpleTestCase
 import org.jetbrains.plugins.scala.lang.ScalaLangParser
@@ -18,7 +19,7 @@ import org.junit.Assert
 class ScalaLangParserTest extends SimpleTestCase
 {
 
-  def parseProgram(s: String) : PsiElement = {
+  def parseProgram(s: String, startRule: String = "program") : PsiElement = {
     val fileFactory = PsiFileFactory.getInstance(fixture.getProject)
     val context = parseText("")
     val holder: FileElement = DummyHolderFactory.createHolder(context.getManager, context).getTreeElement
@@ -28,6 +29,7 @@ class ScalaLangParserTest extends SimpleTestCase
     )
 
     val parser : ANTLRScalaLangParserAdaptor = new ANTLRScalaLangParserAdaptor(new ScalaLangParser(null))
+    parser.setStartRule(startRule)
     val node = parser.parse(ScalaElementTypes.BLOCK_EXPR, builder)
 
     val converter = new ASTTreeToDot()
@@ -38,8 +40,8 @@ class ScalaLangParserTest extends SimpleTestCase
     node.getPsi
   }
 
-  def doTest(s: String): Unit = {
-    val elem = parseProgram(s)
+  def doTest(s: String, startRule: String = "program"): Unit = {
+    val elem = parseProgram(s, startRule)
     Assert.assertEquals(s, elem.getText)
     //Assert.assertEquals(true, true)
   }
@@ -113,5 +115,9 @@ class ScalaLangParserTest extends SimpleTestCase
     doTest("""object main{
                def whileLoop (cond: => Boolean) (stat: => Unit): Unit
              }""")
+  }
+
+  def testProgram9(): Unit = {
+    doTest("a+b+c+d", "pattern3")
   }
 }

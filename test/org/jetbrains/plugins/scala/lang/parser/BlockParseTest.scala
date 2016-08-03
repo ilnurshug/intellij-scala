@@ -10,6 +10,7 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaLexer
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilderImpl
 import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.BlockExpr
 import org.jetbrains.plugins.scala.lang.parser.ASTTreeToDot
+import org.jetbrains.plugins.scala.lang.parser.parsing.patterns.Pattern3
 import org.junit.Assert
 
 /**
@@ -17,7 +18,7 @@ import org.junit.Assert
  */
 
 class BlockParseTest extends SimpleTestCase {
-  def parseBlock(s: String): PsiElement = {
+  def parseBlock(s: String, p: ScalaPsiBuilderImpl => Boolean = BlockExpr.parse(_) ): PsiElement = {
     ScalaParserDefinition.setUseOldParser(true)
 
     val fileFactory = PsiFileFactory.getInstance(fixture.getProject)
@@ -27,7 +28,7 @@ class BlockParseTest extends SimpleTestCase {
       PsiBuilderFactory.getInstance.createBuilder(context.getProject, holder, new ScalaLexer,
         ScalaFileType.SCALA_LANGUAGE, s)
     )
-    BlockExpr.parse(builder)
+    p(builder)
     val node = builder.getTreeBuilt
 
     val converter = new ASTTreeToDot()
@@ -37,8 +38,8 @@ class BlockParseTest extends SimpleTestCase {
     node.getPsi
   }
 
-  def doTest(s: String) {
-    val elem = parseBlock(s)
+  def doTest(s: String, p: ScalaPsiBuilderImpl => Boolean = BlockExpr.parse(_)) {
+    val elem = parseBlock(s, p)
     Assert.assertEquals(s, elem.getText)
   }
 
@@ -185,5 +186,9 @@ class BlockParseTest extends SimpleTestCase {
 
     def testBlock9(): Unit = {
       doTest("{def f(a:Int*){}}")
+    }
+
+    def testBlock10(): Unit = {
+      doTest("a +: b +: c +: d", Pattern3.parse(_))
     }
 }
