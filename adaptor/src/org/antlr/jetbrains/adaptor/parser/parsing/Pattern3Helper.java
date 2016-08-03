@@ -24,7 +24,7 @@ public class Pattern3Helper extends ParserRuleNodeContextHelper implements Helpe
     @Override
     public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
         // unnecessary code since we using Pattern3Walker
-        //marker.drop();
+        // marker.drop();
         return;
     }
 
@@ -106,8 +106,7 @@ public class Pattern3Helper extends ParserRuleNodeContextHelper implements Helpe
             else if (ParserUtils.priority(id1,false) > ParserUtils.priority(id2,false))
                 return false;       //  a + b * c = (a + (b * c))
             else if (associate(id1) == associate(id2))
-                if (associate(id1) == -1) return true;
-                else return false;
+                return (associate(id1) == -1);
             else {
                 builder.error("wrong.type.associativity");
                 return false;

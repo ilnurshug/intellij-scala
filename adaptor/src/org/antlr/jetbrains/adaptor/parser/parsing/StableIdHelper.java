@@ -27,6 +27,9 @@ public class StableIdHelper implements Helper {
         else if (r == ScalaLangParser.RULE_importExpr) {
             marker.done(ScalaElementTypes.REFERENCE());
         }
+        /*else if (r == ScalaLangParser.RULE_simplePattern) {
+            marker.done(ScalaElementTypes.REFERENCE_EXPRESSION());
+        }*/
         else {
             marker.drop();
         }
