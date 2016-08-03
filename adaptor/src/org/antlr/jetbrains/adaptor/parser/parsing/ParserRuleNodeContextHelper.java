@@ -25,6 +25,18 @@ public class ParserRuleNodeContextHelper {
         return f;
     }
 
+    boolean hasTerminalNode(ParserRuleContext ctx, String text) {
+        boolean f = false;
+
+        for (int i = 0; i < ctx.getChildCount(); i++)
+        {
+            ParseTree c = ctx.getChild(i);
+            if (c instanceof TerminalNode && ((TerminalNode)c).getSymbol().getText().compareTo(text) == 0)
+                f = true;
+        }
+        return f;
+    }
+
     RuleNode findRuleNode(ParserRuleContext ctx, int ruleType) {
         RuleNode t = null;
         for (int i = 0; i < ctx.getChildCount(); i++)

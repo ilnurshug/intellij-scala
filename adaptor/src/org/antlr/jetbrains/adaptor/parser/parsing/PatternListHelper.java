@@ -10,17 +10,11 @@ import org.antlr.jetbrains.adaptor.parser.parsing.Helper;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-public class PatternHelper extends ParserRuleNodeContextHelper implements Helper {
+public class PatternListHelper implements Helper {
     @Override
     public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
     @Override
     public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
-        if (hasTerminalNode(ctx, "|")) {
-            marker.done(ScalaElementTypes.PATTERN());
-        }
-        else {
-            marker.drop();
-        }
-        //marker.done(ScalaElementTypes.PATTERN());
+        marker.done(ScalaElementTypes.PATTERN_LIST());
     }
 }

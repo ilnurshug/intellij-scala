@@ -10,7 +10,7 @@ import org.antlr.jetbrains.adaptor.parser.parsing.Helper;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-public class ExprHelper implements Helper {
+public class ExprHelper extends ParserRuleNodeContextHelper implements Helper {
     @Override
     public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
     @Override
@@ -20,8 +20,6 @@ public class ExprHelper implements Helper {
     }
 
     private Boolean canDrop(ParserRuleContext ctx) {
-        for (int j = 0; j < ctx.getChildCount(); j++)
-            if (ctx.getChild(j).getText().compareTo("=>") == 0) return false;
-        return true;
+        return !hasTerminalNode(ctx, ScalaLangParser.FUNTYPE);
     }
 }

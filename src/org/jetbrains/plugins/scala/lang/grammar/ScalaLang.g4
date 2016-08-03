@@ -60,9 +60,11 @@ stableId          :  id
 
 classQualifier    : '[' id ']' ;
 
-type              : functionArgTypes  '=>'  type
+type              : infixType  '=>'  type
+                  | '(' ('=>' type)? ')' '=>' type
                   | infixType  existentialClause
-                  | infixType ;
+                  | infixType
+                  | '_' ('>:' type)? ('<:' type)? ;
 
 functionArgTypes  : infixType
                   | '('  ( paramType ( ','  paramType )* )?  ')' ;
@@ -101,7 +103,7 @@ ascription        : ':'  infixType
                   | ':'  annotationsNonEmpty
                   | ':' '_' '*';
 
-expr              : (bindings | ('implicit')? id | '_')  '=>'  expr
+expr              : (bindings | /*('implicit')?*/ id | '_')  '=>'  expr
                   | expr1 ;
 
 expr1             : 'if'  '('  expr  ')'  Nl*  expr ( semi?  'else'  expr)?
@@ -318,7 +320,9 @@ patVarDef         : annotations modifiersOrEmpty ('val'  patDef
 def               : annotations modifiersOrEmpty ('val'  patDef | 'var'  varDef | 'def'  funDef | 'type'  Nl*  typeDef)
                   | tmplDef ;
                   
-patDef            : pattern2 ( ','  pattern2)* ( ':'  type)*  '='  expr ;
+patDef            : patternList ( ':'  type)*  '='  expr ;
+
+patternList       : pattern2 ( ','  pattern2)* ;
 
 varDef            : patDef
                   | ids  ':'  type  '='  '_' ;

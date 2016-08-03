@@ -12,7 +12,7 @@ import org.antlr.jetbrains.adaptor.parser.parsing.Helper;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-public class TypeHelper implements Helper {
+public class TypeHelper extends ParserRuleNodeContextHelper implements Helper {
     @Override
     public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
     @Override
@@ -24,11 +24,14 @@ public class TypeHelper implements Helper {
             if (firstChild instanceof RuleNode) {
                 int rule = ((RuleNode) firstChild).getRuleContext().getRuleIndex();
                 if (rule == ScalaLangParser.RULE_infixType) {
-                    if (hasTerminalNode(ctx, "=>"))
+                    if (hasTerminalNode(ctx, ScalaLangParser.FUNTYPE))
                         marker.done(ScalaElementTypes.TYPE());
-                    else if (hasTerminalNode(ctx, "forSome"))
+                    else if (hasTerminalNode(ctx, ScalaLangParser.FOR_SOME))
                         marker.done(ScalaElementTypes.EXISTENTIAL_TYPE());
                 }
+            }
+            else {
+
             }
         }
         else {
@@ -36,13 +39,4 @@ public class TypeHelper implements Helper {
         }
     }
 
-    private boolean hasTerminalNode(ParserRuleContext ctx, String terminal) {
-        boolean f = false;
-        int childCount = ctx.getChildCount();
-        for (int i = 0; i < childCount; i++) {
-            if (ctx.getChild(i).getText().compareTo(terminal) == 0) f = true;
-        }
-
-        return f;
-    }
 }
