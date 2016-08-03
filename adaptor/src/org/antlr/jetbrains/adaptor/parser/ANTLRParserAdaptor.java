@@ -60,7 +60,7 @@ public abstract class ANTLRParserAdaptor implements PsiParser {
 		// tree (AST as they call it) when you call {@link PsiBuilder#getTreeBuilt}
 		ANTLRParseTreeToPSIConverter listener = createListener(parser, root, builder);
 		PsiBuilder.Marker rootMarker = builder.mark();
-		ParseTreeWalker.DEFAULT.walk(listener, parseTree);
+		CustomParseTreeWalker.DEFAULT.walk(listener, parseTree);
 		while (!builder.eof()) {
 			ProgressIndicatorProvider.checkCanceled();
 			builder.advanceLexer();

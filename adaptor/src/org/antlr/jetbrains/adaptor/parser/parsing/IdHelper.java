@@ -22,9 +22,9 @@ public class IdHelper implements Helper {
         if (r == ScalaLangParser.RULE_infixExpr) {
             marker.done(ScalaElementTypes.REFERENCE_EXPRESSION());
         }
-        else if (r == ScalaLangParser.RULE_pattern3) {
+        /*else if (r == ScalaLangParser.RULE_pattern3) {
             marker.done(ScalaElementTypes.REFERENCE());
-        }
+        }*/
         else {
             marker.drop();
         }

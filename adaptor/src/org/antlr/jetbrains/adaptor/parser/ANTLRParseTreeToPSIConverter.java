@@ -71,7 +71,7 @@ public class ANTLRParseTreeToPSIConverter implements ParseTreeListener {
 		return language;
 	}
 
-	protected final PsiBuilder getBuilder() {
+	public final PsiBuilder getBuilder() {
 		return builder;
 	}
 

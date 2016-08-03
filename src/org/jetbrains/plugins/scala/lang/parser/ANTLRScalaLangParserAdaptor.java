@@ -6,6 +6,8 @@ import com.intellij.lang.PsiBuilder;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import org.antlr.jetbrains.adaptor.parser.ANTLRParserAdaptor;
+import org.antlr.jetbrains.adaptor.parser.CustomParseTreeWalker;
+import org.antlr.jetbrains.adaptor.parser.parsing.Pattern3Helper;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -23,6 +25,8 @@ public class ANTLRScalaLangParserAdaptor extends ScalaParser {
 
     public ANTLRScalaLangParserAdaptor(Parser parser) {
         parserAdaptor = new ScalaLangParserAdaptor(ScalaLanguage.Instance, parser);
+
+        CustomParseTreeWalker.DEFAULT.registerWalker(ScalaLangParser.RULE_pattern3, new Pattern3Helper.Pattern3Walker());
     }
 
     @Override
