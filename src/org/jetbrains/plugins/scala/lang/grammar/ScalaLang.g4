@@ -272,7 +272,9 @@ accessModifier    : ('private'  | 'protected' )  accessQualifier? ;
 
 accessQualifier   : '['  (id | 'this')  ']' ;
 
-annotation        : '@' simpleType  argumentExprs* ;
+annotation        : '@' annotationExpr ;
+
+annotationExpr    : constr ;
 
 annotations       : annotation* ;
 annotationsNonEmpty
