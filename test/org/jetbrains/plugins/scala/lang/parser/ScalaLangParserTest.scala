@@ -5,6 +5,7 @@ import java.util.concurrent.Callable
 import com.intellij.lang.PsiBuilderFactory
 import com.intellij.psi.impl.source.DummyHolderFactory
 import com.intellij.psi.impl.source.tree.{FileElement, TreeElement}
+import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.{PsiElement, PsiFileFactory}
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.tree.ParseTree
@@ -23,13 +24,10 @@ class ScalaLangParserTest extends SimpleTestCase
 {
 
   def parseProgram(s: String, startRule: String) : PsiElement = {
-    val fileFactory = PsiFileFactory.getInstance(fixture.getProject)
-    val context = parseText("")
-    val holder: FileElement = DummyHolderFactory.createHolder(context.getManager, context).getTreeElement
-    val builder: ScalaPsiBuilderImpl = new ScalaPsiBuilderImpl(
-      PsiBuilderFactory.getInstance.createBuilder(context.getProject, holder, new ScalaLexer,
-        ScalaFileType.SCALA_LANGUAGE, s)
-    )
+    val parserDefinition = new ScalaParserDefinition()
+
+    val tmp = PsiBuilderFactory.getInstance.createBuilder(parserDefinition, new ScalaLexer(), s)
+    val builder: ScalaPsiBuilderImpl = new ScalaPsiBuilderImpl(tmp)
 
     val parser : ANTLRScalaLangParserAdaptor = ANTLRScalaLangParserAdaptor.INSTANCE
 
@@ -37,8 +35,6 @@ class ScalaLangParserTest extends SimpleTestCase
 
     val converter = new ASTTreeToDot()
     println(converter.convert(node))
-
-    holder.rawAddChildren(node.asInstanceOf[TreeElement])
 
     node.getPsi
   }
@@ -122,5 +118,44 @@ class ScalaLangParserTest extends SimpleTestCase
 
   def testProgram9(): Unit = {
     doTest("a +: b +: c +: d", "pattern3")
+  }
+
+  def testProgram10(): Unit = {
+    doTest("{ \n def a() {} \n def b(){} }"/*.replace('\n',';')*/)
+  }
+
+  def testExperiment(): Unit = {
+    val lexer: ScalaLexer  = new ScalaLexer()
+    lexer.start("class a \n{\n a.b.c\n}")
+
+    var f = true
+    while (f) {
+      val t = lexer.getTokenType
+      if (t == null) f = false
+      else {
+        println(t.toString)
+        lexer.advance()
+      }
+    }
+    assert(true)
+  }
+
+  def testExperiment2(): Unit = {
+    val s = "class A{def a(){}\n def b(){}\n val a = 1\n}"
+
+    val parserDefinition = new ScalaParserDefinition()
+
+    val tmp = PsiBuilderFactory.getInstance.createBuilder(parserDefinition, new ScalaLexer(), s)
+    val builder: ScalaPsiBuilderImpl = new ScalaPsiBuilderImpl(tmp)
+
+    while(!builder.eof()) {
+      print(builder.getTokenType.toString)
+
+      if (builder.getTokenText.contains("\n")) println(1)
+      else println()
+
+      builder.advanceLexer()
+    }
+    assert(true)
   }
 }

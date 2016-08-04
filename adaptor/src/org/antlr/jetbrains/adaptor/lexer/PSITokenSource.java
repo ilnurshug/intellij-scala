@@ -61,7 +61,7 @@ public class PSITokenSource implements TokenSource {
 		map.put(ScalaTokenTypes.tSYMBOL, ScalaLangParser.SymbolLiteral);
 		map.put(ScalaTokenTypes.tINTEGER, ScalaLangParser.IntegerLiteral);
 		map.put(ScalaTokenTypes.tFLOAT, ScalaLangParser.FloatingPointLiteral);
-		map.put(ScalaTokenTypes.tWHITE_SPACE_IN_LINE, ScalaLangParser.WHITE_SPACE_IN_LINE);
+		//map.put(ScalaTokenTypes.tWHITE_SPACE_IN_LINE, ScalaLangParser.WHITE_SPACE_IN_LINE);
 		map.put(ScalaTokenTypes.kABSTRACT, ScalaLangParser.ABSTRACT);
 		map.put(ScalaTokenTypes.kCASE, ScalaLangParser.CASE);
 		map.put(ScalaTokenTypes.kCATCH, ScalaLangParser.CATCH);
@@ -152,6 +152,10 @@ public class PSITokenSource implements TokenSource {
 
 	private int convertScalaTokenTypeToInt(IElementType t, String tokenText) {
 		if (t == null) return Token.EOF;
+		else if (t == ScalaTokenTypes.tWHITE_SPACE_IN_LINE) {
+			if (tokenText.contains("\n")) return ScalaLangParser.Nl;
+			else return ScalaLangParser.WHITE_SPACE_IN_LINE;
+		}
 		else if (t == ScalaTokenTypes.tIDENTIFIER) return identifierTextToTokenType(tokenText);
 		else {
 			if (map.containsKey(t)) return map.get(t);

@@ -21,8 +21,6 @@ public class TmplDefHelper extends ParserRuleNodeContextHelper implements Helper
             marker.done(ScalaElementTypes.OBJECT_DEF());
         else if (hasRuleNode(ctx, ScalaLangParser.RULE_traitDef))
             marker.done(ScalaElementTypes.TRAIT_DEF());
-        else assert false;
-
-        //marker.drop();
+        else marker.drop();
     }
 }

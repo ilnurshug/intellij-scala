@@ -103,7 +103,7 @@ ascription        : ':'  infixType
                   | ':'  annotationsNonEmpty
                   | ':' '_' '*';
 
-expr              : (bindings | /*('implicit')?*/ id | '_')  '=>'  expr
+expr              : (bindings | id | '_')  '=>'  expr
                   | expr1 ;
 
 expr1             : 'if'  '('  expr  ')'  Nl*  expr ( semi?  'else'  expr)?
@@ -113,8 +113,6 @@ expr1             : 'if'  '('  expr  ')'  Nl*  expr ( semi?  'else'  expr)?
                   | 'for'  ('('  enumerators  ')' | '{'  enumerators  '}')  Nl*  'yield'?  expr
                   | 'throw'  expr
                   | 'return'  expr?
-                  //| (simpleExpr '.')?  id  '='  expr
-                  //| simpleExpr1  argumentExprs  '='  expr
                   | postfixExpr '=' expr
                   | postfixExpr
                   | postfixExpr  ascription
@@ -139,36 +137,6 @@ simpleExpr1       : literal
                   | simpleExpr1 '_'? typeArgs
                   | simpleExpr1 argumentExprs ;
 
-/*simpleExpr        : 'new' (classTemplate | templateBody)| blockExpr | simpleExpr1 '_'? ;
-
-simpleExpr1       :	literal  simpleExpr2
-                  |	literal
-                  |	path  simpleExpr2
-                  |	path
-                  |	'_'  simpleExpr2
-                  |	'_'
-                  |	'('  ')'  simpleExpr2
-                  |	'('  ')'
-                  |	'('  exprs  ')'  simpleExpr2
-                  |	'('  exprs  ')'
-                  |	'new' ( classTemplate  '.'  id |  'new' ( classTemplate  '.'  id  simpleExpr2 |  templateBody)  '.'  id  |  templateBody)  '.'  id  simpleExpr2
-                  |	blockExpr  '.'  id  simpleExpr2
-                  |	blockExpr  '.'  id
-                  |	'new' ( classTemplate  typeArgs  |	 'new' ( classTemplate  typeArgs  simpleExpr2  |  templateBody)  typeArgs |  templateBody)  typeArgs  simpleExpr2
-                  |	blockExpr  typeArgs  simpleExpr2
-                  |	blockExpr  typeArgs ;
-
-simpleExpr2       :  '.' id   simpleExpr2
-                  |	'.' id
-                  |	'_' '.' id   simpleExpr2
-                  |	'_' '.' id
-                  |	typeArgs   simpleExpr2
-                  |	typeArgs
-                  |	'_'   typeArgs   simpleExpr2
-                  |	'_'   typeArgs
-                  |	argumentExprs   simpleExpr2
-                  |	argumentExprs ;
-*/
 exprs             : expr (  ','  expr)* ;
 
 argumentExprs     : '('  exprs?  ')' 
@@ -279,8 +247,6 @@ annotationExpr    : constr ;
 annotations       : annotation* ;
 annotationsNonEmpty
                   : annotation+ ;
-
-//constrAnnotation  : '@' simpleType  argumentExprs ;
 
 templateBody      : Nl?  '{'  selfType?  templateStat ( semi  templateStat)*  '}' ;
 

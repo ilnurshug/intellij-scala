@@ -22,6 +22,8 @@ class ScalaParserDefinition extends ScalaParserDefinitionWrapper {
 
   private var hasDotty = false
 
+  private val whitespacesTokenSet = ScalaTokenTypes.WHITES_SPACES_TOKEN_SET
+
   def createLexer(project: Project): ScalaLexer = {
     val treatDocCommentAsBlockComment = ScalaProjectSettings.getInstance(project).isTreatDocCommentAsBlockComment
     new ScalaLexer(treatDocCommentAsBlockComment)
@@ -43,7 +45,14 @@ class ScalaParserDefinition extends ScalaParserDefinitionWrapper {
 
   def getStringLiteralElements: TokenSet = ScalaTokenTypes.STRING_LITERAL_TOKEN_SET
 
-  def getWhitespaceTokens: TokenSet = ScalaTokenTypes.WHITES_SPACES_TOKEN_SET
+  def getWhitespaceTokens: TokenSet = {
+    if (ScalaParserDefinition.useOldParser)
+      whitespacesTokenSet
+    else {
+      if (ScalaParserDefinition.omitWhitespaces) whitespacesTokenSet
+      else TokenSet.EMPTY
+    }
+  }
 
   def createElement(astNode: ASTNode): PsiElement = (if (hasDotty) DottyPsiCreator else ScalaPsiCreator).createElement(astNode)
 
@@ -71,6 +80,7 @@ class ScalaParserDefinition extends ScalaParserDefinitionWrapper {
 
 object ScalaParserDefinition {
   var useOldParser = false
+  var omitWhitespaces = true
 
   def setUseOldParser(f : Boolean) = useOldParser = f
 }
