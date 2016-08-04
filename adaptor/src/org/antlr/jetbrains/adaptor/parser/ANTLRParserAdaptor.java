@@ -38,6 +38,15 @@ public abstract class ANTLRParserAdaptor implements PsiParser {
 	@NotNull
 	@Override
 	public ASTNode parse(IElementType root, PsiBuilder builder) {
+		return parse(builder, root);
+	}
+
+	public ASTNode parse(PsiBuilder builder) {
+		return parse(builder, null);
+	}
+
+
+	private ASTNode parse(PsiBuilder builder, IElementType root) {
 		ProgressIndicatorProvider.checkCanceled();
 
 		TokenSource source = new PSITokenSource(builder);
@@ -59,7 +68,8 @@ public abstract class ANTLRParserAdaptor implements PsiParser {
 		// enter/exit with mark/done calls. I *think* this creates their parse
 		// tree (AST as they call it) when you call {@link PsiBuilder#getTreeBuilt}
 		ANTLRParseTreeToPSIConverter listener = createListener(parser, root, builder);
-		PsiBuilder.Marker rootMarker = builder.mark();
+		PsiBuilder.Marker rootMarker = null;
+		if (root != null) rootMarker = builder.mark();
 		CustomParseTreeWalker.DEFAULT.walk(listener, parseTree);
 		while (!builder.eof()) {
 			ProgressIndicatorProvider.checkCanceled();
@@ -80,9 +90,10 @@ public abstract class ANTLRParserAdaptor implements PsiParser {
 		// CompositeElement and created by
 		// ParserDefinition.createElement() despite having
 		// being TokenIElementType.
-		rootMarker.done(root);
+		if (root != null) rootMarker.done(root);
 		return builder.getTreeBuilt(); // calls the ASTFactory.createComposite() etc...
 	}
+
 
 	protected abstract ParseTree parse(Parser parser, IElementType root);
 

@@ -28,13 +28,12 @@ class ScalaParserDefinition extends ScalaParserDefinitionWrapper {
   }
 
   def createParser(project: Project): ScalaParser = {
-    val parser: ScalaLangParser = new ScalaLangParser(null)
     hasDotty = project.hasDotty
     if (hasDotty)
       new DottyParser
     else  {
       if (ScalaParserDefinition.useOldParser) new ScalaParser
-      else new ANTLRScalaLangParserAdaptor(parser) //ScalaParser
+      else ANTLRScalaLangParserAdaptor.INSTANCE //ScalaParser
     }
   }
 

@@ -21,7 +21,7 @@ import org.apache.commons.lang.StringUtils
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
 import org.jetbrains.plugins.scala.lang.lexer.{ScalaLexer, ScalaTokenTypes}
-import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
+import org.jetbrains.plugins.scala.lang.parser.{ANTLRScalaLangParserAdaptor, ScalaElementTypes, ScalaParserDefinition}
 import org.jetbrains.plugins.scala.lang.parser.parsing.base.{Constructor, Import}
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.{ScalaPsiBuilder, ScalaPsiBuilderImpl}
 import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.{Block, Expr}
@@ -1071,10 +1071,20 @@ object ScalaPsiElementFactory {
   }
 
   def createTypeElementFromText(text: String, context: PsiElement, child: PsiElement): ScTypeElement = {
-    createElementWithContext(text, context, child, Type.parse(_)) match {
-      case te: ScTypeElement => te
-      case _ => null
+    if (ScalaParserDefinition.useOldParser) {
+      createElementWithContext(text, context, child, Type.parse(_)) match {
+        case te: ScTypeElement => te
+        case _ => null
+      }
     }
+    else {
+      val rule: String = "type"
+      createElementWithContext(text, context, child, ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, rule)) match {
+        case te: ScTypeElement => te
+        case _ => null
+      }
+    }
+
   }
 
   def createConstructorTypeElementFromText(text: String, context: PsiElement, child: PsiElement): ScTypeElement = {

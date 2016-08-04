@@ -11,6 +11,7 @@ import org.antlr.jetbrains.adaptor.parser.parsing.InfixTypeHelper;
 import org.antlr.jetbrains.adaptor.parser.parsing.Pattern3Helper;
 import org.antlr.jetbrains.adaptor.parser.parsing.ResultExprHelper;
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.jetbrains.plugins.scala.ScalaLanguage;
@@ -23,11 +24,12 @@ import java.util.concurrent.Callable;
  * Created by user on 7/20/16.
  */
 public class ANTLRScalaLangParserAdaptor extends ScalaParser {
-    private final ScalaLangParserAdaptor parserAdaptor;
+    public static final ANTLRScalaLangParserAdaptor INSTANCE = new ANTLRScalaLangParserAdaptor();
 
-    public ANTLRScalaLangParserAdaptor(Parser parser) {
-        parserAdaptor = new ScalaLangParserAdaptor(ScalaLanguage.Instance, parser);
+    private final ScalaLangParser parser = new ScalaLangParser(null);
+    private final Language language = ScalaLanguage.Instance;
 
+    private ANTLRScalaLangParserAdaptor() {
         CustomParseTreeWalker.DEFAULT.registerWalker(ScalaLangParser.RULE_pattern3, new Pattern3Helper.Pattern3Walker());
         CustomParseTreeWalker.DEFAULT.registerWalker(ScalaLangParser.RULE_infixType, new InfixTypeHelper.InfixTypeWalker());
         CustomParseTreeWalker.DEFAULT.registerWalker(ScalaLangParser.RULE_resultExpr, new ResultExprHelper.ResultExprWalker());
@@ -35,31 +37,28 @@ public class ANTLRScalaLangParserAdaptor extends ScalaParser {
 
     @Override
     public ASTNode parse(IElementType root, PsiBuilder builder) {
-        return parserAdaptor.parse(root, builder);
+        return new ANTLRParserAdaptor(language, parser) {
+            @Override
+            protected ParseTree parse(Parser parser, IElementType root) {
+                return ((ScalaLangParser) parser).program();
+            }
+        }.parse(root, builder);
     }
 
-    public void setStartRule(String startRule) {
-        parserAdaptor.startRule = startRule;
-    }
-
-    private class ScalaLangParserAdaptor extends ANTLRParserAdaptor {
-        public String startRule = "program";
-
-        public ScalaLangParserAdaptor(Language language, Parser parser) {
-            super(language, parser);
-        }
-
-        @Override
-        protected ParseTree parse(Parser parser, IElementType root) {
-            try {
-                Method m = ((ScalaLangParser) parser).getClass().getMethod(startRule);
-                return (ParseTree) m.invoke((ScalaLangParser) parser);
+    public ASTNode parse(PsiBuilder builder, final String rule) {
+        return new ANTLRParserAdaptor(language, parser) {
+            @Override
+            protected ParseTree parse(Parser parser, IElementType root) {
+                try {
+                    Method m = ((ScalaLangParser) parser).getClass().getMethod(rule);
+                    return (ParseTree)m.invoke(parser);
+                }
+                catch (Exception e) {
+                    System.out.print(e.getMessage());
+                    return null;
+                }
             }
-            catch (Exception e) {
-                System.out.print(e.getMessage());
-                return null;
-            }
-        }
+        }.parse(builder);
     }
 }
 
