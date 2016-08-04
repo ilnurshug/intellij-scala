@@ -31,7 +31,7 @@ public class TypeHelper extends ParserRuleNodeContextHelper implements Helper {
                 }
             }
             else {
-
+                marker.done(ScalaElementTypes.WILDCARD_TYPE());
             }
         }
         else {

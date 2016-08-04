@@ -62,9 +62,9 @@ classQualifier    : '[' id ']' ;
 
 type              : infixType  '=>'  type
                   | '(' ('=>' type)? ')' '=>' type
+                  | '_' ('>:' type)? ('<:' type)?
                   | infixType  existentialClause
-                  | infixType
-                  | '_' ('>:' type)? ('<:' type)? ;
+                  | infixType ;
 
 functionArgTypes  : infixType
                   | '('  ( paramType ( ','  paramType )* )?  ')' ;
