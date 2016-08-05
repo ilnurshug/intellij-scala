@@ -124,6 +124,14 @@ class ScalaLangParserTest extends SimpleTestCase
     doTest("{ \n def a() {} \n def b(){} }"/*.replace('\n',';')*/)
   }
 
+  def testProgram11(): Unit = {
+    doTest("Container {type }", "type")
+  }
+
+  def testProgram12(): Unit = {
+    doTest("class A{ var a,b,c: Type }")
+  }
+
   def testExperiment(): Unit = {
     val lexer: ScalaLexer  = new ScalaLexer()
     lexer.start("class a \n{\n a.b.c\n}")

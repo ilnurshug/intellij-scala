@@ -69,4 +69,8 @@ class CompilationUnitTest extends SimpleTestCase {
   def testCompilationUnit5(): Unit = {
     doTest("""class A{ {x => 3} }""")
   }
+
+  def testCompilationUnit6(): Unit = {
+    doTest("""class A{ var a,b,c: Type }""")
+  }
 }

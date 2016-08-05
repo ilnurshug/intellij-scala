@@ -12,24 +12,11 @@ import org.antlr.jetbrains.adaptor.parser.parsing.Helper;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-public class IdHelper implements Helper {
+public class IdsHelper implements Helper {
     @Override
     public void visitTerminal(TerminalNode node, PsiBuilder builder) {}
     @Override
     public void exitEveryRule(ParserRuleContext ctx, PsiBuilder.Marker marker, final Deque<PsiBuilder.Marker> markers) {
-        RuleNode p = (RuleNode)ctx.getParent();
-        int r = p.getRuleContext().getRuleIndex();
-        if (r == ScalaLangParser.RULE_infixExpr) {
-            marker.done(ScalaElementTypes.REFERENCE_EXPRESSION());
-        }
-        /*else if (r == ScalaLangParser.RULE_pattern3) {
-            marker.done(ScalaElementTypes.REFERENCE());
-        }*/
-        else if (r == ScalaLangParser.RULE_ids) {
-            marker.done(ScalaElementTypes.FIELD_ID());
-        }
-        else {
-            marker.drop();
-        }
+        marker.done(ScalaElementTypes.IDENTIFIER_LIST());
     }
 }

@@ -1,12 +1,10 @@
 package org.antlr.jetbrains.adaptor.parser;
 
-import org.antlr.v4.runtime.BaseErrorListener;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Recognizer;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /** Traps errors from parsing language of plugin. E.g., for a Java plugin,
@@ -30,6 +28,11 @@ public class SyntaxErrorListener extends BaseErrorListener {
 							String msg, RecognitionException e)
 	{
 		syntaxErrors.add(new SyntaxError(recognizer, (Token)offendingSymbol, line, charPositionInLine, msg, e));
+
+		List<String> stack = ((Parser)recognizer).getRuleInvocationStack();
+		Collections.reverse(stack);
+		System.err.println("rule stack: "+stack);
+		System.err.println("line "+line+":"+charPositionInLine+" at "+offendingSymbol+": "+msg);
 	}
 
 	@Override

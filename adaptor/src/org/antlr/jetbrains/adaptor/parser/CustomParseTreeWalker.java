@@ -39,14 +39,14 @@ public class CustomParseTreeWalker extends ParseTreeWalker {
             listener.visitTerminal((TerminalNode)t);
         } else {
             RuleNode r = (RuleNode)t;
-            this.enterRule(listener, r);
+            enterRule(listener, r);
             int n = r.getChildCount();
 
             for(int i = 0; i < n; ++i) {
-                this.walk(listener, r.getChild(i));
+                walk(listener, r.getChild(i));
             }
 
-            this.exitRule(listener, r);
+            exitRule(listener, r);
         }
     }
 
