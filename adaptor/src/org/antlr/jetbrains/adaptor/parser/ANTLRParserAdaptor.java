@@ -16,6 +16,8 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.scala.lang.ScalaLangParser;
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes;
 
+import java.util.ArrayList;
+
 /** An adaptor that makes an ANTLR parser look like a PsiParser. */
 public abstract class ANTLRParserAdaptor implements PsiParser {
 	protected final Language language;
@@ -37,15 +39,22 @@ public abstract class ANTLRParserAdaptor implements PsiParser {
 	@NotNull
 	@Override
 	public ASTNode parse(IElementType root, PsiBuilder builder) {
-		return parse(builder, root);
+		return parse(builder, root, true);
 	}
 
 	public ASTNode parse(PsiBuilder builder) {
-		return parse(builder, null);
+		return parse(builder, null, true);
 	}
 
+	public boolean tryParse(PsiBuilder builder) {
+		parse(builder, null, false);
 
-	private ASTNode parse(PsiBuilder builder, IElementType root) {
+		//if (parser.get)
+		SyntaxErrorListener listener = (SyntaxErrorListener)parser.getErrorListeners().get(0);
+		return listener.getSyntaxErrors().isEmpty();
+	}
+
+	private ASTNode parse(PsiBuilder builder, IElementType root, boolean buildTree) {
 		ProgressIndicatorProvider.checkCanceled();
 
 		builder = new PsiBuilderAdaptor(builder);
@@ -92,7 +101,12 @@ public abstract class ANTLRParserAdaptor implements PsiParser {
 		// ParserDefinition.createElement() despite having
 		// being TokenIElementType.
 		if (root != null) rootMarker.done(root);
-		return builder.getTreeBuilt(); // calls the ASTFactory.createComposite() etc...
+		if (buildTree) {
+			return builder.getTreeBuilt(); // calls the ASTFactory.createComposite() etc...
+		}
+		else {
+			return null;
+		}
 	}
 
 
@@ -108,7 +122,6 @@ public abstract class ANTLRParserAdaptor implements PsiParser {
 		public PsiBuilderAdaptor(PsiBuilder builder) {
 			this.builder = builder;
 		}
-
 		@Override
 		public void advanceLexer() {
 			//System.out.print("before " + builder.getTokenText());

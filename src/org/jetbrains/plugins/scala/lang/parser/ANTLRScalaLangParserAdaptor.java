@@ -45,7 +45,7 @@ public class ANTLRScalaLangParserAdaptor extends ScalaParser {
         }.parse(root, builder);
     }
 
-    public ASTNode parse(PsiBuilder builder, final String rule) {
+    public boolean parse(PsiBuilder builder, final String rule) {
         return new ANTLRParserAdaptor(language, parser) {
             @Override
             protected ParseTree parse(Parser parser, IElementType root) {
@@ -58,7 +58,7 @@ public class ANTLRScalaLangParserAdaptor extends ScalaParser {
                     return null;
                 }
             }
-        }.parse(builder);
+        }.tryParse(builder);
     }
 }
 

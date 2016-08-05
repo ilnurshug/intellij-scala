@@ -82,5 +82,7 @@ object ScalaParserDefinition {
   var useOldParser = false
   var omitWhitespaces = true
 
+  var replaceTypeParsing = false
+
   def setUseOldParser(f : Boolean) = useOldParser = f
 }

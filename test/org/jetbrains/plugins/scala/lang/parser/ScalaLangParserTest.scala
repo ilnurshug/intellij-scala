@@ -31,7 +31,8 @@ class ScalaLangParserTest extends SimpleTestCase
 
     val parser : ANTLRScalaLangParserAdaptor = ANTLRScalaLangParserAdaptor.INSTANCE
 
-    val node = parser.parse(builder, startRule)
+    parser.parse(builder, startRule)
+    val node = builder.getTreeBuilt
 
     val converter = new ASTTreeToDot()
     println(converter.convert(node))

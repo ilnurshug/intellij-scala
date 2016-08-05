@@ -1,10 +1,8 @@
 package org.antlr.jetbrains.adaptor.parser;
 
-import org.antlr.v4.runtime.CommonToken;
-import org.antlr.v4.runtime.DefaultErrorStrategy;
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 /** Adapt ANTLR's DefaultErrorStrategy so that we add error nodes
  *  for EOF if reached at start of resync's consumeUntil().
@@ -19,6 +17,11 @@ public class ErrorStrategyAdaptor extends DefaultErrorStrategy {
 			recognizer.getRuleContext().addErrorNode(o);
 		}
 		super.consumeUntil(recognizer, set);
+	}
+
+	@Override
+	public void recover(Parser recognizer, RecognitionException e) {
+		super.recover(recognizer, e);
 	}
 
 	/** By default ANTLR makes the start/stop -1/-1 for invalid tokens
@@ -38,5 +41,10 @@ public class ErrorStrategyAdaptor extends DefaultErrorStrategy {
 			((CommonToken) missingSymbol).setStopIndex(stop);
 		}
 		return missingSymbol;
+	}
+
+	@Override
+	public void sync(Parser recognizer) throws RecognitionException {
+		super.sync(recognizer);
 	}
 }
