@@ -7,7 +7,6 @@ import com.intellij.psi.tree.IElementType;
 import org.antlr.jetbrains.adaptor.lexer.PSIElementTypeFactory;
 import org.antlr.jetbrains.adaptor.lexer.RuleIElementType;
 import org.antlr.jetbrains.adaptor.lexer.TokenIElementType;
-import org.antlr.jetbrains.adaptor.parser.parsing.*;
 import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -39,8 +38,6 @@ public class ANTLRParseTreeToPSIConverter implements ParseTreeListener {
 	 */
 	protected Map<Integer, SyntaxError> tokenToErrorMap = new HashMap<Integer, SyntaxError>();
 
-	protected HashMap<String, Helper> helpers = new HashMap<String, Helper>();
-
 	public ANTLRParseTreeToPSIConverter(Language language, Parser parser, PsiBuilder builder) {
 		this.language = language;
 		this.builder = builder;
@@ -60,11 +57,6 @@ public class ANTLRParseTreeToPSIConverter implements ParseTreeListener {
 				}
 			}
 		}
-
-		helpers.put("Expr1Helper", new Expr1Helper());
-		helpers.put("FunDefHelper", new FunDefHelper());
-		helpers.put("QualIdHelper", new QualIdHelper());
-		helpers.put("AscriptionHelper", new AscriptionHelper());
 	}
 
 	protected final Language getLanguage() {
@@ -89,35 +81,7 @@ public class ANTLRParseTreeToPSIConverter implements ParseTreeListener {
 
 	@Override
 	public void visitTerminal(TerminalNode node) {
-		RuleNode parent = (RuleNode) node.getParent();
-		int parentRule = parent.getRuleContext().getRuleIndex();
-
-		switch (parentRule) {
-			case ScalaLangParser.RULE_expr1:
-				helpers.get("Expr1Helper").visitTerminal(node, builder);
-				break;
-			case ScalaLangParser.RULE_funDef:
-				helpers.get("FunDefHelper").visitTerminal(node, builder);
-				break;
-			case ScalaLangParser.RULE_qualId:
-				helpers.get("QualIdHelper").visitTerminal(node, builder);
-				break;
-			case ScalaLangParser.RULE_id:
-				RuleNode gParent = (RuleNode) parent.getParent();
-				int gParentRule = gParent.getRuleContext().getRuleIndex();
-				if (gParentRule == ScalaLangParser.RULE_qualId) {
-					helpers.get("QualIdHelper").visitTerminal(node, builder);
-				}
-				break;
-			case ScalaLangParser.RULE_ascription:
-				helpers.get("AscriptionHelper").visitTerminal(node, builder);
-				break;
-		}
-
-
-
 		//System.out.println(node.getSymbol().getText() + " " + type + " " + pos);
-
 		builder.advanceLexer();
 	}
 
@@ -193,23 +157,6 @@ public class ANTLRParseTreeToPSIConverter implements ParseTreeListener {
 	public void exitEveryRule(ParserRuleContext ctx) {
 		ProgressIndicatorProvider.checkCanceled();
 		PsiBuilder.Marker marker = markers.pop();
-		//marker.done(getRuleElementTypes().get(ctx.getRuleIndex()));
-
-		String helperName = ScalaLangParser.ruleNames[ctx.getRuleIndex()] + "Helper";
-		helperName = helperName.substring(0, 1).toUpperCase() + helperName.substring(1);
-		try {
-			if (helpers.containsKey(helperName)) {
-				helpers.get(helperName).exitEveryRule(ctx, marker, markers);
-			} else {
-				Class cls = Class.forName("org.antlr.jetbrains.adaptor.parser.parsing." + helperName);
-				Helper helper = (Helper) cls.newInstance();
-				helpers.put(helperName, helper);
-				helper.exitEveryRule(ctx, marker, markers);
-			}
-
-		} catch (Exception e) {
-			marker.done(ScalaElementTypes.DUMMY_ELEMENT());
-		}
-
+		marker.done(getRuleElementTypes().get(ctx.getRuleIndex()));
 	}
 }

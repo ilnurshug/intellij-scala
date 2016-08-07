@@ -79,7 +79,7 @@ class ScalaParserDefinition extends ScalaParserDefinitionWrapper {
 }
 
 object ScalaParserDefinition {
-  var useOldParser = false
+  var useOldParser = true
   var omitWhitespaces = true
 
   var replaceTypeParsing = false

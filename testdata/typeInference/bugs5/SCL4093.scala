@@ -8,7 +8,7 @@ object SCL4093 {
     }
 
     /**
-     * Helper which calls the passed in setter if value is not null.  Caller passes in the setter using the 'field_=' notation,
+     * VisitorHelper which calls the passed in setter if value is not null.  Caller passes in the setter using the 'field_=' notation,
      * which as of this writing, intellij thinks is wrong, but actually compiles and works fine.
      */
     def setIfNotNull[T](setter: T => Unit, value: T)
