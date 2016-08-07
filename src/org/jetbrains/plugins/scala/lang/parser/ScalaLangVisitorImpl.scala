@@ -12,9 +12,9 @@ import scala.collection.mutable
 /**
   * Created by ilnur on 06.08.16.
   */
-class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor {
+class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Unit] {
 
-  var args: mutable.Stack[Object] = new mutable.Stack[Object]  // stack for arguments, might be helpful for some parsing methods
+  var args: mutable.Stack[Boolean] = new mutable.Stack[Boolean]  // stack for arguments, might be helpful for some parsing methods
 
   override def visitProgram(ctx: ProgramContext): Unit = ProgramVisitor.visit(builder, ctx, args)
 

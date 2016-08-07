@@ -26,9 +26,9 @@ abstract class SimpleTestCase extends UsefulTestCase with AssertMatches {
       IdeaTestFixtureFactory.getFixtureFactory.createFixtureBuilder("SimpleTestCase")
 
     fixture = IdeaTestFixtureFactory.getFixtureFactory.createCodeInsightFixture(fixtureBuilder.getFixture)
-    ScalaParserDefinition.setUseOldParser(true)
+    //ScalaParserDefinition.setUseOldParser(true)
     fixture.setUp()
-    ScalaParserDefinition.setUseOldParser(false)
+    //ScalaParserDefinition.setUseOldParser(false)
   }
 
   override def tearDown() {

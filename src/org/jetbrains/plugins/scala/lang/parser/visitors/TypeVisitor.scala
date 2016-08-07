@@ -11,9 +11,9 @@ import org.antlr.v4.runtime.ParserRuleContext
 import org.jetbrains.plugins.scala.lang.parser.visitors._
 
 object TypeVisitor extends VisitorHelper {
-  override def visit(builder: PsiBuilder, ctx: ParserRuleContext, args: mutable.Stack[Object]): Unit = {
-    val isPattern: Boolean = args.pop().asInstanceOf[Boolean]
-    val star: Boolean = args.pop().asInstanceOf[Boolean]
+  override def visit(builder: PsiBuilder, ctx: ParserRuleContext, args: mutable.Stack[Boolean]): Unit = {
+    val isPattern: Boolean = args.pop()
+    val star: Boolean = args.pop()
     var i = 0
 
     val context: TypeContext = ctx.asInstanceOf[TypeContext]
