@@ -191,4 +191,8 @@ class BlockParseTest extends SimpleTestCase {
     def testBlock10(): Unit = {
       doTest("a +: b +: c +: d", Pattern3.parse(_))
     }
+
+    def testBlock11(): Unit = {
+      doTest("{def f(){}}")
+    }
 }

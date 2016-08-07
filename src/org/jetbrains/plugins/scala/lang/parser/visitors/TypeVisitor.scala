@@ -4,14 +4,15 @@ import org.jetbrains.plugins.scala.ScalaBundle
 import org.jetbrains.plugins.scala.lang.ScalaLangParser
 import org.jetbrains.plugins.scala.lang.ScalaLangParser.TypeContext
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
-import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
+import org.jetbrains.plugins.scala.lang.parser.{ScalaElementTypes, ScalaLangVisitorImpl}
 import org.jetbrains.plugins.scala.lang.parser.parsing.types.ExistentialClause
+
 import scala.collection.mutable
 import org.antlr.v4.runtime.ParserRuleContext
 import org.jetbrains.plugins.scala.lang.parser.visitors._
 
 object TypeVisitor extends VisitorHelper {
-  override def visit(builder: PsiBuilder, ctx: ParserRuleContext, args: mutable.Stack[Boolean]): Unit = {
+  override def visit(visitor: ScalaLangVisitorImpl, builder: PsiBuilder, ctx: ParserRuleContext, args: mutable.Stack[Boolean]): Unit = {
     val isPattern: Boolean = args.pop()
     val star: Boolean = args.pop()
     var i = 0
@@ -29,7 +30,7 @@ object TypeVisitor extends VisitorHelper {
               builder.advanceLexer()
 
               args.push(false); args.push(false)
-              visit(builder, context.`type`(i), args)
+              visit(visitor, builder, context.`type`(i), args)
               i = i + 1
 
               /*if (!parse(builder)) {
@@ -42,7 +43,7 @@ object TypeVisitor extends VisitorHelper {
               builder.advanceLexer()
 
               args.push(false); args.push(false)
-              visit(builder, context.`type`(i), args)
+              visit(visitor, builder, context.`type`(i), args)
               i = i + 1
 
               /*if (!parse(builder)) {
@@ -57,7 +58,7 @@ object TypeVisitor extends VisitorHelper {
               builder.advanceLexer() //Ate =>
 
               args.push(false); args.push(isPattern)
-              visit(builder, context.`type`(i), args)
+              visit(visitor, builder, context.`type`(i), args)
               i = i + 1
 
               /*if (!parse(builder, star = false, isPattern = isPattern)) {
@@ -66,17 +67,17 @@ object TypeVisitor extends VisitorHelper {
               funMarker.done(ScalaElementTypes.TYPE)
             case _ =>
           }
-          return true
+          return
         case _ =>
           typeMarker.drop()
-          return false
+          return
       }
     }
     else {
       //infixType.parse(builder, star, isPattern)
       args.push(star)
       args.push(isPattern)
-      InfixTypeVisitor.visit(builder, context.infixType(), args)
+      InfixTypeVisitor.visit(visitor, builder, context.infixType(), args)
     }
 
 
@@ -87,14 +88,14 @@ object TypeVisitor extends VisitorHelper {
           builder error ScalaBundle.message("wrong.type")
         }*/
         args.push(false); args.push(isPattern)
-        visit(builder, context.`type`(i), args)
+        visit(visitor, builder, context.`type`(i), args)
         i = i + 1
 
         typeMarker.done(ScalaElementTypes.TYPE)
       case ScalaTokenTypes.kFOR_SOME =>
         //ExistentialClause parse builder
 
-        ExistentialClauseVisitor.visit(builder, context.infixType(), args)
+        ExistentialClauseVisitor.visit(visitor, builder, context.infixType(), args)
 
         typeMarker.done(ScalaElementTypes.EXISTENTIAL_TYPE)
       case _ => typeMarker.drop()
