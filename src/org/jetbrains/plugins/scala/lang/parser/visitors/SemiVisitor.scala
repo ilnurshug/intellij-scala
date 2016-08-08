@@ -4,5 +4,7 @@ import scala.collection.mutable
 import org.antlr.v4.runtime.ParserRuleContext
 import org.jetbrains.plugins.scala.lang.parser.ScalaLangVisitorImpl
 object SemiVisitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, builder: PsiBuilder, ctx: ParserRuleContext, args: mutable.Stack[Boolean]): Unit = ???
+  override def visit(visitor: ScalaLangVisitorImpl, builder: PsiBuilder, ctx: ParserRuleContext, args: mutable.Stack[Boolean]): Unit = {
+    visitor.visitChildren(ctx)
+  }
 }

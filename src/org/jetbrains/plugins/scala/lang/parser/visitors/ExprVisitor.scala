@@ -16,12 +16,12 @@ object ExprVisitor extends VisitorHelper {
   override def visit(visitor: ScalaLangVisitorImpl, builder: PsiBuilder, ctx: ParserRuleContext, args: mutable.Stack[Boolean]): Unit = {
     val context: ExprContext = ctx.asInstanceOf[ExprContext]
 
-    val exprMarker = builder.mark
-
     if (context.expr1() != null) {
       visitor.visitChildren(context.expr1())
       return
     }
+
+    val exprMarker = builder.mark
 
     builder.getTokenType match {
       case ScalaTokenTypes.tIDENTIFIER | ScalaTokenTypes.tUNDER =>

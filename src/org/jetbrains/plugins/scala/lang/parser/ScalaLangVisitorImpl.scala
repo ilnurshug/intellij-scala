@@ -1,6 +1,7 @@
 package org.jetbrains.plugins.scala.lang.parser
 
 import com.intellij.lang.PsiBuilder
+import com.intellij.psi.tree.IElementType
 import org.antlr.v4.runtime.tree.{ErrorNode, RuleNode, TerminalNode}
 import org.jetbrains.plugins.scala.lang.ScalaLangBaseVisitor
 import org.jetbrains.plugins.scala.lang.ScalaLangParser._
@@ -13,7 +14,9 @@ import scala.collection.mutable
   */
 class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Unit] {
 
-  var args: mutable.Stack[Boolean] = new mutable.Stack[Boolean]  // stack for arguments, might be helpful for some parsing methods
+  var args: mutable.Stack[Boolean] = new mutable.Stack[Boolean]  // stack for bool-arguments, might be helpful for some parsing methods
+
+  var typeArgs: mutable.Stack[IElementType] = new mutable.Stack[IElementType]
 
   override def visitProgram(ctx: ProgramContext): Unit = ProgramVisitor.visit(this, builder, ctx, args)
 

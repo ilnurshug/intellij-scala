@@ -120,8 +120,9 @@ expr1             : 'if'  '('  expr  ')'  Nl*  expr ( semi?  'else'  expr)?
 
 postfixExpr       : infixExpr ( id  Nl?)? ;
 
-infixExpr         : infixExpr  id  Nl?  infixExpr
-                  | prefixExpr ;
+/*infixExpr         : infixExpr  id  Nl?  infixExpr
+                  | prefixExpr ;*/
+infixExpr         : prefixExpr (id typeArgs? Nl? prefixExpr)* ;
 
 prefixExpr        : ('-' | '+' | '~' | '!')? simpleExpr ;
 
