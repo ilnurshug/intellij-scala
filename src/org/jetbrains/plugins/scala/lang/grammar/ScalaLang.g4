@@ -60,11 +60,15 @@ stableId          :  id
 
 classQualifier    : '[' id ']' ;
 
-type              : infixType  '=>'  type
-                  | '(' ('=>' type)? ')' '=>' type
-                  | '_' ('>:' type)? ('<:' type)?
-                  | infixType  existentialClause
+type              : typeType
+                  | wildcardType
+                  | existentialType
                   | infixType ;
+
+typeType          : infixType  '=>'  type
+                  | '(' ('=>' type)? ')' '=>' type ;
+wildcardType      : '_' ('>:' type)? ('<:' type)? ;
+existentialType   : infixType  existentialClause ;
 
 functionArgTypes  : infixType
                   | '('  ( paramType ( ','  paramType )* )?  ')' ;
@@ -101,23 +105,48 @@ typePat           : type;
 
 ascription        : ':'  infixType
                   | ':'  annotationsNonEmpty
-                  | ':' '_' '*';
+                  | ':'  sequenceArg;
+
+sequenceArg       : '_' '*' ;
 
 expr              : (bindings | id | '_')  '=>'  expr
                   | expr1 ;
 
-expr1             : 'if'  '('  expr  ')'  Nl*  expr ( semi?  'else'  expr)?
-                  | 'while'  '('  expr  ')'  Nl*  expr
-                  | 'try' ( '{'  block  '}'  |  expr) ( 'catch'  '{'  caseClauses  '}')? ( 'finally'  expr)?
-                  | 'do'  expr  semi?  'while'  '('  expr  ')'
-                  | 'for'  ('('  enumerators  ')' | '{'  enumerators  '}')  Nl*  'yield'?  expr
-                  | 'throw'  expr
-                  | 'return'  expr?
-                  | postfixExpr '=' expr
+expr1             : ifStmt
+                  | whileStmt
+                  | tryStmt
+                  | doStmt
+                  | forStmt
+                  | throwStmt
+                  | returnStmt
+                  | assignStmt
                   | postfixExpr
-                  | postfixExpr  ascription
-                  | postfixExpr  'match'  '{'  caseClauses  '}' ;
+                  | typedExprStmt
+                  | matchStmt ;
+//-----------------------------------------------------------------------------
+ifStmt            : 'if'  '('  expr  ')'  Nl*  expr ( semi?  'else'  expr)? ;
 
+whileStmt         : 'while'  '('  expr  ')'  Nl*  expr ;
+
+tryStmt           : 'try' tryBlock catchBlock? finallyBlock? ;
+tryBlock          : '{'  block  '}'  |  expr ;
+catchBlock        : 'catch'  '{'  caseClauses  '}' ;
+finallyBlock      : 'finally'  expr ;
+
+doStmt            : 'do'  expr  semi?  'while'  '('  expr  ')' ;
+
+forStmt           : 'for'  ('('  enumerators  ')' | '{'  enumerators  '}')  Nl*  'yield'?  expr ;
+
+throwStmt         : 'throw'  expr ;
+
+returnStmt        : 'return'  expr? ;
+
+assignStmt        : postfixExpr '=' expr ;
+
+typedExprStmt     : postfixExpr  ascription ;
+
+matchStmt         : postfixExpr  'match'  '{'  caseClauses  '}' ;
+//-----------------------------------------------------------------------------
 postfixExpr       : infixExpr ( id  Nl?)? ;
 
 /*infixExpr         : infixExpr  id  Nl?  infixExpr
@@ -126,15 +155,17 @@ infixExpr         : prefixExpr (id typeArgs? Nl? prefixExpr)* ;
 
 prefixExpr        : ('-' | '+' | '~' | '!')? simpleExpr ;
 
-simpleExpr        : 'new' (classTemplate | templateBody) | blockExpr | simpleExpr1 '_'?;
+simpleExpr        : newTemplate | blockExpr | simpleExpr1 '_'?;
+
+newTemplate       : 'new' (classTemplate | templateBody) ;
 
 simpleExpr1       : literal
                   | path
                   | '_'
                   | '(' (exprs ','?)? ')'
-                  | ('new' (classTemplate | templateBody) | blockExpr) '.' id
+                  | (newTemplate | blockExpr) '.' id
                   | simpleExpr1 '_'? '.' id
-                  | ('new' (classTemplate | templateBody) | blockExpr) typeArgs
+                  | (newTemplate | blockExpr) typeArgs
                   | simpleExpr1 '_'? typeArgs
                   | simpleExpr1 argumentExprs ;
 
@@ -160,7 +191,10 @@ resultExpr        : expr1
 
 enumerators       : generator  ( semi  generator)* ;
 
-generator         : pattern1  '<-'  expr ( semi?  guard |  semi  pattern1  '='  expr)* ;
+//generator         : pattern1  '<-'  expr ( semi?  guard |  semi  pattern1  '='  expr)* ;
+generator         : generatorNoGuard guard? ;
+
+generatorNoGuard  : pattern1  '<-'  expr ;
 
 caseClauses       : caseClause+ ;
 
@@ -170,25 +204,57 @@ guard             : 'if'  postfixExpr ;
 
 pattern           : pattern1 ( '|'  pattern1 )* ;
 
-pattern1          : ID  ':'  typePat
-                  | '_'  ':'  typePat
+pattern1          : typedPattern
                   | pattern2 ;
 
-pattern2          : ID  ('@' pattern3)?
+typedPattern      : ID  ':'  typePat
+                  | '_'  ':'  typePat ;
+
+pattern2          : referencePattern
+                  | namingPattern
                   | pattern3 ;
+
+referencePattern  : ID ;
+namingPattern     : ID '@' pattern3 ;
 
 pattern3          : simplePattern
                   | simplePattern ( id  Nl?  simplePattern)* ;
-                  
-simplePattern     : '_'
-                  | ID
-                  | literal 
-                  | stableId ( '('  patterns  ')')?
-                  | stableId  '('  (patterns  ',' )? (ID  '@')?  '_'  '*'  ')'
-                  | '('  patterns?  ')' ;
+//-----------------------------------------------------------------------------
+simplePattern     : wildcardPattern
+                  | patternInParenthesis
+                  | referencePattern
+                  | literalPattern
+                  | stableReferencePattern
+                  | constructorPattern
+                  | tuplePattern ;
 
-patterns          : pattern ( ','  patterns)*
-                  | ('_' ) * ;
+wildcardPattern   : '_' ;
+
+patternInParenthesis
+                  : '(' pattern ')' ;
+
+tuplePattern      : '(' patterns? ')' ;
+
+literalPattern    : literal ;
+
+stableReferencePattern
+                  : stableId ;
+
+constructorPattern: patternArgs ;
+
+patternArgs       : '('  patterns  ')'
+                  | '('  (patterns  ',' )? namingPattern2  ')'
+                  | '('  (patterns  ',' )? seqWildcard  ')';
+
+namingPattern2    : ID  '@'  seqWildcard ;
+
+//-----------------------------------------------------------------------------
+patterns          : patternSeq
+                  | pattern
+                  | seqWildcard ;
+
+patternSeq        : pattern ( ','  patterns)* ;
+seqWildcard       : '_' '*' ;
 
 typeParamClause   : '['  variantTypeParam ( ','  variantTypeParam)*  ']' ;
 
@@ -286,8 +352,17 @@ typeDcl           : id  typeParamClause?  ('>:'  type)? ( '<:'  type)? ;
 patVarDef         : annotations modifiersOrEmpty ('val'  patDef
                   | 'var'  varDef );
 
-def               : annotations modifiersOrEmpty ('val'  patDef | 'var'  varDef | 'def'  funDef | 'type'  Nl*  typeDef)
-                  | tmplDef ;
+def               : patternDefinition
+                  | variableDefinition
+                  | functionDefinition
+                  | typeDefinition
+                  | templateDefinition ;
+
+patternDefinition        : annotations modifiersOrEmpty 'val'  patDef ;
+variableDefinition       : annotations modifiersOrEmpty 'var'  varDef ;
+functionDefinition       : annotations modifiersOrEmpty 'def'  funDef ;
+typeDefinition           : annotations modifiersOrEmpty 'type'  Nl*  typeDef ;
+templateDefinition       : annotations modifiersOrEmpty tmplDef ;
                   
 patDef            : patternList ( ':'  type)*  '='  expr ;
 
@@ -297,9 +372,11 @@ varDef            : patDef
                   | ids  ':'  type  '='  '_' ;
                   
 funDef            : funSig ( ':'  type)?  '='  expr
-                  | funSig  Nl?  '{'  block  '}'
+                  | funSig  Nl?  blockWithBraces
                   | 'this'  paramClause  paramClauses
                     ('='  constrExpr |  Nl  constrBlock) ;
+
+blockWithBraces   : '{'  block  '}' ;
 
 typeDef           :  id  typeParamClause?  '='  type ;
 

@@ -22,16 +22,17 @@ simpleExpr1       : literal
  */
 
 object SimpleExpr1Visitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, builder: PsiBuilder, ctx: ParserRuleContext, args: mutable.Stack[Boolean]): Unit = {
+  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
     val context: SimpleExpr1Context = ctx.asInstanceOf[SimpleExpr1Context]
 
     if (context.path() != null) {
       visitor.typeArgs.push(ScalaElementTypes.REFERENCE_EXPRESSION)
-      PathVisitor.visit(visitor, builder, context.path(), args)
+      //PathVisitor.visit(visitor, builder, context.path(), args)
+      visitor.visitPath(context.path())
       return
     }
 
-    val marker = builder.mark()
+    val marker = visitor.getBuilder.mark()
 
     visitor.visitChildren(ctx)
 

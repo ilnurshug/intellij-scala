@@ -13,8 +13,9 @@ expr              : (bindings | id | '_')  '=>'  expr
  */
 
 object ExprVisitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, builder: PsiBuilder, ctx: ParserRuleContext, args: mutable.Stack[Boolean]): Unit = {
+  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
     val context: ExprContext = ctx.asInstanceOf[ExprContext]
+    val builder = visitor.getBuilder
 
     if (context.expr1() != null) {
       visitor.visitChildren(context.expr1())
@@ -39,7 +40,7 @@ object ExprVisitor extends VisitorHelper {
 
             builder.advanceLexer() //Ate =>
             //if (!parse(builder)) builder error ErrMsg("wrong.expression")
-            visit(visitor, builder, context.expr(), args)
+            visit(visitor, context.expr())
 
             exprMarker.done(ScalaElementTypes.FUNCTION_EXPR)
             return
@@ -49,9 +50,12 @@ object ExprVisitor extends VisitorHelper {
         }
 
       case ScalaTokenTypes.tLPARENTHESIS =>
-        BindingsVisitor.visit(visitor, builder, context.bindings(), args)
+
+        //BindingsVisitor.visit(visitor, builder, context.bindings(), args)
+        visitor.visitBindings(context.bindings())
+
         builder.advanceLexer() //Ate =>
-        visit(visitor, builder, context.expr(), args)
+        visit(visitor, context.expr())
         exprMarker.done(ScalaElementTypes.FUNCTION_EXPR)
         return
 

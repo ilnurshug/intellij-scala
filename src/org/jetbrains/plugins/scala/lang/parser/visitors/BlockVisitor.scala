@@ -8,7 +8,9 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.{ScalaElementTypes, ScalaLangVisitorImpl}
 
 object BlockVisitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, builder: PsiBuilder, ctx: ParserRuleContext, args: mutable.Stack[Boolean]): Unit = {
+  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
+    val builder = visitor.getBuilder
+    val args = visitor.args
 
     val context:BlockContext = ctx.asInstanceOf[BlockContext]
     if (args.isEmpty) {
@@ -22,7 +24,7 @@ object BlockVisitor extends VisitorHelper {
         val blockMarker = builder.mark
         builder.advanceLexer() // ate '{'
 
-        visit(visitor, builder, context, args)
+        visit(visitor, context)
 
         builder.advanceLexer() // ate '}'
 
@@ -34,7 +36,7 @@ object BlockVisitor extends VisitorHelper {
         var count = context.blockStat().size()
         if (context.resultExpr() != null) count = count + 1
 
-        visit(visitor, builder, context, args)
+        visit(visitor, context)
 
         if (count > 1) {
           bm.done(ScalaElementTypes.BLOCK)

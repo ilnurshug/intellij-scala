@@ -11,8 +11,9 @@ postfixExpr       : infixExpr ( id  Nl?)? ;
  */
 
 object PostfixExprVisitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, builder: PsiBuilder, ctx: ParserRuleContext, args: mutable.Stack[Boolean]): Unit = {
+  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
     val context: PostfixExprContext = ctx.asInstanceOf[PostfixExprContext]
+    val builder = visitor.getBuilder
     if (context.id() == null) {
       visitor.visitChildren(context)
       return
@@ -20,7 +21,8 @@ object PostfixExprVisitor extends VisitorHelper {
 
     val postfixMarker = builder.mark
 
-    InfixExprVisitor.visit(visitor, builder, context.infixExpr(), args)
+    //InfixExprVisitor.visit(visitor, builder, context.infixExpr(), args)
+    visitor.visitInfixExpr(context.infixExpr())
 
     val refMarker = builder.mark
     builder.advanceLexer() //Ate id

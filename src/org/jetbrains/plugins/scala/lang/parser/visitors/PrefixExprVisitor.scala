@@ -11,7 +11,8 @@ prefixExpr        : ('-' | '+' | '~' | '!')? simpleExpr ;
  */
 
 object PrefixExprVisitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, builder: PsiBuilder, ctx: ParserRuleContext, args: mutable.Stack[Boolean]): Unit = {
+  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
+    val builder = visitor.getBuilder
     val context: PrefixExprContext = ctx.asInstanceOf[PrefixExprContext]
 
     builder.getTokenText match {
@@ -21,7 +22,8 @@ object PrefixExprVisitor extends VisitorHelper {
         builder.advanceLexer()
         refExpr.done(ScalaElementTypes.REFERENCE_EXPRESSION)
 
-        SimpleExprVisitor.visit(visitor, builder, context.simpleExpr(), args)
+        //SimpleExprVisitor.visit(visitor, builder, context.simpleExpr(), args)
+        visitor.visitSimpleExpr(context.simpleExpr())
 
         prefixMarker.done(ScalaElementTypes.PREFIX_EXPR);
 

@@ -49,7 +49,7 @@ class ScalaLangParserTest extends SimpleTestCase
 
   def testProgram(): Unit = {
     doTest(
-      """{def f(){};f(A)}"""
+      """{def f(){};f(A)(B)}"""
     )
   }
 

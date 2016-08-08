@@ -13,7 +13,8 @@ infixExpr         : prefixExpr (id typeArgs? Nl? prefixExpr)* ;
  */
 
 object InfixExprVisitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, builder: PsiBuilder, ctx: ParserRuleContext, args: mutable.Stack[Boolean]): Unit = {
+  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
+    val builder = visitor.getBuilder
     val context: InfixExprContext = ctx.asInstanceOf[InfixExprContext]
 
     type MStack[X] = _root_.scala.collection.mutable.Stack[X]
@@ -27,7 +28,8 @@ object InfixExprVisitor extends VisitorHelper {
     var prefixExprIdx = 0
     val prefixExprCount = context.prefixExpr().size()
 
-    PrefixExprVisitor.visit(visitor, builder, context.prefixExpr(prefixExprIdx), args)
+    //PrefixExprVisitor.visit(visitor, builder, context.prefixExpr(prefixExprIdx), args)
+    visitor.visitPrefixExpr(context.prefixExpr(prefixExprIdx))
     prefixExprIdx += 1
 
     while (prefixExprIdx < prefixExprCount) {
@@ -63,7 +65,8 @@ object InfixExprVisitor extends VisitorHelper {
       backupMarker.drop()
       backupMarker = builder.mark
 
-      PrefixExprVisitor.visit(visitor, builder, context.prefixExpr(prefixExprIdx), args)
+      //PrefixExprVisitor.visit(visitor, builder, context.prefixExpr(prefixExprIdx), args)
+      visitor.visitPrefixExpr(context.prefixExpr(prefixExprIdx))
       prefixExprIdx += 1
 
       count = count + 1
