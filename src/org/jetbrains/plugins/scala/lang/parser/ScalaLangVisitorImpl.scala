@@ -34,15 +34,19 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitIds(ctx: IdsContext): Unit = visit(ctx, ScalaElementTypes.IDENTIFIER_LIST)
 
-  //override def visitPath(ctx: PathContext): Unit = PathVisitor.visit(this, ctx)
-
   override def visitReference(ctx: ReferenceContext): Unit = visit(ctx, ScalaElementTypes.REFERENCE)
 
   override def visitThisReference(ctx: ThisReferenceContext): Unit = visit(ctx, ScalaElementTypes.THIS_REFERENCE)
 
+  override def visitSuperReference(ctx: SuperReferenceContext): Unit = visit(ctx, ScalaElementTypes.SUPER_REFERENCE)
 
-  override def visitStableId(ctx: StableIdContext): Unit = StableIdVisitor.visit(this, ctx)
+  override def visitPathRef(ctx: PathRefContext): Unit = visit(ctx, ScalaElementTypes.REFERENCE)
 
+  override def visitPathRefExpr(ctx: PathRefExprContext): Unit = visit(ctx, ScalaElementTypes.REFERENCE_EXPRESSION)
+
+  override def visitStableIdRef(ctx: StableIdRefContext): Unit = visit(ctx, ScalaElementTypes.REFERENCE)
+
+  override def visitStableIdRefExpr(ctx: StableIdRefExprContext): Unit = visit(ctx, ScalaElementTypes.REFERENCE_EXPRESSION)
 
   override def visitTypeType(ctx: TypeTypeContext): Unit = visit(ctx, ScalaElementTypes.TYPE)
 

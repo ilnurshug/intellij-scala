@@ -50,16 +50,32 @@ qualId            : qualId '.' id | id ;
 
 ids               : id (  ','  id)* ;
 
-path              :  stableId
+pathRef           :  id
+                  |  stableIdRef '.' id
+                  |  thisReference '.' id
+                  |  superReference '.' id
+                  |  thisReference ;
+
+pathRefExpr       :  id
+                  |  stableIdRefExpr '.' id
+                  |  thisReference '.' id
+                  |  superReference '.' id
                   |  thisReference ;
 
 reference         : id ;
 thisReference     : (reference '.')? 'this' ;
 
-stableId          :  id
-                  |  stableId '.' id
-                  |  (id '.')? 'this' '.' id
-                  |  (id '.')? 'super' (classQualifier)? '.' id ;
+stableIdRef       :  id
+                  |  stableIdRef '.' id
+                  |  thisReference '.' id
+                  |  superReference '.' id ;
+
+stableIdRefExpr   :  id
+                  |  stableIdRefExpr '.' id
+                  |  thisReference '.' id
+                  |  superReference '.' id ;
+
+superReference    : (reference '.')? 'super' (classQualifier)? ;
 
 classQualifier    : '[' id ']' ;
 
@@ -90,8 +106,8 @@ annotType         : simpleType  annotationsNonEmpty?;
 
 simpleType        : simpleType  typeArgs
                   | simpleType '#' id
-                  | stableId
-                  | path '.' 'type'
+                  | stableIdRef
+                  | pathRef '.' 'type'
                   | '('  types ','? ')';
 
 typeArgs          : '['  types  ']';
@@ -164,7 +180,7 @@ newTemplate       : 'new' extendsBlock ;
 extendsBlock      : classTemplate | templateBody ;
 
 simpleExpr1       : literal
-                  | path
+                  | pathRefExpr
                   | '_'
                   | '(' (exprs ','?)? ')'
                   | (newTemplate | blockExpr) '.' id
@@ -246,9 +262,9 @@ tuplePattern      : '(' patterns? ')' ;
 literalPattern    : literal ;
 
 stableReferencePattern
-                  : stableId ;
+                  : stableIdRefExpr ;
 
-constructorPattern: stableId patternArgs ;
+constructorPattern: stableIdRef patternArgs ;
 
 patternArgs       : '('  patterns  ')'
                   | '('  (patterns  ',' )? namingPattern2  ')'
@@ -341,8 +357,8 @@ selfType          : id ( ':'  type)?  '=>'
 
 import_           : 'import'  importExpr ( ','  importExpr)* ;
 
-importExpr        : stableId ('.' '_' | '.' importSelectors)
-                  | stableId ;
+importExpr        : stableIdRef ('.' '_' | '.' importSelectors)
+                  | stableIdRef ;
 
 importSelectors   : '{'  ( importSelector  ',')* ( importSelector |  '_')  '}' ;
 
