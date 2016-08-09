@@ -15,8 +15,7 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.types.{CompoundType, Type
 */
 
 /*
- * ResultExpr ::= Expr1
- *              | (Bindings | id ':' CompoundType) '=>' Block
+ * ResultExpr ::= (Bindings | (['implicit']  id | '_') ':' CompoundType) '=>' Block
  */
 object ResultExpr extends ResultExpr {
   override protected val bindings = Bindings

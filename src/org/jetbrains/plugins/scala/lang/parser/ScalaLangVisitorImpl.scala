@@ -21,6 +21,13 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   var typeArgs: mutable.Stack[IElementType] = new mutable.Stack[IElementType]
 
+
+  override def visitBlockNode(ctx: BlockNodeContext): Unit = visit(ctx, ScalaElementTypes.BLOCK)
+
+  override def visitImplicitParamClause(ctx: ImplicitParamClauseContext): Unit = visit(ctx, ScalaElementTypes.PARAM_CLAUSE)
+
+  override def visitImplicitClassParamClause(ctx: ImplicitClassParamClauseContext): Unit = visit(ctx, ScalaElementTypes.PARAM_CLAUSE)
+
   override def visitLiteral(ctx: LiteralContext): Unit = visit(ctx, ScalaElementTypes.LITERAL)
 
   override def visitQualId(ctx: QualIdContext): Unit = visit(ctx, ScalaElementTypes.REFERENCE)
@@ -113,9 +120,7 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitBlock(ctx: BlockContext): Unit = BlockVisitor.visit(this, ctx)
 
-
   override def visitResultExpr(ctx: ResultExprContext): Unit = ResultExprVisitor.visit(this, ctx)
-
 
   override def visitParam(ctx: ParamContext): Unit = visit(ctx, ScalaElementTypes.PARAM)
 

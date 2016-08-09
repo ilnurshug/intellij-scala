@@ -179,6 +179,10 @@ blockExpr         : '{'  caseClauses  '}'
                   | '{'  block  '}' ;
 block             : blockStat ( semi  blockStat)*
                   | blockStat ( semi  blockStat)* resultExpr ;
+/*
+    DO NOT try to replace enterances of blockNode symbol with block symbol
+*/
+blockNode         : block ;
 
 blockStat         : import_
                   | 'implicit'? def
@@ -186,8 +190,8 @@ blockStat         : import_
                   | expr1
                   | ;
 
-resultExpr        : expr1
-                  | (bindings | ('implicit'?  id | '_')  ':'  compoundType)  '=>'  block ;
+resultExpr        : bindings  '=>'  blockNode
+                  | ('implicit'?  id | '_')  ':'  paramType '=>'  blockNode ;
 
 enumerators       : generator  ( semi  generator)* ;
 
@@ -198,7 +202,7 @@ generatorNoGuard  : pattern1  '<-'  expr ;
 
 caseClauses       : caseClause+ ;
 
-caseClause        : 'case'  pattern  guard?  '=>'  block ;
+caseClause        : 'case'  pattern  guard?  '=>'  blockNode ;
   
 guard             : 'if'  postfixExpr ;
 
@@ -265,7 +269,10 @@ funTypeParamClause: '['  typeParam ( ','  typeParam)*  ']' ;
 typeParam         : annotationsNonEmpty? (id | '_')  typeParamClause? ( '>:'  type)? ( '<:'  type)?
                     ('<%'  type)* ( ':'  type)* ;
                          
-paramClauses      : paramClause* ( Nl?  '('  'implicit'  params  ')')? ;
+paramClauses      : paramClause* implicitParamClause?;
+
+implicitParamClause
+                  : ( Nl?  '('  'implicit'  params  ')') ;
 
 paramClause       : Nl?  '('  params? ')'  ;
 
@@ -277,10 +284,12 @@ paramType         : type
                   | '=>'  type
                   | type  '*';
 
-classParamClauses : classParamClause* 
-                    ( Nl?  '('  'implicit'  classParams  ')')? ;
-                         
-classParamClause  : Nl?  '(' 'implicit'? classParams?  ')'  ;
+classParamClauses : classParamClause* implicitClassParamClause? ;
+
+implicitClassParamClause
+                  : Nl?  '(' 'implicit'  classParams ')' ;
+
+classParamClause  : Nl?  '(' classParams? ')'  ;
 
 classParams       : classParam ( ','  classParam)* ;
 
@@ -295,7 +304,7 @@ modifier          : localModifier
                   | accessModifier
                   | 'override' ;
 
-modifiersOrEmpty         : modifier* ;
+modifiersOrEmpty  : modifier* ;
                   
 localModifier     : 'abstract'
                   | 'final'

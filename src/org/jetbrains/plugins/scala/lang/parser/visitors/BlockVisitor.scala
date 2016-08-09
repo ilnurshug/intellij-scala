@@ -32,7 +32,6 @@ object BlockVisitor extends VisitorHelper {
       }
       else {
         val bm = builder.mark()
-        //val count = parseImpl(builder)
         var count = context.blockStat().size()
         if (context.resultExpr() != null) count = count + 1
 
@@ -42,7 +41,6 @@ object BlockVisitor extends VisitorHelper {
           bm.done(ScalaElementTypes.BLOCK)
         } else {
           if (!needNode) bm.drop() else bm.done(ScalaElementTypes.BLOCK)
-          //        bm.done(ScalaElementTypes.BLOCK)
         }
       }
     }
