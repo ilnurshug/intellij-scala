@@ -26,6 +26,8 @@ trait TypeArgs {
       case ScalaTokenTypes.tLSQBRACKET =>
         builder.advanceLexer() //Ate [
         builder.disableNewlines()
+
+
         def checkTypeVariable: Boolean = {
           if (isPattern) {
             builder.getTokenType match {

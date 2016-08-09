@@ -110,7 +110,7 @@ simpleType        : simpleType  typeArgs
                   | pathRef '.' 'type'
                   | '('  types ','? ')';
 
-typeArgs          : '['  types  ']';
+typeArgs          : '['  type ( ','  type)*  ']';
 
 types             : type ( ','  type)*;
 
@@ -131,7 +131,7 @@ sequenceArg       : '_' '*' ;
 expr              : (bindings | id | '_')  '=>'  expr
                   | expr1 ;
 
-expr1             : postfixExpr
+expr1             : assignStmt
                   | ifStmt
                   | whileStmt
                   | tryStmt
@@ -139,7 +139,7 @@ expr1             : postfixExpr
                   | forStmt
                   | throwStmt
                   | returnStmt
-                  | assignStmt
+                  | postfixExpr
                   | typedExprStmt
                   | matchStmt ;
 //-----------------------------------------------------------------------------
@@ -318,7 +318,7 @@ classParam        : annotations  modifiersOrEmpty  ( 'val' |  'var')?
                     
 bindings          : '('  binding ( ','  binding )*  ')' ;
 
-binding           : (id | '_') ( ':'  type)? ;
+binding           : (id | '_') ( ':'  paramType)? ;
 
 modifier          : localModifier 
                   | accessModifier
@@ -413,7 +413,7 @@ varDef            : patDef
                   
 funDef            : funSig ( ':'  type)?  '='  expr
                   | funSig  Nl?  blockWithBraces
-                  | 'this'  paramClause  paramClauses
+                  | 'this'  paramClauses
                     ('='  constrExpr |  Nl  constrBlock) ;
 
 blockWithBraces   : '{'  block  '}' ;
