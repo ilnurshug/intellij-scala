@@ -54,8 +54,8 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitAnnotType(ctx: AnnotTypeContext): Unit = AnnotTypeVisitor.visit(this, ctx)
 
-
   override def visitSimpleType(ctx: SimpleTypeContext): Unit = SimpleTypeVisitor.visit(this, ctx)
+
 
   override def visitTypeArgs(ctx: TypeArgsContext): Unit = TypeArgsVisitor.visit(this, ctx)
 

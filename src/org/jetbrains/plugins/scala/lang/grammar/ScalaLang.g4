@@ -88,8 +88,8 @@ annotType         : simpleType  annotationsNonEmpty?;
 simpleType        : simpleType  typeArgs
                   | simpleType '#' id
                   | stableId
-                  | path '.' 'type' //(stableId | (id '.')? 'this') '.' 'type'
-                  | '('  types  ')';
+                  | path '.' 'type'
+                  | '('  types ','? ')';
 
 typeArgs          : '['  types  ']';
 
