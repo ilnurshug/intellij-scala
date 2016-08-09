@@ -46,7 +46,7 @@ literal           : '-'? IntegerLiteral
                   | SymbolLiteral
                   | 'null' ; 
                   
-qualId            : id ('.' id)* ;
+qualId            : qualId '.' id | id ;
 
 ids               : id (  ','  id)* ;
 
@@ -75,8 +75,8 @@ functionArgTypes  : infixType
 
 existentialClause : 'forSome'  '{'  existentialDcl ( semi  existentialDcl)*  '}';
 
-existentialDcl    : 'type'  typeDcl
-                  | 'val'  valDcl;
+existentialDcl    : typeDeclaration
+                  | valueDeclaration;
 
 infixType         : compoundType (  id  Nl?  compoundType)*;
 
@@ -98,7 +98,7 @@ types             : type ( ','  type)*;
 refinement        : Nl? '{'  refineStat ( semi  refineStat)*  '}';
 
 refineStat        : dcl
-                  | 'type'  typeDef
+                  | typeDefinition
                   | ;
 
 typePat           : type;
@@ -334,10 +334,20 @@ importSelectors   : '{'  ( importSelector  ',')* ( importSelector |  '_')  '}' ;
 
 importSelector    : id ( '=>'  id |  '=>'  '_')? ;
  
-dcl               : annotations modifiersOrEmpty ('val'  valDcl
-                  | 'var'  varDcl
-                  | 'def'  funDcl
-                  | 'type'  Nl*  typeDcl) ;
+dcl               : valueDeclaration
+                  | variableDeclaration
+                  | functionDeclaration
+                  | typeDeclaration ;
+
+valueDeclaration  : annotations modifiersOrEmpty 'val'  valDcl ;
+
+variableDeclaration
+                  : annotations modifiersOrEmpty 'var' varDcl ;
+
+functionDeclaration
+                  : annotations modifiersOrEmpty 'def' funDcl ;
+
+typeDeclaration   : annotations modifiersOrEmpty 'type'  Nl*  typeDcl ;
 
 valDcl            : ids  ':'  type ;
 
@@ -349,8 +359,8 @@ funSig            : id  funTypeParamClause?  paramClauses ;
 
 typeDcl           : id  typeParamClause?  ('>:'  type)? ( '<:'  type)? ;
 
-patVarDef         : annotations modifiersOrEmpty ('val'  patDef
-                  | 'var'  varDef );
+patVarDef         : patternDefinition
+                  | variableDefinition;
 
 def               : patternDefinition
                   | variableDefinition
@@ -362,9 +372,9 @@ patternDefinition        : annotations modifiersOrEmpty 'val'  patDef ;
 variableDefinition       : annotations modifiersOrEmpty 'var'  varDef ;
 functionDefinition       : annotations modifiersOrEmpty 'def'  funDef ;
 typeDefinition           : annotations modifiersOrEmpty 'type'  Nl*  typeDef ;
-templateDefinition       : annotations modifiersOrEmpty tmplDef ;
+templateDefinition       : tmplDef ;
                   
-patDef            : patternList ( ':'  type)*  '='  expr ;
+patDef            : patternList (':'  type)?  '='  expr ;
 
 patternList       : pattern2 ( ','  pattern2)* ;
 
@@ -380,9 +390,15 @@ blockWithBraces   : '{'  block  '}' ;
 
 typeDef           :  id  typeParamClause?  '='  type ;
 
-tmplDef           : annotations (modifiersOrCase  'class'  classDef
-                  | modifiersOrCase  'object'  objectDef
-                  | modifiersOrEmpty 'trait'  traitDef) ;
+tmplDef           : classDefinition
+                  | objectDefinition
+                  | traitDefinition ;
+
+classDefinition   : annotations modifiersOrCase  'class'  classDef ;
+
+objectDefinition  : annotations modifiersOrCase  'object'  objectDef ;
+
+traitDefinition   : annotations modifiersOrEmpty 'trait'  traitDef ;
 
 modifiersOrCase   : modifier* 'case'? ;
 
@@ -412,9 +428,7 @@ traitParents      : annotType ( 'with'  annotType)* ;
 
 constr            : annotType  argumentExprs* ;
 
-earlyDefs         : '{'  (earlyDef ( semi  earlyDef)*)?  '}'  'with' ;
-
-earlyDef          : patVarDef ;
+earlyDefs         : '{'  (patVarDef ( semi  patVarDef)*)?  '}'  'with' ;
 
 constrExpr        : selfInvocation 
                   | constrBlock ;

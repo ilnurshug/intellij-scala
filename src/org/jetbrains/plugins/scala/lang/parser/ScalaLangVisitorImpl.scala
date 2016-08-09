@@ -23,13 +23,15 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitLiteral(ctx: LiteralContext): Unit = visit(ctx, ScalaElementTypes.LITERAL)
 
-  override def visitQualId(ctx: QualIdContext): Unit = QualIdVisitor.visit(this, ctx)
+  override def visitQualId(ctx: QualIdContext): Unit = visit(ctx, ScalaElementTypes.REFERENCE)
 
   override def visitIds(ctx: IdsContext): Unit = visit(ctx, ScalaElementTypes.IDENTIFIER_LIST)
+
 
   override def visitPath(ctx: PathContext): Unit = PathVisitor.visit(this, ctx)
 
   override def visitStableId(ctx: StableIdContext): Unit = StableIdVisitor.visit(this, ctx)
+
 
   override def visitTypeType(ctx: TypeTypeContext): Unit = visit(ctx, ScalaElementTypes.TYPE)
 
@@ -45,9 +47,11 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitAnnotType(ctx: AnnotTypeContext): Unit = AnnotTypeVisitor.visit(this, ctx)
 
+
   override def visitSimpleType(ctx: SimpleTypeContext): Unit = SimpleTypeVisitor.visit(this, ctx)
 
   override def visitTypeArgs(ctx: TypeArgsContext): Unit = TypeArgsVisitor.visit(this, ctx)
+
 
   override def visitTypes(ctx: TypesContext): Unit = TypesVisitor.visit(this, ctx)
 
@@ -109,7 +113,9 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitBlock(ctx: BlockContext): Unit = BlockVisitor.visit(this, ctx)
 
+
   override def visitResultExpr(ctx: ResultExprContext): Unit = ResultExprVisitor.visit(this, ctx)
+
 
   override def visitParam(ctx: ParamContext): Unit = visit(ctx, ScalaElementTypes.PARAM)
 
@@ -130,8 +136,6 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
   override def visitFunctionDefinition(ctx: FunctionDefinitionContext): Unit = visit(ctx, ScalaElementTypes.FUNCTION_DEFINITION)
 
   override def visitTypeDefinition(ctx: TypeDefinitionContext): Unit = visit(ctx, ScalaElementTypes.TYPE_DEFINITION)
-
-  override def visitTemplateDefinition(ctx: TemplateDefinitionContext): Unit = ???
 
   override def visitBlockWithBraces(ctx: BlockWithBracesContext): Unit = visit(ctx, ScalaElementTypes.BLOCK_EXPR)
 
@@ -203,85 +207,58 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitGeneratorNoGuard(ctx: GeneratorNoGuardContext): Unit = visit(ctx, ScalaElementTypes.GENERATOR)
 
+  override def visitEarlyDefs(ctx: EarlyDefsContext): Unit = visit(ctx, ScalaElementTypes.EARLY_DEFINITIONS)
 
+  override def visitPatternList(ctx: PatternListContext): Unit = visit(ctx, ScalaElementTypes.PATTERN_LIST)
 
+  override def visitClassDefinition(ctx: ClassDefinitionContext): Unit = visit(ctx, ScalaElementTypes.CLASS_DEF)
 
+  override def visitObjectDefinition(ctx: ObjectDefinitionContext): Unit = visit(ctx, ScalaElementTypes.OBJECT_DEF)
 
+  override def visitTraitDefinition(ctx: TraitDefinitionContext): Unit = visit(ctx, ScalaElementTypes.TRAIT_DEF)
 
+  override def visitModifiersOrCase(ctx: ModifiersOrCaseContext): Unit = visit(ctx, ScalaElementTypes.MODIFIERS)
 
-  override def visitImport_(ctx: Import_Context): Unit = Import_Visitor.visit(this, ctx)
+  override def visitPrimaryConstructor(ctx: PrimaryConstructorContext): Unit = visit(ctx, ScalaElementTypes.PRIMARY_CONSTRUCTOR)
 
-  override def visitImportExpr(ctx: ImportExprContext): Unit = ImportExprVisitor.visit(this, ctx)
+  override def visitPackageObject(ctx: PackageObjectContext): Unit = visit(ctx, ScalaElementTypes.OBJECT_DEF)
 
-  override def visitImportSelectors(ctx: ImportSelectorsContext): Unit = ImportSelectorsVisitor.visit(this, ctx)
+  override def visitValueDeclaration(ctx: ValueDeclarationContext): Unit = visit(ctx, ScalaElementTypes.VALUE_DECLARATION)
 
-  override def visitImportSelector(ctx: ImportSelectorContext): Unit = ImportSelectorVisitor.visit(this, ctx)
+  override def visitVariableDeclaration(ctx: VariableDeclarationContext): Unit = visit(ctx, ScalaElementTypes.VARIABLE_DECLARATION)
 
-  override def visitDcl(ctx: DclContext): Unit = DclVisitor.visit(this, ctx)
+  override def visitFunctionDeclaration(ctx: FunctionDeclarationContext): Unit = visit(ctx, ScalaElementTypes.FUNCTION_DECLARATION)
 
-  override def visitValDcl(ctx: ValDclContext): Unit = ValDclVisitor.visit(this, ctx)
+  override def visitTypeDeclaration(ctx: TypeDeclarationContext): Unit = visit(ctx, ScalaElementTypes.TYPE_DECLARATION)
 
-  override def visitVarDcl(ctx: VarDclContext): Unit = VarDclVisitor.visit(this, ctx)
+  override def visitImport_(ctx: Import_Context): Unit = visit(ctx, ScalaElementTypes.IMPORT_STMT)
 
-  override def visitFunDcl(ctx: FunDclContext): Unit = FunDclVisitor.visit(this, ctx)
+  override def visitImportExpr(ctx: ImportExprContext): Unit = visit(ctx, ScalaElementTypes.IMPORT_EXPR)
 
-  override def visitTypeDcl(ctx: TypeDclContext): Unit = TypeDclVisitor.visit(this, ctx)
+  override def visitImportSelectors(ctx: ImportSelectorsContext): Unit = visit(ctx, ScalaElementTypes.IMPORT_SELECTORS)
 
-  override def visitPatVarDef(ctx: PatVarDefContext): Unit = PatVarDefVisitor.visit(this, ctx)
+  override def visitClassTemplateOpt(ctx: ClassTemplateOptContext): Unit = visit(ctx, ScalaElementTypes.EXTENDS_BLOCK)
 
-  override def visitPatDef(ctx: PatDefContext): Unit = PatDefVisitor.visit(this, ctx)
+  override def visitTraitTemplateOpt(ctx: TraitTemplateOptContext): Unit = visit(ctx, ScalaElementTypes.EXTENDS_BLOCK)
 
-  override def visitPatternList(ctx: PatternListContext): Unit = PatternListVisitor.visit(this, ctx)
+  override def visitClassParents(ctx: ClassParentsContext): Unit = visit(ctx, ScalaElementTypes.CLASS_PARENTS)
 
-  override def visitVarDef(ctx: VarDefContext): Unit = VarDefVisitor.visit(this, ctx)
+  override def visitTraitParents(ctx: TraitParentsContext): Unit = visit(ctx, ScalaElementTypes.TRAIT_PARENTS)
 
-  override def visitTypeDef(ctx: TypeDefContext): Unit = TypeDefVisitor.visit(this, ctx)
-
-  override def visitTmplDef(ctx: TmplDefContext): Unit = TmplDefVisitor.visit(this, ctx)
-
-  override def visitModifiersOrCase(ctx: ModifiersOrCaseContext): Unit = ModifiersOrCaseVisitor.visit(this, ctx)
-
-  override def visitClassDef(ctx: ClassDefContext): Unit = ClassDefVisitor.visit(this, ctx)
-
-  override def visitPrimaryConstructor(ctx: PrimaryConstructorContext): Unit = PrimaryConstructorVisitor.visit(this, ctx)
-
-  override def visitTraitDef(ctx: TraitDefContext): Unit = TraitDefVisitor.visit(this, ctx)
-
-  override def visitObjectDef(ctx: ObjectDefContext): Unit = ObjectDefVisitor.visit(this, ctx)
-
-  override def visitClassTemplateOpt(ctx: ClassTemplateOptContext): Unit = ClassTemplateOptVisitor.visit(this, ctx)
-
-  override def visitTraitTemplateOpt(ctx: TraitTemplateOptContext): Unit = TraitTemplateOptVisitor.visit(this, ctx)
-
-  override def visitClassTemplate(ctx: ClassTemplateContext): Unit = ClassTemplateVisitor.visit(this, ctx)
-
-  override def visitTraitTemplate(ctx: TraitTemplateContext): Unit = TraitTemplateVisitor.visit(this, ctx)
-
-  override def visitClassParents(ctx: ClassParentsContext): Unit = ClassParentsVisitor.visit(this, ctx)
-
-  override def visitTraitParents(ctx: TraitParentsContext): Unit = TraitParentsVisitor.visit(this, ctx)
-
-  override def visitConstr(ctx: ConstrContext): Unit = ConstrVisitor.visit(this, ctx)
-
-  override def visitEarlyDefs(ctx: EarlyDefsContext): Unit = EarlyDefsVisitor.visit(this, ctx)
-
-  override def visitEarlyDef(ctx: EarlyDefContext): Unit = EarlyDefVisitor.visit(this, ctx)
+  override def visitConstr(ctx: ConstrContext): Unit = visit(ctx, ScalaElementTypes.CONSTRUCTOR)
 
   override def visitConstrExpr(ctx: ConstrExprContext): Unit = ConstrExprVisitor.visit(this, ctx)
 
-  override def visitConstrBlock(ctx: ConstrBlockContext): Unit = ConstrBlockVisitor.visit(this, ctx)
+  override def visitConstrBlock(ctx: ConstrBlockContext): Unit = visit(ctx, ScalaElementTypes.CONSTR_BLOCK)
 
-  override def visitSelfInvocation(ctx: SelfInvocationContext): Unit = SelfInvocationVisitor.visit(this, ctx)
+  override def visitSelfInvocation(ctx: SelfInvocationContext): Unit = visit(ctx, ScalaElementTypes.SELF_INVOCATION)
 
-  override def visitTopStatSeq(ctx: TopStatSeqContext): Unit = TopStatSeqVisitor.visit(this, ctx)
+  override def visitPackaging(ctx: PackagingContext): Unit = visit(ctx, ScalaElementTypes.PACKAGING)
 
-  override def visitTopStat(ctx: TopStatContext): Unit = TopStatVisitor.visit(this, ctx)
+  // ???
+  override def visitPackageDcl(ctx: PackageDclContext): Unit = visit(ctx, ScalaElementTypes.PACKAGING)
 
-  override def visitPackaging(ctx: PackagingContext): Unit = PackagingVisitor.visit(this, ctx)
 
-  override def visitPackageObject(ctx: PackageObjectContext): Unit = PackageObjectVisitor.visit(this, ctx)
-
-  override def visitPackageDcl(ctx: PackageDclContext): Unit = PackageDclVisitor.visit(this, ctx)
 
   override def visitTerminal(node: TerminalNode): Unit = builder.advanceLexer()
 
