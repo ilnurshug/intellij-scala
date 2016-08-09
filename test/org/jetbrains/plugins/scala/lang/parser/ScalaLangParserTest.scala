@@ -30,8 +30,9 @@ class ScalaLangParserTest extends SimpleTestCase
     val builder: ScalaPsiBuilderImpl = new ScalaPsiBuilderImpl(tmp)
 
     val parser : ANTLRScalaLangParserAdaptor = ANTLRScalaLangParserAdaptor.INSTANCE
-
+    val marker = builder.mark
     parser.parse(builder, startRule)
+    marker.done(ScalaElementTypes.FILE)
     val node = builder.getTreeBuilt
 
     val converter = new ASTTreeToDot()
@@ -73,6 +74,7 @@ class ScalaLangParserTest extends SimpleTestCase
         }"""
     )
   }
+  //f[A](n - 1)(body)
 
   def testProgram2(): Unit = {
     doTest(
@@ -94,7 +96,6 @@ class ScalaLangParserTest extends SimpleTestCase
   private val Header = "class Seq[+A];object Seq { def apply[A](a: A) = new Seq[A] };trait L;trait A; trait B; trait C;object A extends L with A"
   private val line = "def f(a: A){}; f(A)"
   def testProgram5(): Unit = {
-    //doTest("trait L;\ntrait A; trait B; trait C;\nobject A extends L with A")
     //doTest("object Seq { def apply[A](a: A) = new Seq[A] }")
     //doTest("class Seq[+A]\nobject Seq { def apply[A](a: A) = new Seq[A] }")
     doTest(Header + ";" + line)

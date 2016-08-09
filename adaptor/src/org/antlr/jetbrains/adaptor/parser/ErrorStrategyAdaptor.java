@@ -19,11 +19,6 @@ public class ErrorStrategyAdaptor extends DefaultErrorStrategy {
 		super.consumeUntil(recognizer, set);
 	}
 
-	@Override
-	public void recover(Parser recognizer, RecognitionException e) {
-		super.recover(recognizer, e);
-	}
-
 	/** By default ANTLR makes the start/stop -1/-1 for invalid tokens
 	 *  which is reasonable but here we want to highlight the
 	 *  current position indicating that is where we lack a token.
@@ -41,10 +36,5 @@ public class ErrorStrategyAdaptor extends DefaultErrorStrategy {
 			((CommonToken) missingSymbol).setStopIndex(stop);
 		}
 		return missingSymbol;
-	}
-
-	@Override
-	public void sync(Parser recognizer) throws RecognitionException {
-		super.sync(recognizer);
 	}
 }

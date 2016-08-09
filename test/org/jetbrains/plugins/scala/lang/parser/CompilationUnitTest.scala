@@ -24,7 +24,12 @@ class CompilationUnitTest extends SimpleTestCase {
       ScalaFileType.SCALA_LANGUAGE, s)
     val builder: ScalaPsiBuilderImpl = new ScalaPsiBuilderImpl(tmp)
 
+    val marker = builder.mark
+
     Program.parse(builder)
+
+    marker.done(ScalaElementTypes.FILE)
+
     val node = builder.getTreeBuilt
 
     val converter = new ASTTreeToDot()
@@ -55,9 +60,8 @@ class CompilationUnitTest extends SimpleTestCase {
   private val line = "def f(a: A){}; f(A)"
   // why scala's parser crashes??
   def testCompilationUnit3(): Unit = {
-    doTest("object A extends L with A")
     //doTest("object Seq { def apply[A](a: A) = new Seq[A] }")
-    //doTest(Header + "\n" + line)
+    doTest(Header + "\n" + line)
   }
 
   def testCompilationUnit4(): Unit = {

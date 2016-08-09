@@ -20,8 +20,8 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
   private val Header = """
   class Seq[+A]
   object Seq { def apply[A](a: A) = new Seq[A] }
-  trait L;
-  trait A; trait B; trait C;
+  trait L
+  trait A; trait B; trait C
   object A extends L with A
   object B extends L with B
   object C extends L with C

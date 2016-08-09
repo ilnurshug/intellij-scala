@@ -34,7 +34,7 @@ public class ParserTest extends BaseScalaFileSetTestCase {
   public ParserTest() {
     super(System.getProperty("path") != null ?
             System.getProperty("path") :
-            TestUtils.getTestDataPath() + DATA_PATH + "/types"
+            TestUtils.getTestDataPath() + DATA_PATH + "/stmts"
     );
   }
 

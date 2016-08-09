@@ -34,8 +34,8 @@
 grammar ScalaLang;
 
 program           : blockExpr
-                  | compilationUnit
                   | selfType?  templateStat ( semi  templateStat)*    // for debug purposes
+                  | compilationUnit
                   | block;                                            // for debug purposes
 
 literal           : '-'? IntegerLiteral
@@ -51,7 +51,10 @@ qualId            : qualId '.' id | id ;
 ids               : id (  ','  id)* ;
 
 path              :  stableId
-                  |  (id '.')? 'this' ;
+                  |  thisReference ;
+
+reference         : id ;
+thisReference     : (reference '.')? 'this' ;
 
 stableId          :  id
                   |  stableId '.' id
@@ -112,7 +115,8 @@ sequenceArg       : '_' '*' ;
 expr              : (bindings | id | '_')  '=>'  expr
                   | expr1 ;
 
-expr1             : ifStmt
+expr1             : postfixExpr
+                  | ifStmt
                   | whileStmt
                   | tryStmt
                   | doStmt
@@ -120,7 +124,6 @@ expr1             : ifStmt
                   | throwStmt
                   | returnStmt
                   | assignStmt
-                  | postfixExpr
                   | typedExprStmt
                   | matchStmt ;
 //-----------------------------------------------------------------------------
@@ -128,8 +131,8 @@ ifStmt            : 'if'  '('  expr  ')'  Nl*  expr ( semi?  'else'  expr)? ;
 
 whileStmt         : 'while'  '('  expr  ')'  Nl*  expr ;
 
-tryStmt           : 'try' tryBlock catchBlock? finallyBlock? ;
-tryBlock          : '{'  block  '}'  |  expr ;
+tryStmt           : tryBlock catchBlock? finallyBlock? ;
+tryBlock          : 'try' ('{'  block  '}'  |  expr) ;
 catchBlock        : 'catch'  '{'  caseClauses  '}' ;
 finallyBlock      : 'finally'  expr ;
 
