@@ -13,7 +13,7 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.types.StableId
 */
 
 /*
- *  ImportExpr ::= StableId  '.'  (id | '_'  | ImportSelectors)
+ *  ImportExpr ::= StableId  ['.'  (id | '_'  | ImportSelectors)]
  */
 
 object ImportExpr {

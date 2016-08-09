@@ -196,6 +196,8 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitTemplateBody(ctx: TemplateBodyContext): Unit = visit(ctx, ScalaElementTypes.TEMPLATE_BODY)
 
+  override def visitExtendsBlock(ctx: ExtendsBlockContext): Unit = visit(ctx, ScalaElementTypes.EXTENDS_BLOCK)
+
   override def visitSelfType(ctx: SelfTypeContext): Unit = visit(ctx, ScalaElementTypes.SELF_TYPE)
 
   override def visitWildcardPattern(ctx: WildcardPatternContext): Unit = visit(ctx, ScalaElementTypes.WILDCARD_PATTERN)

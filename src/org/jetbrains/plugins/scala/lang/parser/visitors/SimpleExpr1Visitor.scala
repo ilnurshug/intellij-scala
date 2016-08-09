@@ -1,5 +1,6 @@
 package org.jetbrains.plugins.scala.lang.parser.visitors
 import com.intellij.lang.PsiBuilder
+import com.intellij.psi.tree.IElementType
 
 import scala.collection.mutable
 import org.antlr.v4.runtime.ParserRuleContext
@@ -36,11 +37,11 @@ object SimpleExpr1Visitor extends VisitorHelper {
 
     visitor.visitChildren(ctx)
 
-    val childCount = ctx.getChildCount
+    val childCount:Int = ctx.getChildCount
     if (childCount > 1) {
       if (ctx.getChild(childCount - 1).isInstanceOf[RuleNode]) {
         val lastChild = ctx.getChild(childCount - 1).asInstanceOf[RuleNode]
-        val r = lastChild.getRuleContext.getRuleIndex
+        val r: Int = lastChild.getRuleContext.getRuleIndex
 
         if (r == ScalaLangParser.RULE_argumentExprs) {
           marker.done(ScalaElementTypes.METHOD_CALL)
@@ -54,7 +55,7 @@ object SimpleExpr1Visitor extends VisitorHelper {
       }
       else {
         val lastChild = ctx.getChild(childCount - 1).asInstanceOf[TerminalNode]
-        val t = lastChild.getSymbol.getType
+        val t:Int = lastChild.getSymbol.getType
         if (t == ScalaLangParser.RPARENTHESIS) {
           if (context.exprs() != null) {
             if (hasTerminalNode(ctx, ",")) {

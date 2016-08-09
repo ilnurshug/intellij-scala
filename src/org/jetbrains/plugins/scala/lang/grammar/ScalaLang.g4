@@ -160,7 +160,8 @@ prefixExpr        : ('-' | '+' | '~' | '!')? simpleExpr ;
 
 simpleExpr        : newTemplate | blockExpr | simpleExpr1 '_'?;
 
-newTemplate       : 'new' (classTemplate | templateBody) ;
+newTemplate       : 'new' extendsBlock ;
+extendsBlock      : classTemplate | templateBody ;
 
 simpleExpr1       : literal
                   | path
@@ -247,7 +248,7 @@ literalPattern    : literal ;
 stableReferencePattern
                   : stableId ;
 
-constructorPattern: patternArgs ;
+constructorPattern: stableId patternArgs ;
 
 patternArgs       : '('  patterns  ')'
                   | '('  (patterns  ',' )? namingPattern2  ')'
@@ -340,7 +341,8 @@ selfType          : id ( ':'  type)?  '=>'
 
 import_           : 'import'  importExpr ( ','  importExpr)* ;
 
-importExpr        : stableId ('.' '_' | '.' importSelectors)? ;
+importExpr        : stableId ('.' '_' | '.' importSelectors)
+                  | stableId ;
 
 importSelectors   : '{'  ( importSelector  ',')* ( importSelector |  '_')  '}' ;
 

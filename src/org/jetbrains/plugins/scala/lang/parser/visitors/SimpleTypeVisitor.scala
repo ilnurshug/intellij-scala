@@ -30,7 +30,7 @@ object SimpleTypeVisitor extends VisitorHelper {
       marker.done(ScalaElementTypes.TYPE_PROJECTION)
     }
     else if (context.types() != null) {
-      val isTuple = context.types().getChildCount > 1
+      val isTuple:Boolean = context.types().getChildCount > 1
       if (isTuple) marker.done(ScalaElementTypes.TUPLE_TYPE)
       else marker.done(ScalaElementTypes.TYPE_IN_PARENTHESIS)
     }

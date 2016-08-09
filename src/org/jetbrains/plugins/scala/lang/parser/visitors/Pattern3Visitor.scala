@@ -10,15 +10,15 @@ object Pattern3Visitor extends VisitorHelper {
     val context = ctx.asInstanceOf[Pattern3Context]
     val builder = visitor.getBuilder
 
-    var spIdx = 0
-    val spCount = context.simplePattern().size()
+    var spIdx: Int = 0
+    val spCount: Int = context.simplePattern().size()
 
     type Stack[X] = _root_.scala.collection.mutable.Stack[X]
     val markerStack = new Stack[PsiBuilder.Marker]
     val opStack = new Stack[String]
     //val infixMarker = builder.mark
     var backupMarker = builder.mark
-    var count = 0
+    var count: Int = 0
 
     visitor.visitSimplePattern(context.simplePattern(spIdx))
     spIdx += 1

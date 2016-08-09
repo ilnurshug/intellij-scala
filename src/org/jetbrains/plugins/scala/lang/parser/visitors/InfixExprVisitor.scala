@@ -25,8 +25,8 @@ object InfixExprVisitor extends VisitorHelper {
     var backupMarker = builder.mark
     var count = 0
 
-    var prefixExprIdx = 0
-    val prefixExprCount = context.prefixExpr().size()
+    var prefixExprIdx: Int = 0
+    val prefixExprCount: Int = context.prefixExpr().size()
 
     //PrefixExprVisitor.visit(visitor, builder, context.prefixExpr(prefixExprIdx), args)
     visitor.visitPrefixExpr(context.prefixExpr(prefixExprIdx))
