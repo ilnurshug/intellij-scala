@@ -57,7 +57,9 @@ object ImportSelectors extends ParserNode {
             }
           }
         case ScalaTokenTypes.tIDENTIFIER =>
+
           ImportSelector parse builder
+
           builder.getTokenType match {
             case ScalaTokenTypes.tCOMMA => {
               builder.advanceLexer() //Ate ,

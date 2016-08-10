@@ -81,4 +81,8 @@ class CompilationUnitTest extends SimpleTestCase {
   def testCompilationUnit7(): Unit = {
     doTest("class A {def f(q: {val a: String}) {}}")
   }
+
+  def testCompilationUnit8(): Unit = {
+    doTest("import a.b.{a, b, c => d}")
+  }
 }

@@ -365,7 +365,7 @@ importExpr        : stableIdRef ('.' '_' | '.' importSelectors)
 
 importSelectors   : '{'  ( importSelector  ',')* ( importSelector |  '_')  '}' ;
 
-importSelector    : id ( '=>'  id |  '=>'  '_')? ;
+importSelector    : reference ( '=>'  id |  '=>'  '_')? ;
  
 dcl               : valueDeclaration
                   | variableDeclaration

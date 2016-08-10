@@ -144,6 +144,10 @@ class ScalaLangParserTest extends SimpleTestCase
     doTest("class A{ var a,b,c: Type }")
   }
 
+  def testProgram13(): Unit = {
+    doTest("import a.b.{a, b, c => d}")
+  }
+
   def testExperiment(): Unit = {
     val lexer: ScalaLexer  = new ScalaLexer()
     lexer.start("class a \n{\n a.b.c\n}")
