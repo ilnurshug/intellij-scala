@@ -150,7 +150,7 @@ whileStmt         : 'while'  '('  expr  ')'  Nl*  expr ;
 
 tryStmt           : tryBlock catchBlock? finallyBlock? ;
 tryBlock          : 'try' ('{'  block  '}'  |  expr) ;
-catchBlock        : 'catch'  '{'  caseClauses  '}' ;
+catchBlock        : 'catch'  expr /*'{'  caseClauses  '}'*/ ;
 finallyBlock      : 'finally'  expr ;
 
 doStmt            : 'do'  expr  semi?  'while'  '('  expr  ')' ;
