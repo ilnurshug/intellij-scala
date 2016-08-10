@@ -42,7 +42,7 @@ trait Patterns {
     builder.getTokenType match {
       case ScalaTokenTypes.tCOMMA =>
         builder.advanceLexer //Ate ,
-      var end = false
+        var end = false
         while ((!end || !underParams) && pattern.parse(builder)) {
           builder.getTokenType match {
             case ScalaTokenTypes.tCOMMA => {

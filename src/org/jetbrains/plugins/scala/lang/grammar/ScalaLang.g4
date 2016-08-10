@@ -265,9 +265,9 @@ stableReferencePattern
 
 constructorPattern: stableIdRef patternArgs ;
 
-patternArgs       : '('  patterns  ')'
-                  | '('  (patterns  ',' )? namingPattern2  ')'
-                  | '('  (patterns  ',' )? seqWildcard  ')';
+patternArgs       : '('  pattern ( ','  pattern)*  ')'
+                  | '('  (pattern ( ','  pattern)*  ',' )? namingPattern2  ')'
+                  | '('  (pattern ( ','  pattern)*  ',' )? seqWildcard  ')';
 
 namingPattern2    : ID  '@'  seqWildcard ;
 
