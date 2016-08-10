@@ -156,6 +156,10 @@ class ScalaLangParserTest extends SimpleTestCase
     doTest("case Some => g", "caseClauses")
   }
 
+  def testProgram16(): Unit = {
+    doTest("(2+1*2,3)", "simplePattern")
+  }
+
   def testExperiment(): Unit = {
     val lexer: ScalaLexer  = new ScalaLexer()
     lexer.start("class a \n{\n a.b.c\n}")

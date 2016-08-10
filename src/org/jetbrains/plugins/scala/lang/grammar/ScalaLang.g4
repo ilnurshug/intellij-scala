@@ -241,11 +241,11 @@ pattern1          : typedPattern
 typedPattern      : {isVarId()}? ID  ':'  typePat
                   | '_'  ':'  typePat ;
 
-pattern2          : {isVarId()}? referencePattern
+pattern2          : referencePattern
                   | namingPattern
                   | pattern3 ;
 
-referencePattern  : ID ;
+referencePattern  : {isVarId()}? ID ;
 namingPattern     : ID '@' pattern3 ;
 
 pattern3          : simplePattern
@@ -253,7 +253,7 @@ pattern3          : simplePattern
 //-----------------------------------------------------------------------------
 simplePattern     : wildcardPattern
                   | tuplePattern
-                  | {isVarId()}? referencePattern
+                  | referencePattern
                   | literalPattern
                   | stableReferencePattern
                   | constructorPattern
