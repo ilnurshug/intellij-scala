@@ -33,6 +33,12 @@
 
 grammar ScalaLang;
 
+@parser::members {
+Boolean isVarId() {
+    return Character.isLowerCase(getCurrentToken().getText().charAt(0));
+}
+}
+
 program           : blockExpr
                   | selfType?  templateStat ( semi  templateStat)*    // for debug purposes
                   | compilationUnit
@@ -175,7 +181,9 @@ infixExpr         : prefixExpr (id typeArgs? Nl? prefixExpr)* ;
 
 prefixExpr        : ('-' | '+' | '~' | '!')? simpleExpr ;
 
-simpleExpr        : newTemplate | blockExpr | simpleExpr1 '_'?;
+simpleExpr        : newTemplate | blockExpr | placeholderExpr | simpleExpr1 ;
+
+placeholderExpr   : simpleExpr1 '_' ;
 
 newTemplate       : 'new' extendsBlock ;
 extendsBlock      : classTemplate | templateBody ;
@@ -225,15 +233,15 @@ caseClause        : 'case'  pattern  guard?  '=>'  blockNode ;
   
 guard             : 'if'  postfixExpr ;
 
-pattern           : pattern1 ( '|'  pattern1 )* ;
+pattern           : pattern1 ( VDASH  pattern1 )* ;
 
 pattern1          : typedPattern
                   | pattern2 ;
 
-typedPattern      : ID  ':'  typePat
+typedPattern      : {isVarId()}? ID  ':'  typePat
                   | '_'  ':'  typePat ;
 
-pattern2          : referencePattern
+pattern2          : {isVarId()}? referencePattern
                   | namingPattern
                   | pattern3 ;
 
@@ -241,15 +249,15 @@ referencePattern  : ID ;
 namingPattern     : ID '@' pattern3 ;
 
 pattern3          : simplePattern
-                  | simplePattern ( id  Nl?  simplePattern)* ;
+                  | simplePattern ( /*{getCurrentToken().getText().compareTo("|") != 0}?*/ (id  Nl?  simplePattern))* ;
 //-----------------------------------------------------------------------------
 simplePattern     : wildcardPattern
-                  | patternInParenthesis
-                  | referencePattern
+                  | tuplePattern
+                  | {isVarId()}? referencePattern
                   | literalPattern
                   | stableReferencePattern
                   | constructorPattern
-                  | tuplePattern ;
+                  | patternInParenthesis ;
 
 wildcardPattern   : '_' ;
 
@@ -273,10 +281,9 @@ namingPattern2    : ID  '@'  seqWildcard ;
 
 //-----------------------------------------------------------------------------
 patterns          : patternSeq
-                  | pattern
                   | seqWildcard ;
 
-patternSeq        : pattern ( ','  patterns)* ;
+patternSeq        : pattern ( ','  pattern)+ ;
 seqWildcard       : '_' '*' ;
 
 typeParamClause   : '['  variantTypeParam ( ','  variantTypeParam)*  ']' ;
@@ -363,7 +370,7 @@ import_           : 'import'  importExpr ( ','  importExpr)* ;
 importExpr        : stableIdRef ('.' '_' | '.' importSelectors)
                   | stableIdRef ;
 
-importSelectors   : '{'  ( importSelector  ',')* ( importSelector |  '_')  '}' ;
+importSelectors   : '{'  ( importSelector  ',')* ('_' | importSelector)  '}' ;
 
 importSelector    : reference ( '=>'  id |  '=>'  '_')? ;
  
@@ -479,7 +486,9 @@ topStat           : tmplDef
                     
 packaging         : 'package'  qualId  Nl?  '{'  topStatSeq  '}' ;
 
-packageObject     : 'package'  'object'  objectDef ;
+packageObject     : emptyAnnotations emptyModifiers 'package'  'object'  objectDef ;
+
+emptyAnnotations  : ;
 
 compilationUnit   : packageDcl? topStatSeq ;
 
@@ -499,7 +508,7 @@ id                : ID
 semi              :  SEMICOLON |  Nl+;
 
 // Lexer
-
+VDASH       :  '|';
 SEMICOLON   :  ';';
 LBRACE		:  '{';
 RBRACE		:  '}';

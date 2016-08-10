@@ -256,6 +256,10 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitImportSelectors(ctx: ImportSelectorsContext): Unit = visit(ctx, ScalaElementTypes.IMPORT_SELECTORS)
 
+  override def visitPlaceholderExpr(ctx: PlaceholderExprContext): Unit = visit(ctx, ScalaElementTypes.PLACEHOLDER_EXPR)
+
+  override def visitEmptyAnnotations(ctx: EmptyAnnotationsContext): Unit = visit(ctx, ScalaElementTypes.ANNOTATIONS)
+
   override def visitImportSelector(ctx: ImportSelectorContext): Unit = visit(ctx, ScalaElementTypes.IMPORT_SELECTOR)
 
   override def visitClassTemplateOpt(ctx: ClassTemplateOptContext): Unit = visit(ctx, ScalaElementTypes.EXTENDS_BLOCK)

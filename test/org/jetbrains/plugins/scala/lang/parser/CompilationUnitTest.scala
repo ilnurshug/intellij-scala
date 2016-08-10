@@ -83,6 +83,6 @@ class CompilationUnitTest extends SimpleTestCase {
   }
 
   def testCompilationUnit8(): Unit = {
-    doTest("import a.b.{a, b, c => d}")
+    doTest("class a {\n  2 + x _\n}")
   }
 }

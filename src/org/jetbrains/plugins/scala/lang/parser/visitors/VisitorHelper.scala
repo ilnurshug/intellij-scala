@@ -15,4 +15,13 @@ trait VisitorHelper {
 
     false
   }
+
+  def getTerminalNodeIndexByText(ctx: ParserRuleContext, s: String): Int = {
+    for (i <- 0 until ctx.getChildCount)
+      if (ctx.getChild(i).isInstanceOf[TerminalNode]) {
+        if (ctx.getChild(i).getText.compareTo(s) == 0) return i
+      }
+
+    -1
+  }
 }

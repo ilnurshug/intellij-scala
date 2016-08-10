@@ -34,7 +34,23 @@ object SimpleExpr1Visitor extends VisitorHelper {
 
     val marker = visitor.getBuilder.mark()
 
-    visitor.visitChildren(ctx)
+    val idx: Int = getTerminalNodeIndexByText(context, "_")
+    idx match {
+      case -1 =>    // not found
+        visitor.visitChildren(ctx)
+      case _ =>     // found
+        val phmarker = visitor.getBuilder.mark()
+        var i:Int = 0
+        while (i <= idx) {
+          context.getChild(i).accept(visitor)
+          i += 1
+        }
+        phmarker.done(ScalaElementTypes.PLACEHOLDER_EXPR)
+        while (i < context.getChildCount) {
+          context.getChild(i).accept(visitor)
+          i += 1
+        }
+    }
 
     val childCount:Int = ctx.getChildCount
     if (childCount > 1) {
@@ -74,18 +90,7 @@ object SimpleExpr1Visitor extends VisitorHelper {
       }
     }
     else {
-      if (ctx.getChild(childCount - 1).isInstanceOf[TerminalNode]) {
-        val lastChild = ctx.getChild(childCount - 1).asInstanceOf[TerminalNode]
-        val t: Int = lastChild.getSymbol.getType
-
-        t match {
-          case ScalaLangParser.UNDER =>
-            marker.done(ScalaElementTypes.PLACEHOLDER_EXPR)
-          case _ =>
-            marker.drop()
-        }
-      }
-      else marker.drop()
+       marker.drop()
     }
   }
 }
