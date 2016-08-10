@@ -48,7 +48,8 @@ literal           : '-'? IntegerLiteral
                   
 qualId            : qualId '.' id | id ;
 
-ids               : id (  ','  id)* ;
+ids               : fieldId (  ','  fieldId)* ;
+fieldId           : id ;
 
 pathRef           :  stableIdRef '.' id
                   |  thisReference '.' id
@@ -199,9 +200,7 @@ blockExpr         : '{'  caseClauses  '}'
                   | '{'  block  '}' ;
 block             : blockStat ( semi  blockStat)*
                   | blockStat ( semi  blockStat)* resultExpr ;
-/*
-    DO NOT try to replace enterances of blockNode symbol with block symbol
-*/
+
 blockNode         : block ;
 
 blockStat         : import_

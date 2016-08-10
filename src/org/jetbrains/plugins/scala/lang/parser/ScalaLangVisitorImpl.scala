@@ -34,6 +34,8 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitIds(ctx: IdsContext): Unit = visit(ctx, ScalaElementTypes.IDENTIFIER_LIST)
 
+  override def visitFieldId(ctx: FieldIdContext): Unit = visit(ctx, ScalaElementTypes.FIELD_ID)
+
   override def visitReference(ctx: ReferenceContext): Unit = visit(ctx, ScalaElementTypes.REFERENCE)
 
   override def visitThisReference(ctx: ThisReferenceContext): Unit = visit(ctx, ScalaElementTypes.THIS_REFERENCE)
