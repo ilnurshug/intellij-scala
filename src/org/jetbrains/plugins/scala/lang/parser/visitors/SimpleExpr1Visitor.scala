@@ -54,7 +54,7 @@ object SimpleExpr1Visitor extends VisitorHelper {
       }
       else {
         val lastChild = ctx.getChild(childCount - 1).asInstanceOf[TerminalNode]
-        val t:Int = lastChild.getSymbol.getType
+        val t: Int = lastChild.getSymbol.getType
         if (t == ScalaLangParser.RPARENTHESIS) {
           if (context.exprs() != null) {
             if (hasTerminalNode(ctx, ",")) {
@@ -72,7 +72,16 @@ object SimpleExpr1Visitor extends VisitorHelper {
       }
     }
     else {
-      marker.drop()
+      if (ctx.getChild(childCount - 1).isInstanceOf[TerminalNode]) {
+        val lastChild = ctx.getChild(childCount - 1).asInstanceOf[TerminalNode]
+        val t: Int = lastChild.getSymbol.getType
+
+        if (t == ScalaLangParser.UNDER) {
+          marker.done(ScalaElementTypes.PLACEHOLDER_EXPR)
+        }
+        else marker.drop()
+      }
+      else marker.drop()
     }
   }
 }

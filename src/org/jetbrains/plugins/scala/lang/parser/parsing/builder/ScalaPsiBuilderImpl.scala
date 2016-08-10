@@ -4,6 +4,7 @@ import com.intellij.lang.PsiBuilder
 import com.intellij.lang.impl.PsiBuilderAdapter
 import com.intellij.openapi.util.text.StringUtil
 import org.jetbrains.plugins.scala.lang.TokenSets
+import org.jetbrains.plugins.scala.lang.parser.PsiBuilderAdaptor
 import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils
 
 import scala.collection.mutable
@@ -13,7 +14,7 @@ import scala.collection.mutable
   */
 
 class ScalaPsiBuilderImpl(builder: PsiBuilder)
-  extends PsiBuilderAdapter(builder) with ScalaPsiBuilder {
+  extends PsiBuilderAdaptor(builder) with ScalaPsiBuilder {
   private final val newlinesEnabled: mutable.Stack[Boolean] = new mutable.Stack[Boolean]
 
   def newlineBeforeCurrentToken: Boolean = {

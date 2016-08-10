@@ -16,7 +16,7 @@ import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils
 */
 
 /*
- *  ValDef ::= PatDef |
+ *  VarDef ::= PatDef |
  *             ids ':' Type '=' '_'
  */
 object VarDef extends VarDef {

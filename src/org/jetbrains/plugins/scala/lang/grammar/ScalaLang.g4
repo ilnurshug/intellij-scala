@@ -50,30 +50,30 @@ qualId            : qualId '.' id | id ;
 
 ids               : id (  ','  id)* ;
 
-pathRef           :  id
-                  |  stableIdRef '.' id
+pathRef           :  stableIdRef '.' id
                   |  thisReference '.' id
                   |  superReference '.' id
-                  |  thisReference ;
+                  |  thisReference
+                  |  id ;
 
-pathRefExpr       :  id
-                  |  stableIdRefExpr '.' id
+pathRefExpr       :  stableIdRefExpr '.' id
                   |  thisReference '.' id
                   |  superReference '.' id
-                  |  thisReference ;
+                  |  thisReference
+                  |  id ;
 
 reference         : id ;
 thisReference     : (reference '.')? 'this' ;
 
-stableIdRef       :  id
-                  |  stableIdRef '.' id
+stableIdRef       :  stableIdRef '.' id
                   |  thisReference '.' id
-                  |  superReference '.' id ;
+                  |  superReference '.' id
+                  |  id ;
 
-stableIdRefExpr   :  id
-                  |  stableIdRefExpr '.' id
+stableIdRefExpr   :  stableIdRefExpr '.' id
                   |  thisReference '.' id
-                  |  superReference '.' id ;
+                  |  superReference '.' id
+                  |  id ;
 
 superReference    : (reference '.')? 'super' (classQualifier)? ;
 
@@ -180,8 +180,8 @@ newTemplate       : 'new' extendsBlock ;
 extendsBlock      : classTemplate | templateBody ;
 
 simpleExpr1       : literal
-                  | pathRefExpr
                   | '_'
+                  | pathRefExpr
                   | '(' (exprs ','?)? ')'
                   | (newTemplate | blockExpr) '.' id
                   | simpleExpr1 '_'? '.' id
@@ -289,7 +289,8 @@ funTypeParamClause: '['  typeParam ( ','  typeParam)*  ']' ;
 typeParam         : annotationsNonEmpty? (id | '_')  typeParamClause? ( '>:'  type)? ( '<:'  type)?
                     ('<%'  type)* ( ':'  type)* ;
                          
-paramClauses      : paramClause* implicitParamClause?;
+paramClauses      : implicitParamClause
+                  | paramClause* implicitParamClause?;
 
 implicitParamClause
                   : ( Nl?  '('  'implicit'  params  ')') ;
@@ -298,13 +299,16 @@ paramClause       : Nl?  '('  params? ')'  ;
 
 params            : param ( ','  param)* ;
 
-param             : annotations modifiersOrEmpty id  ( ':'  paramType)? ( '='  expr)? ;
+param             : annotations emptyModifiers id  ( ':'  paramType)? ( '='  expr)? ;
+
+emptyModifiers    : ;
 
 paramType         : type 
                   | '=>'  type
                   | type  '*';
 
-classParamClauses : classParamClause* implicitClassParamClause? ;
+classParamClauses : implicitClassParamClause
+                  | classParamClause* implicitClassParamClause? ;
 
 implicitClassParamClause
                   : Nl?  '(' 'implicit'  classParams ')' ;

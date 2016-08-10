@@ -18,7 +18,7 @@ object ExprVisitor extends VisitorHelper {
     val builder = visitor.getBuilder
 
     if (context.expr1() != null) {
-      visitor.visitChildren(context.expr1())
+      visitor.visitExpr1(context.expr1())
       return
     }
 

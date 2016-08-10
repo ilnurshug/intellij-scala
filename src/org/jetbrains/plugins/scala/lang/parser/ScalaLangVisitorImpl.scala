@@ -142,6 +142,8 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitParamType(ctx: ParamTypeContext): Unit = visit(ctx, ScalaElementTypes.PARAM_TYPE)
 
+  override def visitEmptyModifiers(ctx: EmptyModifiersContext): Unit = visit(ctx, ScalaElementTypes.MODIFIERS)
+
   override def visitPatternDefinition(ctx: PatternDefinitionContext): Unit = visit(ctx, ScalaElementTypes.PATTERN_DEFINITION)
 
   override def visitVariableDefinition(ctx: VariableDefinitionContext): Unit = visit(ctx, ScalaElementTypes.VARIABLE_DEFINITION)

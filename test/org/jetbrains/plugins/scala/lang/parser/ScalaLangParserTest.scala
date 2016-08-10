@@ -78,8 +78,8 @@ class ScalaLangParserTest extends SimpleTestCase
 
   def testProgram2(): Unit = {
     doTest(
-      """package a
-         package b
+      """package   a
+         package  b
          package c"""
     )
   }
@@ -89,7 +89,10 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testProgram4(): Unit = {
-    doTest("""class C{}""")
+    doTest(
+      """class C{
+        def f() { if (x.a) x }
+        }""")
   }
 
   // why parser crashes??
