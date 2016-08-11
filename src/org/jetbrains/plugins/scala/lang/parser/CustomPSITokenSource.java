@@ -21,7 +21,6 @@ public class CustomPSITokenSource extends PSITokenSource {
 
     public CustomPSITokenSource(PsiBuilder builder) {
         super(builder);
-
         fillMap();
     }
 

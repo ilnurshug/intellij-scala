@@ -22,6 +22,10 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
   var typeArgs: mutable.Stack[IElementType] = new mutable.Stack[IElementType]
 
 
+  override def visitTestRule(ctx: TestRuleContext): Unit = visit(ctx, ScalaElementTypes.BLOCK_EXPR)
+
+
+
   override def visitBlockNode(ctx: BlockNodeContext): Unit = visit(ctx, ScalaElementTypes.BLOCK)
 
   override def visitImplicitParamClause(ctx: ImplicitParamClauseContext): Unit = visit(ctx, ScalaElementTypes.PARAM_CLAUSE)

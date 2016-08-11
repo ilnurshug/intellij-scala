@@ -33,11 +33,42 @@
 
 grammar ScalaLang;
 
+@parser::header {
+ import com.intellij.openapi.util.text.StringUtil;
+ }
+
 @parser::members {
 Boolean isVarId() {
     return Character.isLowerCase(getCurrentToken().getText().charAt(0));
 }
+
+int getOccurrenceCount(char c) {
+    CommonToken curToken = (CommonToken)_input.LT(1);
+    CommonToken prevToken = (CommonToken)_input.LT(-1);
+
+    int prevTokenStart = prevToken.getStartIndex();
+    int curTokenStart = curToken.getStartIndex();
+
+    String substr = _input.getTokenSource().getInputStream().getText(new Interval(prevTokenStart, curTokenStart));
+
+    return StringUtil.getOccurrenceCount(substr, c);
 }
+
+Boolean isSingleNl() {
+    int nlCount = getOccurrenceCount('\n');
+
+    return (nlCount == 1);
+}
+
+Boolean isNl() {
+    return (getOccurrenceCount('\n') >= 1);
+}
+
+}
+
+testRule          : id ({isNl()}? emptyNl id)+ ;
+
+emptyNl           :  ;
 
 program           : blockExpr
                   | selfType?  templateStat ( semi  templateStat)*    // for debug purposes
@@ -424,7 +455,7 @@ varDef            : patDef
 funDef            : funSig ( ':'  type)?  '='  expr
                   | funSig  Nl?  blockWithBraces
                   | 'this'  paramClauses
-                    ('='  constrExpr |  Nl  constrBlock) ;
+                    ('='  constrExpr |  {isSingleNl()}? Nl  constrBlock) ;
 
 blockWithBraces   : '{'  block  '}' ;
 
@@ -505,7 +536,7 @@ id                : ID
                   | UNDER
                   | FUNTYPE;
 
-semi              :  SEMICOLON |  Nl+;
+semi              :  SEMICOLON | Nl+;
 
 // Lexer
 VDASH       :  '|';

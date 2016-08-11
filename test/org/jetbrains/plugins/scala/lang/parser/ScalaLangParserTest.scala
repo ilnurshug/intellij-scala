@@ -194,4 +194,8 @@ class ScalaLangParserTest extends SimpleTestCase
     }
     assert(true)
   }
+
+  def testExperiment3(): Unit = {
+    doTest("a \n b \n c", "testRule")
+  }
 }
