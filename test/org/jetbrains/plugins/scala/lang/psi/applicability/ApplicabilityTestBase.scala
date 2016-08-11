@@ -107,7 +107,8 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
   private def assertProblemsAre(preface: String, code: String)
                     (pattern: PartialFunction[List[ApplicabilityProblem], Unit]) {
     val line = if(preface.isEmpty) code else preface + "; " + code
-    val file = if (ScalaParserDefinition.useOldParser) (Header + "\n" + line).parse else (Header.replace('\n', ';') + ";" + line).parse
+    //val file = if (ScalaParserDefinition.useOldParser) (Header + "\n" + line).parse else (Header.replace('\n', ';') + ";" + line).parse
+    val file = (Header + "\n" + line).parse
 
     println(line)
     val converter = new ASTTreeToDot()

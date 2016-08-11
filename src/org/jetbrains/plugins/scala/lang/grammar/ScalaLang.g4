@@ -46,6 +46,8 @@ int getOccurrenceCount(char c) {
     CommonToken curToken = (CommonToken)_input.LT(1);
     CommonToken prevToken = (CommonToken)_input.LT(-1);
 
+    if (curToken == null || prevToken == null) return 0;
+
     int prevTokenStart = prevToken.getStartIndex();
     int curTokenStart = curToken.getStartIndex();
 
@@ -71,7 +73,7 @@ testRule          : id ({isNl()}? emptyNl id)+ ;
 emptyNl           :  ;
 
 program           : blockExpr
-                  | selfType?  templateStat ( semi  templateStat)*    // for debug purposes
+                  | selfType?  templateStat? ( (SEMICOLON | {isNl()}? emptyNl)  templateStat)*    // for debug purposes
                   | compilationUnit
                   | block;                                            // for debug purposes
 
@@ -130,7 +132,7 @@ existentialType   : infixType  existentialClause ;
 functionArgTypes  : infixType
                   | '('  ( paramType ( ','  paramType )* )?  ')' ;
 
-existentialClause : 'forSome'  '{'  existentialDcl ( semi  existentialDcl)*  '}';
+existentialClause : 'forSome'  '{'  existentialDcl ( (SEMICOLON | {isNl()}? emptyNl)  existentialDcl)*  '}';
 
 existentialDcl    : typeDeclaration
                   | valueDeclaration;
@@ -152,17 +154,17 @@ typeArgs          : '['  type ( ','  type)*  ']';
 
 types             : type ( ','  type)*;
 
-refinement        : Nl? '{'  refineStat ( semi  refineStat)*  '}';
+refinement        : Nl? '{'  refineStat? ( (SEMICOLON | {isNl()}? emptyNl)  refineStat)*  '}';
 
 refineStat        : dcl
                   | typeDefinition
-                  | ;
+                  ; //| ;
 
 typePat           : type;
 
-ascription        : ':'  infixType
+ascription        : ':'  sequenceArg
                   | ':'  annotationsNonEmpty
-                  | ':'  sequenceArg;
+                  | ':'  infixType;
 
 sequenceArg       : '_' '*' ;
 
@@ -181,7 +183,7 @@ expr1             : assignStmt
                   | typedExprStmt
                   | matchStmt ;
 //-----------------------------------------------------------------------------
-ifStmt            : 'if'  '('  expr  ')'  Nl*  expr ( semi?  'else'  expr)? ;
+ifStmt            : 'if'  '('  expr  ')'  Nl*  expr ( (SEMICOLON | {isNl()}? emptyNl)?  'else'  expr)? ;
 
 whileStmt         : 'while'  '('  expr  ')'  Nl*  expr ;
 
@@ -190,7 +192,7 @@ tryBlock          : 'try' ('{'  block  '}'  |  expr) ;
 catchBlock        : 'catch'  expr /*'{'  caseClauses  '}'*/ ;
 finallyBlock      : 'finally'  expr ;
 
-doStmt            : 'do'  expr  semi?  'while'  '('  expr  ')' ;
+doStmt            : 'do'  expr  (SEMICOLON | {isNl()}? emptyNl)?  'while'  '('  expr  ')' ;
 
 forStmt           : 'for'  ('('  enumerators  ')' | '{'  enumerators  '}')  Nl*  'yield'?  expr ;
 
@@ -204,7 +206,7 @@ typedExprStmt     : postfixExpr  ascription ;
 
 matchStmt         : postfixExpr  'match'  '{'  caseClauses  '}' ;
 //-----------------------------------------------------------------------------
-postfixExpr       : infixExpr ( id  Nl?)? ;
+postfixExpr       : infixExpr ( {!isNl()}? id  Nl?)? ;
 
 /*infixExpr         : infixExpr  id  Nl?  infixExpr
                   | prefixExpr ;*/
@@ -237,8 +239,10 @@ argumentExprs     : '('  exprs?  ')'
                   
 blockExpr         : '{'  caseClauses  '}'
                   | '{'  block  '}' ;
-block             : blockStat ( semi  blockStat)*
-                  | blockStat ( semi  blockStat)* resultExpr ;
+
+block             : blockStat ( (SEMICOLON | {isNl()}? emptyNl)  blockStat )*
+                  | blockStat ( (SEMICOLON | {isNl()}? emptyNl)  blockStat )* resultExpr
+                  | ;
 
 blockNode         : block ;
 
@@ -246,12 +250,16 @@ blockStat         : import_
                   | 'implicit'? def
                   | tmplDef
                   | expr1
-                  | ;
+                  ; // | ;
 
 resultExpr        : bindings  '=>'  blockNode
                   | ('implicit'?  id | '_')  ':'  paramType '=>'  blockNode ;
 
-enumerators       : generator  ( semi  generator)* ;
+enumerators       : generator  ( (SEMICOLON | {isNl()}? emptyNl)  enumerator)* ;
+
+enumerator        : generator // no enumerator
+                  | guard // no enumerator
+                  | 'val'? pattern1 '=' expr ; // enumerator
 
 //generator         : pattern1  '<-'  expr ( semi?  guard |  semi  pattern1  '='  expr)* ;
 generator         : generatorNoGuard guard? ;
@@ -272,11 +280,11 @@ pattern1          : typedPattern
 typedPattern      : {isVarId()}? ID  ':'  typePat
                   | '_'  ':'  typePat ;
 
-pattern2          : referencePattern
+pattern2          : {isVarId()}? referencePattern
                   | namingPattern
                   | pattern3 ;
 
-referencePattern  : {isVarId()}? ID ;
+referencePattern  : ID ;
 namingPattern     : ID '@' pattern3 ;
 
 pattern3          : simplePattern
@@ -284,7 +292,7 @@ pattern3          : simplePattern
 //-----------------------------------------------------------------------------
 simplePattern     : wildcardPattern
                   | tuplePattern
-                  | referencePattern
+                  | {isVarId()}? referencePattern
                   | literalPattern
                   | stableReferencePattern
                   | constructorPattern
@@ -379,19 +387,21 @@ accessQualifier   : '['  (id | 'this')  ']' ;
 
 annotation        : '@' annotationExpr ;
 
-annotationExpr    : constr ;
+annotationExpr    : constrAnnotation;
+
+constrAnnotation  : simpleType argumentExprs*;
 
 annotations       : annotation* ;
 annotationsNonEmpty
-                  : annotation+ ;
+                  : ({!isNl()}? annotation)+ ;
 
-templateBody      : Nl?  '{'  selfType?  templateStat ( semi  templateStat)*  '}' ;
+templateBody      : Nl?  '{'  selfType?  templateStat? ( (SEMICOLON | {isNl()}? emptyNl)  templateStat)*  '}' ;
 
 templateStat      : import_
                   | def
                   | dcl
                   | expr
-                  | ;
+                  ;// | ;
                   
 selfType          : id ( ':'  type)?  '=>' 
                   | 'this'  ':'  type  '=>' ;
@@ -497,23 +507,24 @@ classParents      : constr ( 'with'  annotType)* ;
 
 traitParents      : annotType ( 'with'  annotType)* ;
 
-constr            : annotType  argumentExprs* ;
+constr            : annotType  ({!isNl()}? argumentExprs)* ;
 
-earlyDefs         : '{'  (patVarDef ( semi  patVarDef)*)?  '}'  'with' ;
+earlyDefs         : '{'  (patVarDef ( (SEMICOLON | {isNl()}? emptyNl)  patVarDef )* )?  '}'  'with' ;
 
 constrExpr        : selfInvocation 
                   | constrBlock ;
                   
-constrBlock       : '{'  selfInvocation ( semi  blockStat)*  '}' ;
+constrBlock       : '{'  selfInvocation ( (SEMICOLON | {isNl()}? emptyNl)  blockStat)*  '}' ;
 selfInvocation    : 'this'  argumentExprs+ ;
 
-topStatSeq        : topStat ( semi  topStat)* ;
+topStatSeq        : topStat ( (SEMICOLON | {isNl()}? emptyNl)  topStat)*
+                  | ;
 
 topStat           : tmplDef
                   | import_
                   | packaging
                   | packageObject
-                  | ;
+                  ;// | ;
                     
 packaging         : 'package'  qualId  Nl?  '{'  topStatSeq  '}' ;
 
@@ -523,7 +534,7 @@ emptyAnnotations  : ;
 
 compilationUnit   : packageDcl? topStatSeq ;
 
-packageDcl        : 'package'  qualId  semi? packageDcl? ;
+packageDcl        : 'package'  qualId  (SEMICOLON | {isNl()}? emptyNl)? packageDcl? ;
 
 id                : ID
                   | '\'' StringLiteral '\''
@@ -536,7 +547,7 @@ id                : ID
                   | UNDER
                   | FUNTYPE;
 
-semi              :  SEMICOLON | Nl+;
+semi              :  SEMICOLON | Nl+ ;
 
 // Lexer
 VDASH       :  '|';

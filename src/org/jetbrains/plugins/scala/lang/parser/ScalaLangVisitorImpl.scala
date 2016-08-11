@@ -25,6 +25,16 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
   override def visitTestRule(ctx: TestRuleContext): Unit = visit(ctx, ScalaElementTypes.BLOCK_EXPR)
 
 
+  override def visitEnumerator(ctx: EnumeratorContext): Unit = {
+    val marker = builder.mark()
+
+    visitChildren(ctx)
+
+    if (ctx.pattern1() != null) marker.done(ScalaElementTypes.ENUMERATOR)
+    else marker.drop()
+  }
+
+  override def visitConstrAnnotation(ctx: ConstrAnnotationContext): Unit = visit(ctx, ScalaElementTypes.CONSTRUCTOR)
 
   override def visitBlockNode(ctx: BlockNodeContext): Unit = visit(ctx, ScalaElementTypes.BLOCK)
 
