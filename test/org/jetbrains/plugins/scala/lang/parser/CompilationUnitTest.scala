@@ -85,4 +85,8 @@ class CompilationUnitTest extends SimpleTestCase {
   def testCompilationUnit8(): Unit = {
     doTest("class a {\n  2 + x _\n}")
   }
+
+  def testCompilationUnit9(): Unit = {
+    doTest("trait IdeSupport {\n  def unpickleIDEHook : (( => Type) => Type) = 42\n}")
+  }
 }

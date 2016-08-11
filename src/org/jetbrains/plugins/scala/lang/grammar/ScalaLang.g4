@@ -126,7 +126,9 @@ type              : typeType
 
 typeType          : infixType  '=>'  type
                   | '(' ('=>' type)? ')' '=>' type ;
+
 wildcardType      : '_' ('>:' type)? ('<:' type)? ;
+
 existentialType   : infixType  existentialClause ;
 
 functionArgTypes  : infixType
@@ -152,7 +154,7 @@ simpleType        : simpleType  typeArgs
 
 typeArgs          : '['  type ( ','  type)*  ']';
 
-types             : type ( ','  type)*;
+types             : ( '=>'  type | type  '*' | type) ( ','  ( '=>'  type | type  '*' | type))*;
 
 refinement        : Nl? '{'  refineStat? ( (SEMICOLON | {isNl()}? emptyNl)  refineStat)*  '}';
 

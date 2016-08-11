@@ -13,7 +13,7 @@ object TypesVisitor extends VisitorHelper {
 
     visitor.visitChildren(ctx)
 
-    if (context.getChildCount > 1)
+    if (context.`type`().size() > 1)
       marker.done(ScalaElementTypes.TYPES)
     else
       marker.drop()
