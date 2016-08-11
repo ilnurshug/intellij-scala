@@ -295,7 +295,14 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
   override def visitPackaging(ctx: PackagingContext): Unit = visit(ctx, ScalaElementTypes.PACKAGING)
 
   // ???
-  override def visitPackageDcl(ctx: PackageDclContext): Unit = visit(ctx, ScalaElementTypes.PACKAGING)
+  override def visitPackageDcl(ctx: PackageDclContext): Unit = {
+    val marker = builder.mark()
+
+    visitChildren(ctx)
+
+    if (ctx.topStatSeq() != null) marker.drop()
+    else marker.done(ScalaElementTypes.PACKAGING)
+  }
 
 
 

@@ -157,7 +157,7 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testProgram16(): Unit = {
-    doTest("new ASDGASDF()\n(x, timestamp)")
+    doTest("object A {\n  find {x => null}\n}")
   }
 
   def testExperiment(): Unit = {

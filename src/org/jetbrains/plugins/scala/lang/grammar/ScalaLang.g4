@@ -137,7 +137,7 @@ existentialClause : 'forSome'  '{'  existentialDcl ( (SEMICOLON | {isNl()}? empt
 existentialDcl    : typeDeclaration
                   | valueDeclaration;
 
-infixType         : compoundType (  id  Nl?  compoundType)*;
+infixType         : compoundType ( {!isNl()}? id  Nl?  compoundType)*;
 
 compoundType      : annotType ( 'with'  annotType)*  refinement?
                   | refinement;
@@ -240,7 +240,8 @@ argumentExprs     : '('  exprs?  ')'
 blockExpr         : '{'  caseClauses  '}'
                   | '{'  block  '}' ;
 
-block             : blockStat ( (SEMICOLON | {isNl()}? emptyNl)  blockStat )*
+block             : resultExpr
+                  | blockStat ( (SEMICOLON | {isNl()}? emptyNl)  blockStat )*
                   | blockStat ( (SEMICOLON | {isNl()}? emptyNl)  blockStat )* resultExpr
                   | ;
 
@@ -494,10 +495,10 @@ traitDef          : id  typeParamClause?  traitTemplateOpt ;
 
 objectDef         : id  classTemplateOpt ;
 
-classTemplateOpt  : 'extends'  classTemplate | ('extends'?  templateBody)? ;
+classTemplateOpt  : ('extends'|UPPER_BOUND)  classTemplate | (('extends'|UPPER_BOUND)?  templateBody)? ;
 
-traitTemplateOpt  : ('extends'  traitTemplate)
-                  | ('extends'?  templateBody)? ;
+traitTemplateOpt  : (('extends'|UPPER_BOUND)  traitTemplate)
+                  | (('extends'|UPPER_BOUND)?  templateBody)? ;
 
 classTemplate     : earlyDefs?  classParents  templateBody? ;
 
@@ -532,9 +533,10 @@ packageObject     : emptyAnnotations emptyModifiers 'package'  'object'  objectD
 
 emptyAnnotations  : ;
 
-compilationUnit   : packageDcl? topStatSeq ;
+compilationUnit   : packageDcl ;
 
-packageDcl        : 'package'  qualId  (SEMICOLON | {isNl()}? emptyNl)? packageDcl? ;
+packageDcl        : 'package'  qualId  (SEMICOLON | {isNl()}? emptyNl)? packageDcl?
+                  | topStatSeq ;
 
 id                : ID
                   | '\'' StringLiteral '\''
