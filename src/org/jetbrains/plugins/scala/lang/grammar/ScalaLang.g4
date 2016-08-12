@@ -177,8 +177,8 @@ refineStat        : dcl
 typePat           : type;
 
 ascription        : ':'  sequenceArg
-                  | ':'  annotationsNonEmpty
-                  | ':'  infixType;
+                  | ':'  type
+                  | ':'  annotationsNonEmpty;
 
 sequenceArg       : '_' '*' ;
 
@@ -193,9 +193,9 @@ expr1             : assignStmt
                   | forStmt
                   | throwStmt
                   | returnStmt
-                  | postfixExpr
                   | typedExprStmt
-                  | matchStmt ;
+                  | matchStmt
+                  | postfixExpr ;
 //-----------------------------------------------------------------------------
 ifStmt            : 'if'  '('  expr  ')'  Nl*  expr ( (SEMICOLON | {isNl()}? emptyNl)?  'else'  expr)? ;
 

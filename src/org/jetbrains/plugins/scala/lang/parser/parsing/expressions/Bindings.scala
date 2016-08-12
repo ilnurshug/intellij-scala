@@ -13,7 +13,7 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 */
 
 /*
- * Bindings ::= '(' Binding {',' Binding } ')'
+ * Bindings ::= '(' (Binding {',' Binding })? ')'
  */
 
 object Bindings extends Bindings {
