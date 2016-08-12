@@ -67,10 +67,14 @@ Boolean isNl() {
 }
 
 Boolean isLParenthesis() {
+    return equalTo("(");
+}
+
+Boolean equalTo(String s) {
     Token curToken = getCurrentToken();
     if (curToken == null) return false;
 
-    return curToken.getText().compareTo("(") == 0;
+    return curToken.getText().compareTo(s) == 0;
 }
 
 }
@@ -298,8 +302,10 @@ pattern2          : {isVarId()}? referencePattern
 referencePattern  : ID ;
 namingPattern     : ID '@' pattern3 ;
 
-pattern3          : simplePattern
-                  | simplePattern ( /*{getCurrentToken().getText().compareTo("|") != 0}?*/ (id  Nl?  simplePattern))* ;
+pattern3          : simplePattern subPattern3 ;
+
+subPattern3       : {!equalTo("|")}? id  Nl?  simplePattern subPattern3
+                  | emptyNl ;
 //-----------------------------------------------------------------------------
 simplePattern     : wildcardPattern
                   | tuplePattern
@@ -377,7 +383,7 @@ classParams       : classParam ( ','  classParam)* ;
 classParam        : annotations  modifiersOrEmpty  ( 'val' |  'var')?
                     id  ':'  paramType ( '='  expr)? ;
                     
-bindings          : '('  binding ( ','  binding )*  ')' ;
+bindings          : '('  (binding ( ','  binding )*)?  ')' ;
 
 binding           : (id | '_') ( ':'  paramType)? ;
 
