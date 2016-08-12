@@ -66,6 +66,13 @@ Boolean isNl() {
     return (getOccurrenceCount('\n') >= 1);
 }
 
+Boolean isLParenthesis() {
+    Token curToken = getCurrentToken();
+    if (curToken == null) return false;
+
+    return curToken.getText().compareTo("(") == 0;
+}
+
 }
 
 testRule          : id ({isNl()}? emptyNl id)+ ;
@@ -316,9 +323,9 @@ stableReferencePattern
 
 constructorPattern: stableIdRef patternArgs ;
 
-patternArgs       : '('  pattern ( ','  pattern)*  ')'
+patternArgs       : '('  (pattern ( ','  pattern)*  ',' )? seqWildcard  ')'
                   | '('  (pattern ( ','  pattern)*  ',' )? namingPattern2  ')'
-                  | '('  (pattern ( ','  pattern)*  ',' )? seqWildcard  ')';
+                  | '('  pattern ( ','  pattern)*  ')' ;
 
 namingPattern2    : ('_' | ID)  '@'  seqWildcard ;
 
@@ -512,7 +519,7 @@ classParents      : constr ( 'with'  annotType)* ;
 
 traitParents      : annotType ( 'with'  annotType)* ;
 
-constr            : annotType  ({!isNl()}? argumentExprs)* ;
+constr            : annotType  ({!isNl() && isLParenthesis()}? argumentExprs)* ;
 
 earlyDefs         : '{'  (patVarDef ( (SEMICOLON | {isNl()}? emptyNl)  patVarDef )* )?  '}'  'with' ;
 
