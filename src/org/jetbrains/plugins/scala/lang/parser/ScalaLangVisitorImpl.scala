@@ -19,7 +19,9 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   var args: mutable.Stack[Boolean] = new mutable.Stack[Boolean]  // stack for bool-arguments, might be helpful for some parsing methods
 
-  var typeArgs: mutable.Stack[IElementType] = new mutable.Stack[IElementType]
+  //var typeArgs: mutable.Stack[IElementType] = new mutable.Stack[IElementType]
+
+  var isPattern: mutable.Stack[Boolean] = new mutable.Stack[Boolean]
 
 
   override def visitTestRule(ctx: TestRuleContext): Unit = visit(ctx, ScalaElementTypes.BLOCK_EXPR)
@@ -88,7 +90,11 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitRefinement(ctx: RefinementContext): Unit = visit(ctx, ScalaElementTypes.REFINEMENT)
 
-  override def visitTypePat(ctx: TypePatContext): Unit = visit(ctx, ScalaElementTypes.TYPE_PATTERN)
+  override def visitTypePat(ctx: TypePatContext): Unit = {
+    isPattern.push(true)
+    visit(ctx, ScalaElementTypes.TYPE_PATTERN)
+    isPattern.pop()
+  }
 
   override def visitSequenceArg(ctx: SequenceArgContext): Unit = visit(ctx, ScalaElementTypes.SEQUENCE_ARG)
 
