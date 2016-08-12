@@ -256,7 +256,7 @@ blockStat         : import_
                   ; // | ;
 
 resultExpr        : bindings  '=>'  blockNode
-                  | ('implicit'?  id | '_')  ':'  paramType '=>'  blockNode ;
+                  | ('implicit'?  id | '_')  (':'  paramType)? '=>'  blockNode ;
 
 enumerators       : generator  ( (SEMICOLON | {isNl()}? emptyNl)  enumerator)* ;
 
@@ -394,7 +394,7 @@ annotationExpr    : constrAnnotation;
 
 constrAnnotation  : simpleType argumentExprs*;
 
-annotations       : annotation* ;
+annotations       : (annotation)* ;
 annotationsNonEmpty
                   : ({!isNl()}? annotation)+ ;
 
@@ -488,7 +488,7 @@ modifiersOrCase   : modifier* 'case'? ;
 
 classDef          : id  typeParamClause?  primaryConstructor classTemplateOpt ;
 
-primaryConstructor: annotations  accessModifierOrEmpty classParamClauses ;
+primaryConstructor: annotations  (accessModifierOrEmpty) classParamClauses ;
 
 accessModifierOrEmpty
                   : accessModifier ? ;
@@ -518,7 +518,7 @@ constrExpr        : selfInvocation
                   | constrBlock ;
                   
 constrBlock       : '{'  selfInvocation ( (SEMICOLON | {isNl()}? emptyNl)  blockStat)*  '}' ;
-selfInvocation    : 'this'  argumentExprs+ ;
+selfInvocation    : 'this'  argumentExprs ({!isNl()}? argumentExprs)* ;
 
 topStatSeq        : topStat ( (SEMICOLON | {isNl()}? emptyNl)  topStat)*
                   | ;
