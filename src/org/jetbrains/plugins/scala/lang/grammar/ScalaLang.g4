@@ -200,7 +200,7 @@ forStmt           : 'for'  ('('  enumerators  ')' | '{'  enumerators  '}')  Nl* 
 
 throwStmt         : 'throw'  expr ;
 
-returnStmt        : 'return'  expr? ;
+returnStmt        : 'return'  ({!isNl()}? expr)? ;
 
 assignStmt        : postfixExpr '=' expr ;
 
@@ -212,7 +212,7 @@ postfixExpr       : infixExpr ( {!isNl()}? id  Nl?)? ;
 
 /*infixExpr         : infixExpr  id  Nl?  infixExpr
                   | prefixExpr ;*/
-infixExpr         : prefixExpr (id typeArgs? Nl? prefixExpr)* ;
+infixExpr         : prefixExpr ({!isNl()}? id typeArgs? Nl? prefixExpr)* ;
 
 prefixExpr        : ('-' | '+' | '~' | '!')? simpleExpr ;
 
