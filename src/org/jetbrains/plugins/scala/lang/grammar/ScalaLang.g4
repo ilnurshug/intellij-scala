@@ -307,7 +307,7 @@ wildcardPattern   : '_' ;
 patternInParenthesis
                   : '(' pattern ')' ;
 
-tuplePattern      : '(' patterns? ')' ;
+tuplePattern      : '(' (patterns)? ')' ;
 
 literalPattern    : literal ;
 
@@ -320,13 +320,14 @@ patternArgs       : '('  pattern ( ','  pattern)*  ')'
                   | '('  (pattern ( ','  pattern)*  ',' )? namingPattern2  ')'
                   | '('  (pattern ( ','  pattern)*  ',' )? seqWildcard  ')';
 
-namingPattern2    : ID  '@'  seqWildcard ;
+namingPattern2    : ('_' | ID)  '@'  seqWildcard ;
 
 //-----------------------------------------------------------------------------
 patterns          : patternSeq
                   | seqWildcard ;
 
-patternSeq        : pattern ( ','  pattern)+ ;
+patternSeq        : pattern ( ','  pattern)+ ','?
+                  | pattern ',' ;
 seqWildcard       : '_' '*' ;
 
 typeParamClause   : '['  variantTypeParam ( ','  variantTypeParam)*  ']' ;

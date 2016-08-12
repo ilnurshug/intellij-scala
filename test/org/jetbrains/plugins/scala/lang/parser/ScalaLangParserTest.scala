@@ -161,7 +161,7 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testProgram17(): Unit = {
-    doTest("(g, k) = genAndKill(b)", "enumerator")
+    doTest("class C {\n  x match {\n   case () => 0\n   case (t,) => 1\n   case (t,s,u) => 2\n   case (t,s,) => 3\n  }\n}")
   }
 
   def testExperiment(): Unit = {
