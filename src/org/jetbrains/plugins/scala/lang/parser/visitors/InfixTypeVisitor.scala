@@ -5,6 +5,7 @@ import scala.collection.mutable
 import org.antlr.v4.runtime.ParserRuleContext
 import org.jetbrains.plugins.scala.ScalaBundle
 import org.jetbrains.plugins.scala.lang.ScalaLangParser.InfixTypeContext
+import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.{ScalaElementTypes, ScalaLangVisitorImpl}
 
 /*
@@ -17,7 +18,7 @@ object InfixTypeVisitor extends VisitorHelper {
     val context = ctx.asInstanceOf[InfixTypeContext]
 
     var typeIdx = 0
-    val typeCount = context.compoundType().size()
+    val typeCount = context.compoundOrWildType().size()
 
     var infixTypeMarker = builder.mark
     var markerList = List[PsiBuilder.Marker]() //This list consist of markers for right-associated op
@@ -25,8 +26,10 @@ object InfixTypeVisitor extends VisitorHelper {
     markerList = infixTypeMarker :: markerList
 
     //CompoundTypeVisitor.visit(visitor, builder, context.compoundType(typeIdx), args)
-    visitor.visitCompoundType(context.compoundType(typeIdx))
+
+    visitor.visitCompoundOrWildType(context.compoundOrWildType(typeIdx))
     typeIdx += 1
+
 
     var assoc: Int = 0  //this mark associativity: left - 1, right - -1
     while (typeIdx < typeCount) {
@@ -57,7 +60,7 @@ object InfixTypeVisitor extends VisitorHelper {
       }
 
       //CompoundTypeVisitor.visit(visitor, builder, context.compoundType(typeIdx), args)
-      visitor.visitCompoundType(context.compoundType(typeIdx))
+      visitor.visitCompoundOrWildType(context.compoundOrWildType(typeIdx))
       typeIdx += 1
 
       if (assoc == 1) {

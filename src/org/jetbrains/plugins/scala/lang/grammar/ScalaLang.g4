@@ -120,9 +120,9 @@ superReference    : (reference '.')? 'super' (classQualifier)? ;
 classQualifier    : '[' id ']' ;
 
 type              : typeType
-                  | wildcardType
+                  | infixType
                   | existentialType
-                  | infixType ;
+                  | wildcardType ;
 
 typeType          : infixType  '=>'  type
                   | '(' ('=>' type)? ')' '=>' type ;
@@ -131,15 +131,16 @@ wildcardType      : '_' ('>:' type)? ('<:' type)? ;
 
 existentialType   : infixType  existentialClause ;
 
-functionArgTypes  : infixType
-                  | '('  ( paramType ( ','  paramType )* )?  ')' ;
-
 existentialClause : 'forSome'  '{'  existentialDcl ( (SEMICOLON | {isNl()}? emptyNl)  existentialDcl)*  '}';
 
 existentialDcl    : typeDeclaration
                   | valueDeclaration;
 
-infixType         : compoundType ( {!isNl()}? id  Nl?  compoundType)*;
+infixType         : compoundOrWildType ( {!isNl()}? id  Nl?  compoundOrWildType )*;
+
+compoundOrWildType: wildcardType2 | compoundType ;
+
+wildcardType2     : '_' ;
 
 compoundType      : annotType ( 'with'  annotType)*  refinement?
                   | refinement;
@@ -256,7 +257,7 @@ blockStat         : import_
                   ; // | ;
 
 resultExpr        : bindings  '=>'  blockNode
-                  | ('implicit'?  id | '_')  (':'  paramType)? '=>'  blockNode ;
+                  | ('implicit'?  id | '_')  (':'  compoundType)? '=>'  blockNode ;
 
 enumerators       : generator  ( (SEMICOLON | {isNl()}? emptyNl)  enumerator)* ;
 

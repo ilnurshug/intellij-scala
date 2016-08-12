@@ -58,6 +58,13 @@ object SimpleExpr1Visitor extends VisitorHelper {
         val lastChild = ctx.getChild(childCount - 1).asInstanceOf[RuleNode]
         val r: Int = lastChild.getRuleContext.getRuleIndex
 
+        if (r == ScalaLangParser.`RULE_argumentExprs`) {
+          println("yes")
+        }
+        else {
+          println("no " + r + " " + ScalaLangParser.`RULE_argumentExprs`)
+        }
+
         r match {
           case  ScalaLangParser.`RULE_argumentExprs` =>
             marker.done (ScalaElementTypes.METHOD_CALL)

@@ -41,7 +41,7 @@ object ResultExprVisitor extends VisitorHelper {
         builder.advanceLexer() // ate ':'
         val pt = builder.mark
         //`type`.parse(builder, isPattern = false)
-        visitor.visitParamType(context.paramType())
+        visitor.visitCompoundType(context.compoundType())
         pt.done(ScalaElementTypes.PARAM_TYPE)
       }
       builder.getTokenType match {

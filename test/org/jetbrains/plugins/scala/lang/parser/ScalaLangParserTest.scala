@@ -160,6 +160,10 @@ class ScalaLangParserTest extends SimpleTestCase
     doTest("object A {\n  find {x => null}\n}")
   }
 
+  def testProgram17(): Unit = {
+    doTest("(g, k) = genAndKill(b)", "enumerator")
+  }
+
   def testExperiment(): Unit = {
     val lexer: ScalaLexer  = new ScalaLexer()
     lexer.start("class a \n{\n a.b.c\n}")
