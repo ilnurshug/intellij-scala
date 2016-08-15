@@ -25,17 +25,13 @@ object InfixExprVisitor extends VisitorHelper {
     var backupMarker = builder.mark
     var count = 0
 
-    var prefixExprIdx: Int = 0
-    val prefixExprCount: Int = context.prefixExpr().size()
-
-    var childIdx: Int = 0
+    var curSubCtx = context.subInfixExpr()
 
     //PrefixExprVisitor.visit(visitor, builder, context.prefixExpr(prefixExprIdx), args)
-    visitor.visitPrefixExpr(context.prefixExpr(prefixExprIdx))
-    prefixExprIdx += 1
-    childIdx += 1
+    visitor.visitPrefixExpr(context.prefixExpr())
 
-    while (prefixExprIdx < prefixExprCount) {
+
+    while (curSubCtx.prefixExpr() != null) {
       //need to know associativity
       val s = builder.getTokenText
 
@@ -63,22 +59,18 @@ object InfixExprVisitor extends VisitorHelper {
 
       val opMarker = builder.mark
       builder.advanceLexer() //Ate id
-      childIdx += 1
       opMarker.done(ScalaElementTypes.REFERENCE_EXPRESSION)
 
-      if (context.getChild(childIdx).isInstanceOf[TypeArgsContext]) {
-        visitor.visitTypeArgs(context.getChild(childIdx).asInstanceOf[TypeArgsContext])
-        childIdx += 1
+      if (curSubCtx.typeArgs() != null) {
+        visitor.visitTypeArgs(curSubCtx.typeArgs())
       }
-      //visitor.visitTypeArgs(context.ty)
 
       backupMarker.drop()
       backupMarker = builder.mark
 
       //PrefixExprVisitor.visit(visitor, builder, context.prefixExpr(prefixExprIdx), args)
-      visitor.visitPrefixExpr(context.prefixExpr(prefixExprIdx))
-      prefixExprIdx += 1
-      childIdx += 1
+      visitor.visitPrefixExpr(curSubCtx.prefixExpr())
+      curSubCtx = curSubCtx.subInfixExpr()
 
       count = count + 1
     }

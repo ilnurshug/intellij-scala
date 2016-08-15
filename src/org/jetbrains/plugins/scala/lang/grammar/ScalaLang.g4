@@ -35,7 +35,7 @@ grammar ScalaLang;
 
 @parser::header {
  import com.intellij.openapi.util.text.StringUtil;
- }
+}
 
 @parser::members {
 Boolean isVarId() {
@@ -80,7 +80,7 @@ testRule          : id ({isNl()}? emptyNl id)+ ;
 emptyNl           :  ;
 
 program           : blockExpr
-                  | selfType?  templateStat? ( (SEMICOLON | {isNl()}? emptyNl)  templateStat)*    // for debug purposes
+                  | selfType?  templateStat? ( (SEMICOLON | {isNl()}? )  templateStat)*    // for debug purposes
                   | compilationUnit
                   | block;                                            // for debug purposes
 
@@ -220,7 +220,10 @@ postfixExpr       : infixExpr ( {!isNl()}? id  Nl?)? ;
 
 /*infixExpr         : infixExpr  id  Nl?  infixExpr
                   | prefixExpr ;*/
-infixExpr         : prefixExpr ({!isNl()}? id typeArgs? Nl? prefixExpr)* ;
+infixExpr         : prefixExpr subInfixExpr ;
+
+subInfixExpr      : {!isNl()}? id typeArgs? Nl? prefixExpr subInfixExpr
+                  | ;
 
 prefixExpr        : ('-' | '+' | '~' | '!')? simpleExpr ;
 
@@ -251,8 +254,8 @@ blockExpr         : '{'  caseClauses  '}'
                   | '{'  block  '}' ;
 
 block             : resultExpr
-                  | blockStat ( (SEMICOLON | {isNl()}? emptyNl)  blockStat )*
                   | blockStat ( (SEMICOLON | {isNl()}? emptyNl)  blockStat )* resultExpr
+                  | blockStat ( (SEMICOLON | {isNl()}? emptyNl)  blockStat )*
                   | ;
 
 blockNode         : block ;

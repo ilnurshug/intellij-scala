@@ -157,7 +157,7 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testProgram16(): Unit = {
-    doTest("new M() map[String] _.toString")
+    doTest("r <<= a b c;d <= e f g\nh = i j k")
   }
 
   def testProgram17(): Unit = {
