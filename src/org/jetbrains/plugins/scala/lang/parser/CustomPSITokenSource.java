@@ -11,6 +11,8 @@ import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.misc.Pair;
 import org.jetbrains.plugins.scala.lang.ScalaLangParser;
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes;
+import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypesEx;
+import org.jetbrains.plugins.scala.lang.lexer.ScalaXmlTokenTypes;
 
 /**
  * Created by ilnur on 06.08.16.
@@ -95,6 +97,31 @@ public class CustomPSITokenSource extends PSITokenSource {
         map.put(ScalaTokenTypes.kWITH, ScalaLangParser.WITH);
         map.put(ScalaTokenTypes.kYIELD, ScalaLangParser.YIELD);
         map.put(ScalaTokenTypes.kMACRO, ScalaLangParser.MACRO);
+        map.put(ScalaTokenTypes.tDOC_COMMENT, ScalaLangParser.DOC_COMMENT);
+        map.put(ScalaTokenTypes.tLINE_COMMENT, ScalaLangParser.LINE_COMMENT);
+        map.put(ScalaTokenTypes.tBLOCK_COMMENT, ScalaLangParser.BLOCK_COMMENT);
+        map.put(ScalaTokenTypes.tSH_COMMENT, ScalaLangParser.SH_COMMENT);
+
+        map.put(ScalaXmlTokenTypes.XML_START_TAG_START(), ScalaLangParser.XML_START_TAG_START);
+        map.put(ScalaXmlTokenTypes.XML_NAME(), ScalaLangParser.XML_NAME);
+        map.put(ScalaXmlTokenTypes.XML_EMPTY_ELEMENT_END(), ScalaLangParser.XML_EMPTY_ELEMENT_END);
+        map.put(ScalaXmlTokenTypes.XML_TAG_END(), ScalaLangParser.XML_TAG_END);
+        map.put(ScalaXmlTokenTypes.XML_END_TAG_START(), ScalaLangParser.XML_END_TAG_START);
+        map.put(ScalaXmlTokenTypes.XML_COMMENT_START(), ScalaLangParser.XML_COMMENT_START);
+        map.put(ScalaXmlTokenTypes.XML_COMMENT_END(), ScalaLangParser.XML_COMMENT_END);
+        map.put(ScalaXmlTokenTypes.XML_CDATA_START(), ScalaLangParser.XML_CDATA_START);
+        map.put(ScalaXmlTokenTypes.XML_CDATA_END(), ScalaLangParser.XML_CDATA_END);
+        map.put(ScalaXmlTokenTypes.XML_DATA_CHARACTERS(), ScalaLangParser.XML_DATA_CHARACTERS);
+        map.put(ScalaXmlTokenTypes.XML_PI_START(), ScalaLangParser.XML_PI_START);
+        map.put(ScalaXmlTokenTypes.XML_PI_END(), ScalaLangParser.XML_PI_END);
+        map.put(ScalaXmlTokenTypes.XML_TAG_CHARACTERS(), ScalaLangParser.XML_TAG_CHARACTERS);
+        map.put(ScalaXmlTokenTypes.XML_EQ(), ScalaLangParser.XML_EQ);
+        map.put(ScalaXmlTokenTypes.XML_ATTRIBUTE_VALUE_START_DELIMITER(), ScalaLangParser.XML_ATTRIBUTE_VALUE_START_DELIMITER);
+        map.put(ScalaXmlTokenTypes.XML_ATTRIBUTE_VALUE_TOKEN(), ScalaLangParser.XML_ATTRIBUTE_VALUE_TOKEN);
+        map.put(ScalaXmlTokenTypes.XML_CHAR_ENTITY_REF(), ScalaLangParser.XML_CHAR_ENTITY_REF);
+        map.put(ScalaXmlTokenTypes.XML_ATTRIBUTE_VALUE_END_DELIMITER(), ScalaLangParser.XML_ATTRIBUTE_VALUE_END_DELIMITER);
+        map.put(ScalaTokenTypesEx.SCALA_IN_XML_INJECTION_START, ScalaLangParser.SCALA_IN_XML_INJECTION_START);
+        map.put(ScalaTokenTypesEx.SCALA_IN_XML_INJECTION_END, ScalaLangParser.SCALA_IN_XML_INJECTION_END);
     }
 
     @Override

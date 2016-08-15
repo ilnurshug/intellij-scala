@@ -250,7 +250,8 @@ simpleExpr1       : literal
                   | simpleExpr1 '_'? '.' id
                   | (newTemplate | blockExpr) typeArgs
                   | simpleExpr1 '_'? typeArgs
-                  | simpleExpr1 argumentExprs ;
+                  | simpleExpr1 argumentExprs
+                  | xmlExpr;
 
 exprs             : expr (  ','  expr)* ;
 
@@ -320,7 +321,8 @@ simplePattern     : wildcardPattern
                   | literalPattern
                   | stableReferencePattern
                   | constructorPattern
-                  | patternInParenthesis ;
+                  | patternInParenthesis
+                  | xmlPattern;
 
 wildcardPattern   : '_' ;
 
@@ -578,6 +580,66 @@ id                : ID
 
 semi              :  SEMICOLON | Nl+ ;
 
+xmlExpr           :    xmlContent (element)* ;
+
+element           :    emptyElemTag
+                  |    sTag content eTag ;
+
+emptyElemTag      :    XML_START_TAG_START XML_NAME (xmlAttribute)*  XML_EMPTY_ELEMENT_END ;
+
+sTag              :    XML_START_TAG_START XML_NAME (xmlAttribute)*  XML_TAG_END ;
+
+eTag              :    XML_END_TAG_START XML_NAME XML_TAG_END ;
+
+content           :    charData? (content1 charData?)* ;
+
+content1          :    xmlContent
+                  //|    xmlReference
+                  |    scalaExpr ;
+
+xmlContent        :    element
+                  |    cDSect
+                  |    pI
+                  |    comment ;
+
+comment           :    XML_COMMENT_START XML_COMMENT_END ; // ???
+
+cDSect            :    XML_CDATA_START (XML_DATA_CHARACTERS | scalaExpr) XML_CDATA_END ;
+
+pI                :    XML_PI_START XML_NAME xmlAttribute* XML_TAG_CHARACTERS XML_PI_END ;
+
+xmlAttribute      :    XML_NAME XML_EQ attValue ;
+
+attValue          :    XML_ATTRIBUTE_VALUE_START_DELIMITER (XML_ATTRIBUTE_VALUE_TOKEN | XML_CHAR_ENTITY_REF)* XML_ATTRIBUTE_VALUE_END_DELIMITER
+                  |    scalaExpr ;
+
+scalaExpr         :    SCALA_IN_XML_INJECTION_START block SCALA_IN_XML_INJECTION_END ;
+
+charData          :    XML_DATA_CHARACTERS | XML_CHAR_ENTITY_REF ;
+
+xmlPattern        :    emptyElemTagP
+                  |    sTagP contentP eTagP ;
+
+emptyElemTagP     :    XML_START_TAG_START XML_NAME XML_EMPTY_ELEMENT_END ;
+
+sTagP             :    XML_START_TAG_START XML_NAME XML_TAG_END ;
+
+eTagP             :    XML_END_TAG_START XML_NAME XML_TAG_END ;
+
+contentP          :    charData? (content1P charData?)* ;
+
+content1P         :    xmlPattern
+                  |    cDSect
+                  |    comment
+                  |    pI
+                  //|    xmlReference
+                  |    scalaPatterns ;
+
+scalaPatterns     :    SCALA_IN_XML_INJECTION_START xmlPatterns SCALA_IN_XML_INJECTION_END ;
+
+xmlPatterns       : patterns ;
+
+
 // Lexer
 VDASH       :  '|';
 SEMICOLON   :  ';';
@@ -672,10 +734,13 @@ ID               : Op
                  | Upper Idrest
                  | Lower Idrest ;
 
-LINE_COMMENT : '//' .*? Nl          -> channel(HIDDEN) ;
-BLOCK_COMMENT      : '/*' .*? '*/'    	-> channel(HIDDEN) ;
 
 WHITE_SPACE_IN_LINE       :  [ \t]+ ;
+
+LINE_COMMENT : '//' .*? Nl          -> channel(HIDDEN) ;
+BLOCK_COMMENT      : '/*' .*? '*/'    	-> channel(HIDDEN) ;
+DOC_COMMENT : ;
+SH_COMMENT : ;
 
 
 

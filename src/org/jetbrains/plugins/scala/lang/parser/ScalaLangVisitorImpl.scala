@@ -319,6 +319,60 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
   }
 
 
+  override def visitXmlExpr(ctx: XmlExprContext): Unit = visit(ctx, ScalaElementTypes.XML_EXPR)
+
+  override def visitElement(ctx: ElementContext): Unit = {
+    val marker = builder.mark()
+
+    visitChildren(ctx)
+
+    if (ctx.emptyElemTag() != null) marker.drop()
+    else marker.done(ScalaElementTypes.XML_ELEMENT)
+  }
+
+  override def visitEmptyElemTag(ctx: EmptyElemTagContext): Unit = visit(ctx, ScalaElementTypes.XML_EMPTY_TAG)
+
+  override def visitSTag(ctx: STagContext): Unit = visit(ctx, ScalaElementTypes.XML_START_TAG)
+
+  override def visitETag(ctx: ETagContext): Unit = visit(ctx, ScalaElementTypes.XML_END_TAG)
+
+  //override def visitContent(ctx: ContentContext): Unit = super.visitContent(ctx)
+
+  //override def visitContent1(ctx: Content1Context): Unit = super.visitContent1(ctx)
+
+  //override def visitXmlContent(ctx: XmlContentContext): Unit = super.visitXmlContent(ctx)
+
+  override def visitComment(ctx: CommentContext): Unit = visit(ctx, ScalaElementTypes.XML_COMMENT)
+
+  override def visitCDSect(ctx: CDSectContext): Unit = visit(ctx, ScalaElementTypes.XML_CD_SECT)
+
+  override def visitPI(ctx: PIContext): Unit = visit(ctx, ScalaElementTypes.XML_PI)
+
+  override def visitXmlAttribute(ctx: XmlAttributeContext): Unit = visit(ctx, ScalaElementTypes.XML_ATTRIBUTE)
+
+  //override def visitAttValue(ctx: AttValueContext): Unit = super.visitAttValue(ctx)
+
+  //override def visitScalaExpr(ctx: ScalaExprContext): Unit = super.visitScalaExpr(ctx)
+
+  //override def visitCharData(ctx: CharDataContext): Unit = super.visitCharData(ctx)
+
+  override def visitXmlPattern(ctx: XmlPatternContext): Unit = visit(ctx, ScalaElementTypes.XML_PATTERN)
+
+  override def visitEmptyElemTagP(ctx: EmptyElemTagPContext): Unit = visit(ctx, ScalaElementTypes.XML_EMPTY_TAG)
+
+  override def visitSTagP(ctx: STagPContext): Unit = visit(ctx, ScalaElementTypes.XML_START_TAG)
+
+  override def visitETagP(ctx: ETagPContext): Unit = visit(ctx, ScalaElementTypes.XML_END_TAG)
+
+  //override def visitContentP(ctx: ContentPContext): Unit = super.visitContentP(ctx)
+
+  //override def visitContent1P(ctx: Content1PContext): Unit = super.visitContent1P(ctx)
+
+  //override def visitScalaPatterns(ctx: ScalaPatternsContext): Unit = super.visitScalaPatterns(ctx)
+
+  //override def visitXmlPatterns(ctx: XmlPatternsContext): Unit = super.visitXmlPatterns(ctx)
+
+
 
   override def visitTerminal(node: TerminalNode): Unit = builder.advanceLexer()
 
