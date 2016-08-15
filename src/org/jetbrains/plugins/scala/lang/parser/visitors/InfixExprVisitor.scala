@@ -3,7 +3,7 @@ import com.intellij.lang.PsiBuilder
 
 import scala.collection.mutable
 import org.antlr.v4.runtime.ParserRuleContext
-import org.jetbrains.plugins.scala.lang.ScalaLangParser.InfixExprContext
+import org.jetbrains.plugins.scala.lang.ScalaLangParser.{InfixExprContext, TypeArgsContext}
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.{ErrMsg, ScalaElementTypes, ScalaLangVisitorImpl}
 import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils._
@@ -28,9 +28,12 @@ object InfixExprVisitor extends VisitorHelper {
     var prefixExprIdx: Int = 0
     val prefixExprCount: Int = context.prefixExpr().size()
 
+    var childIdx: Int = 0
+
     //PrefixExprVisitor.visit(visitor, builder, context.prefixExpr(prefixExprIdx), args)
     visitor.visitPrefixExpr(context.prefixExpr(prefixExprIdx))
     prefixExprIdx += 1
+    childIdx += 1
 
     while (prefixExprIdx < prefixExprCount) {
       //need to know associativity
@@ -60,14 +63,22 @@ object InfixExprVisitor extends VisitorHelper {
 
       val opMarker = builder.mark
       builder.advanceLexer() //Ate id
+      childIdx += 1
       opMarker.done(ScalaElementTypes.REFERENCE_EXPRESSION)
-      // TODO: typeArgs
+
+      if (context.getChild(childIdx).isInstanceOf[TypeArgsContext]) {
+        visitor.visitTypeArgs(context.getChild(childIdx).asInstanceOf[TypeArgsContext])
+        childIdx += 1
+      }
+      //visitor.visitTypeArgs(context.ty)
+
       backupMarker.drop()
       backupMarker = builder.mark
 
       //PrefixExprVisitor.visit(visitor, builder, context.prefixExpr(prefixExprIdx), args)
       visitor.visitPrefixExpr(context.prefixExpr(prefixExprIdx))
       prefixExprIdx += 1
+      childIdx += 1
 
       count = count + 1
     }

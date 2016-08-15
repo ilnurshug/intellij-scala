@@ -157,7 +157,7 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testProgram16(): Unit = {
-    doTest("object A {\n  find {x => null}\n}")
+    doTest("new M() map[String] _.toString")
   }
 
   def testProgram17(): Unit = {
