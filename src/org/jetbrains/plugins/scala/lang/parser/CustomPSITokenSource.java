@@ -45,6 +45,7 @@ public class CustomPSITokenSource extends PSITokenSource {
         map.put(ScalaTokenTypes.tAT, ScalaLangParser.AT);
         map.put(ScalaTokenTypes.tVIEW, ScalaLangParser.VIEW);
         map.put(ScalaTokenTypes.tSTRING, ScalaLangParser.StringLiteral);
+        map.put(ScalaTokenTypes.tMULTILINE_STRING, ScalaLangParser.MultilineStringLiteral);
         map.put(ScalaTokenTypes.tCHAR, ScalaLangParser.CharacterLiteral);
         map.put(ScalaTokenTypes.tSYMBOL, ScalaLangParser.SymbolLiteral);
         map.put(ScalaTokenTypes.tINTEGER, ScalaLangParser.IntegerLiteral);

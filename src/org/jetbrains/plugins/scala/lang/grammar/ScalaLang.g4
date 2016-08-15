@@ -91,6 +91,7 @@ literal           : '-'? IntegerLiteral
                   | BooleanLiteral
                   | CharacterLiteral
                   | StringLiteral
+                  | MultilineStringLiteral
                   | SymbolLiteral
                   | 'null' ;
 
@@ -653,8 +654,10 @@ TLD				:  '~';
 
 BooleanLiteral   :  'true' | 'false';
 CharacterLiteral :  '\'' (PrintableChar | CharEscapeSeq) '\'';
-StringLiteral    :  '"' StringElement* '"'
-                 |  '"""' MultiLineChars '"""';
+StringLiteral    :  '"' StringElement* '"' ;
+MultilineStringLiteral
+                 : '"""' MultiLineChars '"""';
+
 SymbolLiteral    :  '\'' ID;
 IntegerLiteral   :  (DecimalNumeral | HexNumeral) ('L' | 'l')?;
 FloatingPointLiteral
