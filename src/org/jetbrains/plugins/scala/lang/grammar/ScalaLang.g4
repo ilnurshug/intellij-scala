@@ -66,10 +66,6 @@ Boolean isNl() {
     return (getOccurrenceCount('\n') >= 1);
 }
 
-Boolean isLParenthesis() {
-    return equalTo("(");
-}
-
 Boolean equalTo(String s) {
     Token curToken = getCurrentToken();
     if (curToken == null) return false;
@@ -262,7 +258,7 @@ block             : resultExpr
 blockNode         : block ;
 
 blockStat         : import_
-                  | 'implicit'? def
+                  | def
                   | tmplDef
                   | expr1
                   ; // | ;
@@ -525,7 +521,10 @@ classParents      : constr ( 'with'  annotType)* ;
 
 traitParents      : annotType ( 'with'  annotType)* ;
 
-constr            : annotType  ({!isNl() && isLParenthesis()}? argumentExprs)* ;
+constr            : annotType  ({!isNl()}? argumentExprsParen)* ;
+
+argumentExprsParen: '('  exprs?  ')'
+                  | '('  (exprs  ',' )? postfixExpr  ':' '_' '*' ')' ;
 
 earlyDefs         : '{'  (patVarDef ( (SEMICOLON | {isNl()}? emptyNl)  patVarDef )* )?  '}'  'with' ;
 
