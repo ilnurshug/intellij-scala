@@ -86,11 +86,18 @@ program           : blockExpr
 
 literal           : '-'? IntegerLiteral
                   | '-'? FloatingPointLiteral
+                  | interpolatedStringPartReference InterpolatedString ( STRING_INJECTION (blockExpr | referenceExp | thisReference) | InterpolatedString )* InterpolatedStringEnd
+                  | interpolatedStringPartReference InterpolatedMultilineString ( STRING_INJECTION (blockExpr | referenceExp | thisReference) | InterpolatedMultilineString )* InterpolatedStringEnd
                   | BooleanLiteral
                   | CharacterLiteral
                   | StringLiteral
                   | SymbolLiteral
-                  | 'null' ; 
+                  | 'null' ;
+
+referenceExp      : id ;
+
+interpolatedStringPartReference:
+                  id ;
                   
 qualId            : qualId '.' id | id ;
 

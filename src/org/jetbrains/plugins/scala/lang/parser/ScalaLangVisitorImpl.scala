@@ -44,7 +44,11 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitImplicitClassParamClause(ctx: ImplicitClassParamClauseContext): Unit = visit(ctx, ScalaElementTypes.PARAM_CLAUSE)
 
+  override def visitReferenceExp(ctx: ReferenceExpContext): Unit = visit(ctx, ScalaElementTypes.REFERENCE_EXPRESSION)
+
   override def visitLiteral(ctx: LiteralContext): Unit = visit(ctx, ScalaElementTypes.LITERAL)
+
+  override def visitInterpolatedStringPartReference(ctx: InterpolatedStringPartReferenceContext): Unit = visit(ctx, ScalaElementTypes.INTERPOLATED_PREFIX_LITERAL_REFERENCE)
 
   override def visitQualId(ctx: QualIdContext): Unit = visit(ctx, ScalaElementTypes.REFERENCE)
 

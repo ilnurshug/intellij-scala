@@ -50,6 +50,10 @@ public class CustomPSITokenSource extends PSITokenSource {
         map.put(ScalaTokenTypes.tINTEGER, ScalaLangParser.IntegerLiteral);
         map.put(ScalaTokenTypes.tFLOAT, ScalaLangParser.FloatingPointLiteral);
         //map.put(ScalaTokenTypes.tWHITE_SPACE_IN_LINE, ScalaLangParser.WHITE_SPACE_IN_LINE);
+        map.put(ScalaTokenTypes.tINTERPOLATED_STRING_INJECTION, ScalaLangParser.STRING_INJECTION);
+        map.put(ScalaTokenTypes.tINTERPOLATED_STRING, ScalaLangParser.InterpolatedString);
+        map.put(ScalaTokenTypes.tINTERPOLATED_MULTILINE_STRING, ScalaLangParser.InterpolatedMultilineString);
+        map.put(ScalaTokenTypes.tINTERPOLATED_STRING_END, ScalaLangParser.InterpolatedStringEnd);
         map.put(ScalaTokenTypes.kABSTRACT, ScalaLangParser.ABSTRACT);
         map.put(ScalaTokenTypes.kCASE, ScalaLangParser.CASE);
         map.put(ScalaTokenTypes.kCATCH, ScalaLangParser.CATCH);
@@ -106,7 +110,7 @@ public class CustomPSITokenSource extends PSITokenSource {
             if (tokenText.contains("\n")) return ScalaLangParser.Nl;
             else return ScalaLangParser.WHITE_SPACE_IN_LINE;
         }
-        else if (t == ScalaTokenTypes.tIDENTIFIER) return identifierTextToTokenType(tokenText);
+        else if (t == ScalaTokenTypes.tIDENTIFIER || t == ScalaTokenTypes.tINTERPOLATED_STRING_ID) return identifierTextToTokenType(tokenText);
         else {
             if (map.containsKey(t)) return map.get(t);
             else return 1;

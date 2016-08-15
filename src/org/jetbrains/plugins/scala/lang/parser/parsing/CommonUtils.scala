@@ -26,17 +26,24 @@ trait CommonUtils {
     builder.advanceLexer()
     prefixMarker.done(
       if (isPattern) ScalaElementTypes.INTERPOLATED_PREFIX_PATTERN_REFERENCE
-      else ScalaElementTypes.INTERPOLATED_PREFIX_LITERAL_REFERENCE)
+      else ScalaElementTypes.INTERPOLATED_PREFIX_LITERAL_REFERENCE
+    )
+
     val patternArgsMarker = builder.mark()
+
     while (!builder.eof() && builder.getTokenType != ScalaTokenTypes.tINTERPOLATED_STRING_END) {
+
       if (builder.getTokenType == ScalaTokenTypes.tINTERPOLATED_STRING_INJECTION) {
+
         builder.advanceLexer()
+
         if (isPattern) {
           if (builder.getTokenType == ScalaTokenTypes.tIDENTIFIER) {
               val idMarker = builder.mark()
               builder.advanceLexer()
               idMarker.done(ScalaElementTypes.REFERENCE_PATTERN)
-          } else if (builder.getTokenType == ScalaTokenTypes.tLBRACE) {
+          }
+          else if (builder.getTokenType == ScalaTokenTypes.tLBRACE) {
             builder.advanceLexer()
             if (!pattern.parse(builder)) builder.error("Wrong pattern")
             else if (builder.getTokenType != ScalaTokenTypes.tRBRACE) {
@@ -44,7 +51,8 @@ trait CommonUtils {
               ParserUtils.parseLoopUntilRBrace(builder, () => (), braceReported = true)
             } else builder.advanceLexer()
           }
-        } else if (!blockExpr.parse(builder)) {
+        }
+        else if (!blockExpr.parse(builder)) {
           if (builder.getTokenType == ScalaTokenTypes.tIDENTIFIER) {
             val idMarker = builder.mark()
             builder.advanceLexer()
@@ -55,13 +63,16 @@ trait CommonUtils {
             literalMarker.done(ScalaElementTypes.THIS_REFERENCE)
           } else if (!builder.getTokenText.startsWith("$")) builder.error("Bad interpolated string injection")
         }
-      } else {
+      }
+      else {
         if (builder.getTokenType == ScalaTokenTypes.tWRONG_STRING) builder.error("Wrong string literal")
         builder.advanceLexer()
       }
     }
+
     if (isPattern) patternArgsMarker.done(ScalaElementTypes.PATTERN_ARGS)
     else patternArgsMarker.drop()
+
     if (!builder.eof()) builder.advanceLexer()
   }
 }
