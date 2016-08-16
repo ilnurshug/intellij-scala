@@ -206,6 +206,8 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitAnnotations(ctx: AnnotationsContext): Unit = visit(ctx, ScalaElementTypes.ANNOTATIONS)
 
+  override def visitAnnotationsNoNl(ctx: AnnotationsNoNlContext): Unit = visit(ctx, ScalaElementTypes.ANNOTATIONS)
+
   override def visitAnnotationsNonEmpty(ctx: AnnotationsNonEmptyContext): Unit = visit(ctx, ScalaElementTypes.ANNOTATIONS)
 
   override def visitEnumerators(ctx: EnumeratorsContext): Unit = visit(ctx, ScalaElementTypes.ENUMERATORS)

@@ -56,9 +56,9 @@ class ScalaLangParserTest extends SimpleTestCase
 
   def testProgram0(): Unit = {
     doTest(
-      """object test {
-          val h: (Int => Int)  = {(); implicit x => x}
-        }"""
+      """class A
+        |private class B
+      """.stripMargin
     )
   }
 

@@ -524,10 +524,14 @@ modifiersOrCase   : modifier* 'case'? ;
 
 classDef          : id  typeParamClause?  primaryConstructor classTemplateOpt ;
 
-primaryConstructor: annotations  (accessModifierOrEmpty) classParamClauses ;
+primaryConstructor: annotationsNoNl  accessModifierOrEmpty classParamClauses ;
+
+annotationsNoNl   : {!isNl()}? annotation*
+                  | ;
 
 accessModifierOrEmpty
-                  : accessModifier ? ;
+                  : {!isNl()}? accessModifier ?
+                  | ;
                       
 traitDef          : id  typeParamClause?  traitTemplateOpt ;
 
