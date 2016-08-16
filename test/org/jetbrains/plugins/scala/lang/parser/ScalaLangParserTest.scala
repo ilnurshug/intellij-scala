@@ -56,8 +56,8 @@ class ScalaLangParserTest extends SimpleTestCase
 
   def testProgram0(): Unit = {
     doTest(
-      """class a {
-          val x: () => Type
+      """object test {
+          val h: (Int => Int)  = {(); implicit x => x}
         }"""
     )
   }
@@ -97,7 +97,6 @@ class ScalaLangParserTest extends SimpleTestCase
         }""")
   }
 
-  // why parser crashes??
   private val Header = "class Seq[+A];object Seq { def apply[A](a: A) = new Seq[A] };trait L;trait A; trait B; trait C;object A extends L with A"
   private val line = "def f() {}; f(A)"
   def testProgram5(): Unit = {

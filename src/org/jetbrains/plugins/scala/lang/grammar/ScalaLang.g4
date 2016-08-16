@@ -196,6 +196,7 @@ expr1             : assignStmt
                   | doStmt
                   | forStmt
                   | throwStmt
+                  | implicitClosure
                   | returnStmt
                   | typedExprStmt
                   | matchStmt
@@ -215,6 +216,8 @@ doStmt            : 'do'  expr  (SEMICOLON | {isNl()}? emptyNl)?  'while'  '('  
 forStmt           : 'for'  ('('  enumerators  ')' | '{'  enumerators  '}')  Nl*  'yield'?  expr ;
 
 throwStmt         : 'throw'  expr ;
+
+implicitClosure   : 'implicit' id '=>' expr ;
 
 returnStmt        : 'return'  ({!isNl()}? expr)? ;
 
@@ -263,8 +266,14 @@ blockExpr         : '{'  caseClauses  '}'
                   | '{'  block  '}' ;
 
 block             : resultExpr
-                  | blockStat ( (SEMICOLON | {isNl()}? emptyNl)  blockStat )* resultExpr
-                  | blockStat ( (SEMICOLON | {isNl()}? emptyNl)  blockStat )*
+                  | blockStat subBlock
+                  | ;
+
+subBlock          : {isNl()}? emptyNl resultExpr
+                  | SEMICOLON resultExpr
+                  | {isNl()}? emptyNl blockStat subBlock
+                  | SEMICOLON blockStat subBlock
+                  | SEMICOLON
                   | ;
 
 blockNode         : block ;
@@ -273,7 +282,7 @@ blockStat         : import_
                   | def
                   | tmplDef
                   | expr1
-                  ; // | ;
+                  ;// | ;
 
 resultExpr        : bindings  '=>'  blockNode
                   | ('implicit'?  id | '_')  (':'  compoundType)? '=>'  blockNode ;

@@ -122,6 +122,26 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitThrowStmt(ctx: ThrowStmtContext): Unit = visit(ctx, ScalaElementTypes.THROW_STMT)
 
+  override def visitImplicitClosure(ctx: ImplicitClosureContext): Unit = {
+    val exprMarker = builder.mark()
+
+    val ipmarker = builder.mark
+    builder.advanceLexer() //Ate implicit
+
+    val pmarker = builder.mark
+    builder.advanceLexer() //Ate id
+
+    pmarker.done(ScalaElementTypes.PARAM)
+    ipmarker.done(ScalaElementTypes.PARAM_CLAUSE)
+    ipmarker.precede.done(ScalaElementTypes.PARAM_CLAUSES)
+
+    builder.advanceLexer() //Ate =>
+
+    visitExpr(ctx.expr())
+
+    exprMarker.done(ScalaElementTypes.FUNCTION_EXPR)
+  }
+
   override def visitReturnStmt(ctx: ReturnStmtContext): Unit = visit(ctx, ScalaElementTypes.RETURN_STMT)
 
   override def visitAssignStmt(ctx: AssignStmtContext): Unit = visit(ctx, ScalaElementTypes.ASSIGN_STMT)
@@ -153,8 +173,6 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
   override def visitArgumentExprs(ctx: ArgumentExprsContext): Unit = visit(ctx, ScalaElementTypes.ARG_EXPRS)
 
   override def visitBlockExpr(ctx: BlockExprContext): Unit = visit(ctx, ScalaElementTypes.BLOCK_EXPR)
-
-  override def visitBlock(ctx: BlockContext): Unit = BlockVisitor.visit(this, ctx)
 
   override def visitResultExpr(ctx: ResultExprContext): Unit = ResultExprVisitor.visit(this, ctx)
 
