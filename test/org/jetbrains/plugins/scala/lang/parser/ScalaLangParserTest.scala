@@ -55,11 +55,7 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testProgram0(): Unit = {
-    doTest(
-      """class A
-        |private class B
-      """.stripMargin
-    )
+    doTest("new X[Int][String][Boolean]")
   }
 
   def testProgram1(): Unit = {

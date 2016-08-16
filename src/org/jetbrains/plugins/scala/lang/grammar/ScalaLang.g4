@@ -172,10 +172,18 @@ annotType         : simpleType  annotationsNonEmpty?;
 
 simpleType        : simpleType  typeArgs
                   | simpleType '#' id
-                  | stableIdRef
+                  | simpleTypeSub ;
+
+simpleTypeSub     : stableIdRef
                   | pathRef '.' 'type'
                   | '(' ')'
                   | '('  types ','? ')';
+
+simpleTypeNoMultipleSQBrackets
+                  : simpleTypeSub typeArgs
+                  | simpleTypeNoMultipleSQBrackets '#' id typeArgs
+                  | simpleTypeNoMultipleSQBrackets '#' id
+                  | simpleTypeSub ;
 
 typeArgs          : '['  type ( ','  type)*  ']';
 
@@ -563,7 +571,10 @@ classParents      : constr ( 'with'  annotType)* ;
 
 traitParents      : annotType ( 'with'  annotType)* ;
 
-constr            : annotType  ({!isNl()}? argumentExprsParen)* ;
+constr            : annotTypeNoMultipleSQBrackets  ({!isNl()}? argumentExprsParen)* ;
+
+annotTypeNoMultipleSQBrackets
+                  : simpleTypeNoMultipleSQBrackets  annotationsNonEmpty? ;
 
 argumentExprsParen: '('  exprs?  ')'
                   | '('  (exprs  ',' )? postfixExpr  ':' '_' '*' ')' ;

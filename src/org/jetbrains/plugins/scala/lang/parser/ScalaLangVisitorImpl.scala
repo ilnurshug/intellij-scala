@@ -84,6 +84,12 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitAnnotType(ctx: AnnotTypeContext): Unit = AnnotTypeVisitor.visit(this, ctx)
 
+  override def visitAnnotTypeNoMultipleSQBrackets(ctx: AnnotTypeNoMultipleSQBracketsContext): Unit = AnnotTypeNoMultipleSQBracketsVisitor.visit(this, ctx)
+
+  override def visitSimpleTypeNoMultipleSQBrackets(ctx: SimpleTypeNoMultipleSQBracketsContext): Unit = SimpleTypeNoMultipleSQBracketsVisitor.visit(this, ctx)
+
+  override def visitSimpleTypeSub(ctx: SimpleTypeSubContext): Unit = SimpleTypeSubVisitor.visit(this, ctx)
+
   override def visitSimpleType(ctx: SimpleTypeContext): Unit = SimpleTypeVisitor.visit(this, ctx)
 
 

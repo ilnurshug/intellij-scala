@@ -53,7 +53,7 @@ class CompilationUnitTest extends SimpleTestCase {
   }
 
   def testCompilationUnit2(): Unit = {
-    doTest("""class C{}""")
+    doTest("new X[Int][String][Boolean]")
   }
 
   private val Header = "class Seq[+A]\nobject Seq { def apply[A](a: A) = new Seq[A] }\ntrait L;\ntrait A; trait B; trait C;\nobject A extends L with A"
