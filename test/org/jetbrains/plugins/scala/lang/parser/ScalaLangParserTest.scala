@@ -56,7 +56,9 @@ class ScalaLangParserTest extends SimpleTestCase
 
   def testProgram0(): Unit = {
     doTest(
-      """{def f(){}}"""
+      """class a {
+          val x: () => Type
+        }"""
     )
   }
 

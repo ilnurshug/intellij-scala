@@ -139,8 +139,7 @@ type              : typeType
                   | existentialType
                   | wildcardType ;
 
-typeType          : infixType  '=>'  type
-                  | '(' ('=>' type)? ')' '=>' type ;
+typeType          : infixType  '=>'  type ;
 
 wildcardType      : '_' ('>:' type)? ('<:' type)? ;
 
@@ -166,6 +165,7 @@ simpleType        : simpleType  typeArgs
                   | simpleType '#' id
                   | stableIdRef
                   | pathRef '.' 'type'
+                  | '(' ')'
                   | '('  types ','? ')';
 
 typeArgs          : '['  type ( ','  type)*  ']';

@@ -42,6 +42,9 @@ public abstract class CustomANTLRParserAdaptor extends ANTLRParserAdaptor {
         PsiBuilder.Marker rollbackMarker = builder.mark();
         try {
             parseTree = parse(parser, root);
+
+            ParseTreeToDot conv = new ParseTreeToDot();
+            System.out.println(conv.convert(parseTree));
         }
         finally {
             rollbackMarker.rollbackTo();

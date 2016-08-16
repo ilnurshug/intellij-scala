@@ -29,6 +29,9 @@ object SimpleTypeVisitor extends VisitorHelper {
     else if (context.id() != null) {
       marker.done(ScalaElementTypes.TYPE_PROJECTION)
     }
+    else if (context.getChild(0).getText.compareTo("(") == 0 && context.types() == null) {
+      marker.done(ScalaElementTypes.TYPE_IN_PARENTHESIS)
+    }
     else if (context.types() != null) {
       val isTuple:Boolean = context.types().`type`().size() > 1
       if (isTuple) marker.done(ScalaElementTypes.TUPLE_TYPE)
