@@ -161,11 +161,11 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testProgram17(): Unit = {
-    doTest("case Some(a@S()) => a", "caseClause")
+    doTest("val a = <?xml version=\"1.0\" encoding=\"utf-8\" ?>", "def")
   }
 
   def testProgam18(): Unit = {
-    doTest("def body = <span>{42;}</span>", "def")
+    doTest("class a {\n  def this(a: Int, b: Int)\n  {\n    this(a)\n    a = true\n  }\n}")
   }
 
   def testExperiment(): Unit = {

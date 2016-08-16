@@ -489,10 +489,9 @@ patternList       : pattern2 ( ','  pattern2)* ;
 varDef            : patDef
                   | ids  ':'  type  '='  '_' ;
                   
-funDef            : funSig ( ':'  type)?  '='  expr
-                  | funSig  Nl?  blockWithBraces
-                  | 'this'  paramClauses
-                    ('='  constrExpr |  {isSingleNl()}? Nl  constrBlock) ;
+funDef            : 'this'  paramClauses ('='  constrExpr |  {isSingleNl()}? emptyNl constrBlock)
+                  | funSig ( ':'  type)?  '='  expr
+                  | funSig  Nl?  blockWithBraces ;
 
 blockWithBraces   : '{'  block  '}' ;
 
@@ -585,11 +584,11 @@ xmlExpr           :    xmlContent (element)* ;
 element           :    emptyElemTag
                   |    sTag content eTag ;
 
-emptyElemTag      :    XML_START_TAG_START XML_NAME (xmlAttribute)*  XML_EMPTY_ELEMENT_END ;
+emptyElemTag      :    '<' XML_NAME (xmlAttribute)*  '/>' ;
 
-sTag              :    XML_START_TAG_START XML_NAME (xmlAttribute)*  XML_TAG_END ;
+sTag              :    '<' XML_NAME (xmlAttribute)*  '>' ;
 
-eTag              :    XML_END_TAG_START XML_NAME XML_TAG_END ;
+eTag              :    '</' XML_NAME '>' ;
 
 content           :    charData? (content1 charData?)* ;
 
@@ -602,13 +601,13 @@ xmlContent        :    element
                   |    pI
                   |    comment ;
 
-comment           :    XML_COMMENT_START XML_COMMENT_END ; // ???
+comment           :    '<!--' '-->' ; // ???
 
-cDSect            :    XML_CDATA_START (XML_DATA_CHARACTERS | scalaExpr) XML_CDATA_END ;
+cDSect            :    '<![CDATA[' (XML_DATA_CHARACTERS | scalaExpr) ']]>' ;
 
-pI                :    XML_PI_START XML_NAME xmlAttribute* XML_TAG_CHARACTERS XML_PI_END ;
+pI                :    '<?' XML_NAME xmlAttribute* XML_TAG_CHARACTERS? '?>' ;
 
-xmlAttribute      :    XML_NAME XML_EQ attValue ;
+xmlAttribute      :    XML_NAME '=' attValue ;
 
 attValue          :    XML_ATTRIBUTE_VALUE_START_DELIMITER (XML_ATTRIBUTE_VALUE_TOKEN | XML_CHAR_ENTITY_REF)* XML_ATTRIBUTE_VALUE_END_DELIMITER
                   |    scalaExpr ;
@@ -620,11 +619,11 @@ charData          :    XML_DATA_CHARACTERS | XML_CHAR_ENTITY_REF ;
 xmlPattern        :    emptyElemTagP
                   |    sTagP contentP eTagP ;
 
-emptyElemTagP     :    XML_START_TAG_START XML_NAME XML_EMPTY_ELEMENT_END ;
+emptyElemTagP     :    '<' XML_NAME '/>' ;
 
-sTagP             :    XML_START_TAG_START XML_NAME XML_TAG_END ;
+sTagP             :    '<' XML_NAME '>' ;
 
-eTagP             :    XML_END_TAG_START XML_NAME XML_TAG_END ;
+eTagP             :    '</' XML_NAME '>' ;
 
 contentP          :    charData? (content1P charData?)* ;
 
@@ -641,6 +640,35 @@ xmlPatterns       : patterns ;
 
 
 // Lexer
+XML_START_TAG_START     : '<';
+XML_EMPTY_ELEMENT_END   : '/>';
+XML_TAG_END             : '>';
+XML_END_TAG_START       : '</';
+XML_COMMENT_START       : '<!--';
+XML_COMMENT_END         : '-->';
+XML_CDATA_START         : '<![CDATA[' ;
+XML_CDATA_END           : ']]>' ;
+XML_EQ                  : ASSIGN;
+XML_PI_START            : '<?';
+XML_PI_END              : '?>';
+SCALA_IN_XML_INJECTION_START
+                        : LBRACE ;
+SCALA_IN_XML_INJECTION_END
+                        : RBRACE ;
+XML_ATTRIBUTE_VALUE_START_DELIMITER
+                        : Q_MARK | Q_MARK_2 ;
+XML_ATTRIBUTE_VALUE_END_DELIMITER
+                        : Q_MARK | Q_MARK_2 ;
+
+
+XML_NAME                : PrintableChar+;
+XML_DATA_CHARACTERS     : PrintableChar+;
+XML_TAG_CHARACTERS      : PrintableChar+;
+XML_ATTRIBUTE_VALUE_TOKEN
+                        : PrintableChar+;
+XML_CHAR_ENTITY_REF     : PrintableChar+;
+
+
 VDASH       :  '|';
 SEMICOLON   :  ';';
 LBRACE		:  '{';
