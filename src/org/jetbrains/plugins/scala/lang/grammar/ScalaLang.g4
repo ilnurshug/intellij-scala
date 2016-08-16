@@ -579,7 +579,7 @@ id                : ID
                   | TLD
                   | ASSIGN
                   | UNDER
-                  | FUNTYPE;
+                  ;//| FUNTYPE;
 
 semi              :  SEMICOLON | Nl+ ;
 
