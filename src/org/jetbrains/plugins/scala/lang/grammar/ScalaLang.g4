@@ -97,8 +97,17 @@ literal           : '-'? IntegerLiteral
 
 referenceExp      : id ;
 
-interpolatedStringPartReference:
-                  id ;
+interpolatedStringPartReference
+                  : id ;
+
+interpolatedStringPattern
+                  : interpolatedPrefixPatternReference stringPatternArgs InterpolatedStringEnd;
+
+interpolatedPrefixPatternReference
+                  : id ;
+
+stringPatternArgs : InterpolatedString (STRING_INJECTION (referencePattern | '{' pattern '}') | InterpolatedString)*
+                  | InterpolatedMultilineString (STRING_INJECTION (referencePattern | '{' pattern '}') | InterpolatedMultilineString)*;
                   
 qualId            : qualId '.' id | id ;
 
@@ -327,6 +336,7 @@ subPattern3       : {!equalTo("|")}? id  Nl?  simplePattern subPattern3
 simplePattern     : wildcardPattern
                   | tuplePattern
                   | {isVarId()}? referencePattern
+                  | interpolationPattern
                   | literalPattern
                   | stableReferencePattern
                   | constructorPattern
@@ -339,6 +349,9 @@ patternInParenthesis
                   : '(' pattern ')' ;
 
 tuplePattern      : '(' (patterns)? ')' ;
+
+interpolationPattern
+                  : interpolatedStringPattern;
 
 literalPattern    : literal ;
 

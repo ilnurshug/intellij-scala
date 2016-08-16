@@ -264,6 +264,12 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitTuplePattern(ctx: TuplePatternContext): Unit = visit(ctx, ScalaElementTypes.TUPLE_PATTERN)
 
+  override def visitStringPatternArgs(ctx: StringPatternArgsContext): Unit = visit(ctx, ScalaElementTypes.PATTERN_ARGS)
+
+  override def visitInterpolatedPrefixPatternReference(ctx: InterpolatedPrefixPatternReferenceContext): Unit = visit(ctx, ScalaElementTypes.INTERPOLATED_PREFIX_PATTERN_REFERENCE)
+
+  override def visitInterpolationPattern(ctx: InterpolationPatternContext): Unit = visit(ctx, ScalaElementTypes.INTERPOLATION_PATTERN)
+
   override def visitLiteralPattern(ctx: LiteralPatternContext): Unit = visit(ctx, ScalaElementTypes.LITERAL_PATTERN)
 
   override def visitStableReferencePattern(ctx: StableReferencePatternContext): Unit = visit(ctx, ScalaElementTypes.STABLE_REFERENCE_PATTERN)
