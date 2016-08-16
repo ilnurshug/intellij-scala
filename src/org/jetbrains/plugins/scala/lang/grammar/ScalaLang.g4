@@ -529,9 +529,9 @@ classTemplateOpt  : ('extends'|UPPER_BOUND)  classTemplate | (('extends'|UPPER_B
 traitTemplateOpt  : (('extends'|UPPER_BOUND)  traitTemplate)
                   | (('extends'|UPPER_BOUND)?  templateBody)? ;
 
-classTemplate     : earlyDefs?  classParents  templateBody? ;
+classTemplate     : (earlyDefs 'with')?  classParents  templateBody? ;
 
-traitTemplate     : earlyDefs?  traitParents  templateBody? ;
+traitTemplate     : (earlyDefs 'with')?  traitParents  templateBody? ;
 
 classParents      : constr ( 'with'  annotType)* ;
 
@@ -542,7 +542,7 @@ constr            : annotType  ({!isNl()}? argumentExprsParen)* ;
 argumentExprsParen: '('  exprs?  ')'
                   | '('  (exprs  ',' )? postfixExpr  ':' '_' '*' ')' ;
 
-earlyDefs         : '{'  (patVarDef ( (SEMICOLON | {isNl()}? emptyNl)  patVarDef )* )?  '}'  'with' ;
+earlyDefs         : '{'  (patVarDef ( (SEMICOLON | {isNl()}? emptyNl)  patVarDef )* )?  '}'   ;
 
 constrExpr        : selfInvocation 
                   | constrBlock ;
