@@ -287,7 +287,7 @@ blockStat         : import_
 resultExpr        : bindings  '=>'  blockNode
                   | ('implicit'?  id | '_')  (':'  compoundType)? '=>'  blockNode ;
 
-enumerators       : generator  ( (SEMICOLON | {isNl()}? emptyNl)  enumerator)* ;
+enumerators       : generator  ( ((SEMICOLON | {isNl()}? emptyNl)  enumerator | guard) )* ;
 
 enumerator        : generator // no enumerator
                   | guard // no enumerator
