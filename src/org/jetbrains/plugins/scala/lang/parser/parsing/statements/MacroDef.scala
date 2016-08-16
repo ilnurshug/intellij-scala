@@ -36,6 +36,7 @@ trait MacroDef {
     builder.getTokenType match {
       case ScalaTokenTypes.tIDENTIFIER =>
         funSig parse builder
+
         builder.getTokenType match {
           case ScalaTokenTypes.tCOLON =>
             builder.advanceLexer() //Ate :

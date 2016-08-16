@@ -472,12 +472,14 @@ patVarDef         : patternDefinition
 
 def               : patternDefinition
                   | variableDefinition
+                  | macroDefinition
                   | functionDefinition
                   | typeDefinition
                   | templateDefinition ;
 
 patternDefinition        : annotations modifiersOrEmpty 'val'  patDef ;
 variableDefinition       : annotations modifiersOrEmpty 'var'  varDef ;
+macroDefinition          : annotations modifiersOrEmpty 'def'  macroDef ;
 functionDefinition       : annotations modifiersOrEmpty 'def'  funDef ;
 typeDefinition           : annotations modifiersOrEmpty 'type'  Nl*  typeDef ;
 templateDefinition       : tmplDef ;
@@ -488,7 +490,9 @@ patternList       : pattern2 ( ','  pattern2)* ;
 
 varDef            : patDef
                   | ids  ':'  type  '='  '_' ;
-                  
+
+macroDef          : funSig (':' type)? '=' 'macro' qualId typeArgs? ;
+
 funDef            : 'this'  paramClauses ('='  constrExpr |  {isSingleNl()}? emptyNl constrBlock)
                   | funSig ( ':'  type)?  '='  expr
                   | funSig  Nl?  blockWithBraces ;
