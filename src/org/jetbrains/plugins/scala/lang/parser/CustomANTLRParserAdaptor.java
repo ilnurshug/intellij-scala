@@ -54,7 +54,7 @@ public abstract class CustomANTLRParserAdaptor extends ANTLRParserAdaptor {
         if (root != null) rootMarker = builder.mark();
 
         //ParseTreeWalker.DEFAULT.walk(listener, parseTree);
-        ScalaLangVisitorImpl visitor = new ScalaLangVisitorImpl(builder);
+        ScalaLangVisitorImpl visitor = new ScalaLangVisitorImpl(builder, language, parser);
         visitor.visit(parseTree);
 
         while (!builder.eof()) {

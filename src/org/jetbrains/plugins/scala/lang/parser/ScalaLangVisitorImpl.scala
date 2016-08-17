@@ -1,8 +1,10 @@
 package org.jetbrains.plugins.scala.lang.parser
 
-import com.intellij.lang.{PsiBuilder, WhitespacesAndCommentsBinder}
+import com.intellij.lang.{Language, PsiBuilder, WhitespacesAndCommentsBinder}
 import com.intellij.psi.tree.IElementType
-import org.antlr.v4.runtime.ParserRuleContext
+import org.antlr.jetbrains.adaptor.lexer.PSIElementTypeFactory
+import org.antlr.jetbrains.adaptor.parser.{ANTLRParseTreeToPSIConverter, SyntaxError, SyntaxErrorListener}
+import org.antlr.v4.runtime.{ANTLRErrorListener, Parser, ParserRuleContext}
 import org.antlr.v4.runtime.tree.{ErrorNode, RuleNode, TerminalNode}
 import org.jetbrains.plugins.scala.lang.ScalaLangBaseVisitor
 import org.jetbrains.plugins.scala.lang.ScalaLangParser._
@@ -13,13 +15,11 @@ import scala.collection.mutable
 /**
   * Created by ilnur on 06.08.16.
   */
-class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Unit] {
+class ScalaLangVisitorImpl(builder: PsiBuilder, language: Language, parser: Parser) extends ScalaLangBaseVisitor[Unit] {
 
   def getBuilder = builder
 
-  //var args: mutable.Stack[Boolean] = new mutable.Stack[Boolean]  // stack for bool-arguments, might be helpful for some parsing methods
-
-  //var typeArgs: mutable.Stack[IElementType] = new mutable.Stack[IElementType]
+  val converter: ANTLRParseTreeToPSIConverter = new ANTLRParseTreeToPSIConverter(language, parser, builder)
 
   var isPattern: mutable.Stack[Boolean] = new mutable.Stack[Boolean]
 
@@ -414,7 +414,9 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitTerminal(node: TerminalNode): Unit = builder.advanceLexer()
 
-  //override def visitErrorNode(node: ErrorNode): Unit = super.visitErrorNode(node)
+  override def visitErrorNode(node: ErrorNode): Unit = {
+    converter.visitErrorNode(node)
+  }
 
   def visit(ctx: ParserRuleContext, element: IElementType) = {
     val marker = builder.mark()
