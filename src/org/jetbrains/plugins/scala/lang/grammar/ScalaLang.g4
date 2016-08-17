@@ -446,9 +446,11 @@ accessQualifier   : '['  (id | 'this')  ']' ;
 
 annotation        : '@' annotationExpr ;
 
-annotationExpr    : constrAnnotation;
+annotationExpr    : constrAnnotation ( {getOccurrenceCount('\n') <= 1}? emptyNl '{' (nameValuePair (',' nameValuePair)*)? '}' )?;
 
-constrAnnotation  : simpleType argumentExprs*;
+nameValuePair     : 'val' id '=' prefixExpr ;
+
+constrAnnotation  : simpleType  ({!isNl()}? argumentExprsParen)*;
 
 annotations       : (annotation)* ;
 annotationsNonEmpty

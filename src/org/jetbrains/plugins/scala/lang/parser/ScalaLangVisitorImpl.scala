@@ -17,7 +17,7 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   def getBuilder = builder
 
-  var args: mutable.Stack[Boolean] = new mutable.Stack[Boolean]  // stack for bool-arguments, might be helpful for some parsing methods
+  //var args: mutable.Stack[Boolean] = new mutable.Stack[Boolean]  // stack for bool-arguments, might be helpful for some parsing methods
 
   //var typeArgs: mutable.Stack[IElementType] = new mutable.Stack[IElementType]
 
@@ -35,6 +35,8 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
     if (ctx.pattern1() != null) marker.done(ScalaElementTypes.ENUMERATOR)
     else marker.drop()
   }
+
+  override def visitNameValuePair(ctx: NameValuePairContext): Unit = visit(ctx, ScalaElementTypes.NAME_VALUE_PAIR)
 
   override def visitConstrAnnotation(ctx: ConstrAnnotationContext): Unit = visit(ctx, ScalaElementTypes.CONSTRUCTOR)
 
