@@ -114,6 +114,8 @@ qualId            : qualId '.' id | id ;
 ids               : fieldId (  ','  fieldId)* ;
 fieldId           : id ;
 
+//pathRef_          : {lookAhead() && !lookAhead()}? thisReference;
+
 pathRef           :  stableIdRef '.' id
                   |  thisReference '.' id
                   |  superReference '.' id

@@ -1,6 +1,6 @@
 package org.jetbrains.plugins.scala.lang.parser
 
-import com.intellij.lang.PsiBuilder
+import com.intellij.lang.{PsiBuilder, WhitespacesAndCommentsBinder}
 import com.intellij.psi.tree.IElementType
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.tree.{ErrorNode, RuleNode, TerminalNode}
@@ -198,19 +198,19 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitWildcardType2(ctx: WildcardType2Context): Unit = visit(ctx, ScalaElementTypes.WILDCARD_TYPE)
 
-  override def visitPatternDefinition(ctx: PatternDefinitionContext): Unit = visit(ctx, ScalaElementTypes.PATTERN_DEFINITION)
+  override def visitPatternDefinition(ctx: PatternDefinitionContext): Unit = visit(ctx, ScalaElementTypes.PATTERN_DEFINITION, ScalaTokenBinders.PRECEEDING_COMMENTS_TOKEN)
 
-  override def visitVariableDefinition(ctx: VariableDefinitionContext): Unit = visit(ctx, ScalaElementTypes.VARIABLE_DEFINITION)
+  override def visitVariableDefinition(ctx: VariableDefinitionContext): Unit = visit(ctx, ScalaElementTypes.VARIABLE_DEFINITION, ScalaTokenBinders.PRECEEDING_COMMENTS_TOKEN)
 
-  override def visitFunctionDefinition(ctx: FunctionDefinitionContext): Unit = visit(ctx, ScalaElementTypes.FUNCTION_DEFINITION)
+  override def visitFunctionDefinition(ctx: FunctionDefinitionContext): Unit = visit(ctx, ScalaElementTypes.FUNCTION_DEFINITION, ScalaTokenBinders.PRECEEDING_COMMENTS_TOKEN)
 
-  override def visitMacroDefinition(ctx: MacroDefinitionContext): Unit = visit(ctx, ScalaElementTypes.MACRO_DEFINITION)
+  override def visitMacroDefinition(ctx: MacroDefinitionContext): Unit = visit(ctx, ScalaElementTypes.MACRO_DEFINITION, ScalaTokenBinders.PRECEEDING_COMMENTS_TOKEN)
 
-  override def visitTypeDefinition(ctx: TypeDefinitionContext): Unit = visit(ctx, ScalaElementTypes.TYPE_DEFINITION)
+  override def visitTypeDefinition(ctx: TypeDefinitionContext): Unit = visit(ctx, ScalaElementTypes.TYPE_DEFINITION, ScalaTokenBinders.PRECEEDING_COMMENTS_TOKEN)
 
   override def visitBlockWithBraces(ctx: BlockWithBracesContext): Unit = visit(ctx, ScalaElementTypes.BLOCK_EXPR)
 
-  override def visitAnnotations(ctx: AnnotationsContext): Unit = visit(ctx, ScalaElementTypes.ANNOTATIONS)
+  override def visitAnnotations(ctx: AnnotationsContext): Unit = visit(ctx, ScalaElementTypes.ANNOTATIONS, ScalaTokenBinders.DEFAULT_LEFT_EDGE_BINDER, afterDone = true)
 
   override def visitAnnotationsNoNl(ctx: AnnotationsNoNlContext): Unit = visit(ctx, ScalaElementTypes.ANNOTATIONS)
 
@@ -292,11 +292,11 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitPatternList(ctx: PatternListContext): Unit = visit(ctx, ScalaElementTypes.PATTERN_LIST)
 
-  override def visitClassDefinition(ctx: ClassDefinitionContext): Unit = visit(ctx, ScalaElementTypes.CLASS_DEF)
+  override def visitClassDefinition(ctx: ClassDefinitionContext): Unit = visit(ctx, ScalaElementTypes.CLASS_DEF, ScalaTokenBinders.PRECEEDING_COMMENTS_TOKEN)
 
-  override def visitObjectDefinition(ctx: ObjectDefinitionContext): Unit = visit(ctx, ScalaElementTypes.OBJECT_DEF)
+  override def visitObjectDefinition(ctx: ObjectDefinitionContext): Unit = visit(ctx, ScalaElementTypes.OBJECT_DEF, ScalaTokenBinders.PRECEEDING_COMMENTS_TOKEN)
 
-  override def visitTraitDefinition(ctx: TraitDefinitionContext): Unit = visit(ctx, ScalaElementTypes.TRAIT_DEF)
+  override def visitTraitDefinition(ctx: TraitDefinitionContext): Unit = visit(ctx, ScalaElementTypes.TRAIT_DEF, ScalaTokenBinders.PRECEEDING_COMMENTS_TOKEN)
 
   override def visitModifiersOrCase(ctx: ModifiersOrCaseContext): Unit = visit(ctx, ScalaElementTypes.MODIFIERS)
 
@@ -304,13 +304,13 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
 
   override def visitPackageObject(ctx: PackageObjectContext): Unit = visit(ctx, ScalaElementTypes.OBJECT_DEF)
 
-  override def visitValueDeclaration(ctx: ValueDeclarationContext): Unit = visit(ctx, ScalaElementTypes.VALUE_DECLARATION)
+  override def visitValueDeclaration(ctx: ValueDeclarationContext): Unit = visit(ctx, ScalaElementTypes.VALUE_DECLARATION, ScalaTokenBinders.PRECEEDING_COMMENTS_TOKEN)
 
-  override def visitVariableDeclaration(ctx: VariableDeclarationContext): Unit = visit(ctx, ScalaElementTypes.VARIABLE_DECLARATION)
+  override def visitVariableDeclaration(ctx: VariableDeclarationContext): Unit = visit(ctx, ScalaElementTypes.VARIABLE_DECLARATION, ScalaTokenBinders.PRECEEDING_COMMENTS_TOKEN)
 
-  override def visitFunctionDeclaration(ctx: FunctionDeclarationContext): Unit = visit(ctx, ScalaElementTypes.FUNCTION_DECLARATION)
+  override def visitFunctionDeclaration(ctx: FunctionDeclarationContext): Unit = visit(ctx, ScalaElementTypes.FUNCTION_DECLARATION, ScalaTokenBinders.PRECEEDING_COMMENTS_TOKEN)
 
-  override def visitTypeDeclaration(ctx: TypeDeclarationContext): Unit = visit(ctx, ScalaElementTypes.TYPE_DECLARATION)
+  override def visitTypeDeclaration(ctx: TypeDeclarationContext): Unit = visit(ctx, ScalaElementTypes.TYPE_DECLARATION, ScalaTokenBinders.PRECEEDING_COMMENTS_TOKEN)
 
   override def visitImport_(ctx: Import_Context): Unit = visit(ctx, ScalaElementTypes.IMPORT_STMT)
 
@@ -416,6 +416,14 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
     val marker = builder.mark()
     visitChildren(ctx)
     marker.done(element)
+  }
+
+  def visit(ctx: ParserRuleContext, element: IElementType, left: WhitespacesAndCommentsBinder, afterDone: Boolean = false) = {
+    val marker = builder.mark()
+    if (!afterDone) marker.setCustomEdgeTokenBinders(left, null)
+    visitChildren(ctx)
+    marker.done(element)
+    if (afterDone) marker.setCustomEdgeTokenBinders(left, null)
   }
 }
 

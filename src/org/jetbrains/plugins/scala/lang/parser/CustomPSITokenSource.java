@@ -6,6 +6,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.util.containers.HashMap;
 import org.antlr.jetbrains.adaptor.lexer.PSITokenSource;
 import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.misc.Pair;
@@ -123,6 +124,15 @@ public class CustomPSITokenSource extends PSITokenSource {
         map.put(ScalaTokenTypesEx.SCALA_IN_XML_INJECTION_START, ScalaLangParser.SCALA_IN_XML_INJECTION_START);
         map.put(ScalaTokenTypesEx.SCALA_IN_XML_INJECTION_END, ScalaLangParser.SCALA_IN_XML_INJECTION_END);
     }
+
+    /*public class CommonTokenAdaptor extends CommonToken {
+        private CommonToken token = new CommonToken(-1);
+
+        public CommonTokenAdaptor(CommonToken token) {
+            super()
+            this.token = token;
+        }
+    }*/
 
     @Override
     public Token nextToken() {
