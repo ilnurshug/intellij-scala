@@ -96,9 +96,7 @@ class ScalaLangVisitorImpl(builder: PsiBuilder, language: Language, parser: Pars
 
   override def visitSimpleType(ctx: SimpleTypeContext): Unit = SimpleTypeVisitor.visit(this, ctx)
 
-
   override def visitTypeArgs(ctx: TypeArgsContext): Unit = TypeArgsVisitor.visit(this, ctx)
-
 
   override def visitTypes(ctx: TypesContext): Unit = TypesVisitor.visit(this, ctx)
 
@@ -430,13 +428,5 @@ class ScalaLangVisitorImpl(builder: PsiBuilder, language: Language, parser: Pars
     visitChildren(ctx)
     marker.done(element)
     if (afterDone) marker.setCustomEdgeTokenBinders(left, null)
-  }
-}
-
-object ScalaLangVisitorImpl {
-  def visitErrorNode(builder: PsiBuilder, node: ErrorNode, msg: String): Unit = {
-    val errMarker = builder.mark()
-    builder.error(msg)
-    errMarker.done(ScalaElementTypes.ERROR_STMT)
   }
 }

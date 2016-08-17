@@ -72,14 +72,9 @@ class ScalaLangParserTest extends SimpleTestCase
         }"""
     )
   }
-  //f[A](n - 1)(body)
 
   def testProgram2(): Unit = {
-    doTest(
-      """package   a
-         package  b
-         package c"""
-    )
+    doTest("def (){}", "def")
   }
 
   def testProgram3(): Unit = {
@@ -183,6 +178,7 @@ class ScalaLangParserTest extends SimpleTestCase
 
   def testExperiment2(): Unit = {
     val s = "class A{def a(){}\n def b(){}\n val a = 1\n}"
+    //val s = "case a | b => g"
 
     val parserDefinition = new ScalaParserDefinition()
 

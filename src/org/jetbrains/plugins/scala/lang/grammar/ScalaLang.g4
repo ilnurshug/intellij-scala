@@ -341,7 +341,7 @@ caseClause        : 'case'  pattern  guard?  '=>'  blockNode ;
   
 guard             : 'if'  postfixExpr ;
 
-pattern           : pattern1 ( VDASH  pattern1 )* ;
+pattern           : pattern1 ( {equalTo("|")}? id  pattern1 )* ;
 
 pattern1          : typedPattern
                   | pattern2 ;
@@ -349,17 +349,20 @@ pattern1          : typedPattern
 typedPattern      : {isVarId()}? ID  ':'  typePat
                   | '_'  ':'  typePat ;
 
-pattern2          : {isVarId()}? referencePattern
+pattern2          : namingPattern
+                  | pattern3 ;
+
+pattern2RefPat    : referencePattern
                   | namingPattern
                   | pattern3 ;
 
-referencePattern  : ID ;
-namingPattern     : ID '@' pattern3 ;
+referencePattern  : id ;
+namingPattern     : id '@' pattern3 ;
 
 pattern3          : simplePattern subPattern3 ;
 
 subPattern3       : {!equalTo("|")}? id  Nl?  simplePattern subPattern3
-                  | emptyNl ;
+                  | ;
 //-----------------------------------------------------------------------------
 simplePattern     : wildcardPattern
                   | tuplePattern
@@ -538,7 +541,7 @@ templateDefinition       : tmplDef ;
                   
 patDef            : patternList (':'  type)?  '='  expr ;
 
-patternList       : pattern2 ( ','  pattern2)* ;
+patternList       : pattern2RefPat ( ','  pattern2RefPat)* ;
 
 varDef            : patDef
                   | ids  ':'  type  '='  '_' ;
