@@ -36,6 +36,8 @@ class ScalaLangVisitorImpl(builder: PsiBuilder) extends ScalaLangBaseVisitor[Uni
     else marker.drop()
   }
 
+  override def visitKThisReference(ctx: KThisReferenceContext): Unit = visit(ctx, ScalaElementTypes.THIS_REFERENCE)
+
   override def visitNameValuePair(ctx: NameValuePairContext): Unit = visit(ctx, ScalaElementTypes.NAME_VALUE_PAIR)
 
   override def visitConstrAnnotation(ctx: ConstrAnnotationContext): Unit = visit(ctx, ScalaElementTypes.CONSTRUCTOR)

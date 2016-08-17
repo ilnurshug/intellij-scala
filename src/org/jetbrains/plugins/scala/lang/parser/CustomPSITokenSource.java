@@ -125,21 +125,122 @@ public class CustomPSITokenSource extends PSITokenSource {
         map.put(ScalaTokenTypesEx.SCALA_IN_XML_INJECTION_END, ScalaLangParser.SCALA_IN_XML_INJECTION_END);
     }
 
-    /*public class CommonTokenAdaptor extends CommonToken {
-        private CommonToken token = new CommonToken(-1);
+    public class CommonTokenAdaptor extends CommonToken {
+        private final CommonToken token;
+        private final IElementType type;
 
-        public CommonTokenAdaptor(CommonToken token) {
-            super()
+        public CommonTokenAdaptor(CommonToken token, IElementType type) {
+            super(-1);
             this.token = token;
+            this.type = type;
         }
-    }*/
+
+        public IElementType getTokenType() {
+            return type;
+        }
+
+        @Override
+        public int getType() {
+            return token.getType();
+        }
+
+        @Override
+        public void setLine(int line) {
+            token.setLine(line);
+        }
+
+        @Override
+        public String getText() {
+            return token.getText();
+        }
+
+        @Override
+        public void setText(String text) {
+            token.setText(text);
+        }
+
+        @Override
+        public int getLine() {
+            return token.getLine();
+        }
+
+        @Override
+        public int getCharPositionInLine() {
+            return token.getCharPositionInLine();
+        }
+
+        @Override
+        public void setCharPositionInLine(int charPositionInLine) {
+            token.setCharPositionInLine(charPositionInLine);
+        }
+
+        @Override
+        public int getChannel() {
+            return token.getChannel();
+        }
+
+        @Override
+        public void setChannel(int channel) {
+            token.setChannel(channel);
+        }
+
+        @Override
+        public void setType(int type) {
+            token.setType(type);
+        }
+
+        @Override
+        public int getStartIndex() {
+            return token.getStartIndex();
+        }
+
+        @Override
+        public void setStartIndex(int start) {
+            token.setStartIndex(start);
+        }
+
+        @Override
+        public int getStopIndex() {
+            return token.getStopIndex();
+        }
+
+        @Override
+        public void setStopIndex(int stop) {
+            token.setStopIndex(stop);
+        }
+
+        @Override
+        public int getTokenIndex() {
+            return token.getTokenIndex();
+        }
+
+        @Override
+        public void setTokenIndex(int index) {
+            token.setTokenIndex(index);
+        }
+
+        @Override
+        public TokenSource getTokenSource() {
+            return token.getTokenSource();
+        }
+
+        @Override
+        public CharStream getInputStream() {
+            return token.getInputStream();
+        }
+
+        @Override
+        public String toString() {
+            return token.toString();
+        }
+    }
 
     @Override
     public Token nextToken() {
         ProgressIndicatorProvider.checkCanceled();
 
         int type = convertScalaTokenTypeToInt(builder.getTokenType(), builder.getTokenText());
-        return nextTokenHelper(type);
+        return new CommonTokenAdaptor((CommonToken) nextTokenHelper(type), builder.getTokenType());
     }
 
     private int convertScalaTokenTypeToInt(IElementType t, String tokenText) {

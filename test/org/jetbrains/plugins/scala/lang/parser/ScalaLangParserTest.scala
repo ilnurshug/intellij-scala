@@ -162,7 +162,7 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testProgam18(): Unit = {
-    doTest("class a {\n  def this(a: Int, b: Int)\n  {\n    this(a)\n    a = true\n  }\n}")
+    doTest("class A{\n  def getIterator = nodes\n    \t  . filter . map . elements\n}")
   }
 
   def testExperiment(): Unit = {

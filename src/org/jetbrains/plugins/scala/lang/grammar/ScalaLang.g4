@@ -34,7 +34,12 @@
 grammar ScalaLang;
 
 @parser::header {
- import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.util.text.StringUtil;
+import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes;
+import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypesEx;
+import org.jetbrains.plugins.scala.lang.lexer.ScalaXmlTokenTypes;
+import com.intellij.psi.tree.*;
+import org.jetbrains.plugins.scala.lang.parser.*;
 }
 
 @parser::members {
@@ -73,11 +78,22 @@ Boolean equalTo(String s) {
     return curToken.getText().compareTo(s) == 0;
 }
 
+Boolean lookAhead(IElementType... tokens) {
+    for (int i = 0; i < tokens.length; i++) {
+        CustomPSITokenSource.CommonTokenAdaptor t = (CustomPSITokenSource.CommonTokenAdaptor)_input.LT(i + 1);
+
+        if (t == null || t.getTokenType() != tokens[i]) return false;
+    }
+    return true;
+}
+
 }
 
 testRule          : id ({isNl()}? emptyNl id)+ ;
 
 emptyNl           :  ;
+
+testRule2         : {lookAhead(ScalaTokenTypes.kTHIS) && !lookAhead(ScalaTokenTypes.kTHIS, ScalaTokenTypes.tDOT)}? thisReference;
 
 program           : blockExpr
                   | selfType?  templateStat? ( (SEMICOLON | {isNl()}? )  templateStat)*    // for debug purposes
@@ -119,13 +135,13 @@ fieldId           : id ;
 pathRef           :  stableIdRef '.' id
                   |  thisReference '.' id
                   |  superReference '.' id
-                  |  thisReference
+                  //|  thisReference
                   |  id ;
 
 pathRefExpr       :  stableIdRefExpr '.' id
                   |  thisReference '.' id
                   |  superReference '.' id
-                  |  thisReference
+                  //|  thisReference
                   |  id ;
 
 reference         : id ;
@@ -177,9 +193,11 @@ simpleType        : simpleType  typeArgs
                   | simpleTypeSub ;
 
 simpleTypeSub     : stableIdRef
-                  | pathRef '.' 'type'
+                  | (kThisReference | thisReference | pathRef) '.' 'type'
                   | '(' ')'
                   | '('  types ','? ')';
+
+kThisReference    : 'this' ;
 
 simpleTypeNoMultipleSQBrackets
                   : simpleTypeSub typeArgs
@@ -266,7 +284,7 @@ extendsBlock      : classTemplate | templateBody ;
 
 simpleExpr1       : literal
                   | '_'
-                  | pathRefExpr
+                  | (thisReference | pathRefExpr)
                   | '(' (exprs ','?)? ')'
                   | (newTemplate | blockExpr) '.' id
                   | simpleExpr1 '_'? '.' id
