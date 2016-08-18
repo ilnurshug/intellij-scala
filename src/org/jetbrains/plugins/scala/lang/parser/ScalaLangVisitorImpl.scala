@@ -406,7 +406,7 @@ class ScalaLangVisitorImpl(builder: PsiBuilder, language: Language, parser: Pars
 
   //override def visitScalaPatterns(ctx: ScalaPatternsContext): Unit = super.visitScalaPatterns(ctx)
 
-  //override def visitXmlPatterns(ctx: XmlPatternsContext): Unit = super.visitXmlPatterns(ctx)
+  override def visitXmlPatterns(ctx: XmlPatternsContext): Unit = visit(ctx, ScalaElementTypes.PATTERNS)
 
 
 

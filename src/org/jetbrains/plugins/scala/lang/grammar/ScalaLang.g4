@@ -391,10 +391,12 @@ stableReferencePattern
 
 constructorPattern: stableIdRef patternArgs ;
 
-patternArgs       : '(' ')'
-                  | '('  (pattern ( ','  pattern)*  ',' )? seqWildcard  ')'
-                  | '('  (pattern ( ','  pattern)*  ',' )? namingPattern2  ')'
-                  | '('  pattern ( ','  pattern)*  ')' ;
+patternArgs       : '(' patternArgsSub ')' ;
+
+patternArgsSub    : (pattern ( ','  pattern)*  ',' )? seqWildcard
+                  | (pattern ( ','  pattern)*  ',' )? namingPattern2
+                  | pattern ( ','  pattern)*
+                  | ;
 
 namingPattern2    : ('_' | ID)  '@'  seqWildcard ;
 
@@ -674,12 +676,12 @@ cDSect            :    '<![CDATA[' (XML_DATA_CHARACTERS | scalaExpr) ']]>' ;
 
 pI                :    '<?' XML_NAME xmlAttribute* XML_TAG_CHARACTERS? '?>' ;
 
-xmlAttribute      :    XML_NAME '=' attValue ;
+xmlAttribute      :    XML_NAME XML_EQ attValue ;
 
 attValue          :    XML_ATTRIBUTE_VALUE_START_DELIMITER (XML_ATTRIBUTE_VALUE_TOKEN | XML_CHAR_ENTITY_REF)* XML_ATTRIBUTE_VALUE_END_DELIMITER
                   |    scalaExpr ;
 
-scalaExpr         :    SCALA_IN_XML_INJECTION_START block SCALA_IN_XML_INJECTION_END ;
+scalaExpr         :    SCALA_IN_XML_INJECTION_START blockNode ';'? SCALA_IN_XML_INJECTION_END ;
 
 charData          :    XML_DATA_CHARACTERS | XML_CHAR_ENTITY_REF ;
 
@@ -694,16 +696,16 @@ eTagP             :    '</' XML_NAME '>' ;
 
 contentP          :    charData? (content1P charData?)* ;
 
-content1P         :    xmlPattern
-                  |    cDSect
+content1P         :    cDSect
                   |    comment
                   |    pI
                   //|    xmlReference
-                  |    scalaPatterns ;
+                  |    scalaPatterns
+                  |    xmlPattern;
 
 scalaPatterns     :    SCALA_IN_XML_INJECTION_START xmlPatterns SCALA_IN_XML_INJECTION_END ;
 
-xmlPatterns       : patterns ;
+xmlPatterns       :    patternArgsSub ;
 
 
 // Lexer
@@ -736,14 +738,14 @@ XML_ATTRIBUTE_VALUE_TOKEN
 XML_CHAR_ENTITY_REF     : PrintableChar+;
 
 
-VDASH       :  '|';
-SEMICOLON   :  ';';
-LBRACE		:  '{';
-RBRACE		:  '}';
-LSQBRACKET	:  '[';
-RSQBRACKET	:  ']';
-LPARENTHESIS		:  '(';
-RPARENTHESIS		:  ')';
+VDASH           :  '|';
+SEMICOLON       :  ';';
+LBRACE		    :  '{';
+RBRACE		    :  '}';
+LSQBRACKET	    :  '[';
+RSQBRACKET	    :  ']';
+LPARENTHESIS	:  '(';
+RPARENTHESIS	:  ')';
 DOT				:  '.';
 COMMA			:  ',';
 
@@ -751,15 +753,15 @@ Q_MARK			:  '\'';
 Q_MARK_2		:  '"';
 
 COLON			:  ':';
-UNDER		:  '_';
-ASSIGN				:  '=';
-FUNTYPE				:  '=>';
+UNDER		    :  '_';
+ASSIGN			:  '=';
+FUNTYPE			:  '=>';
 CHOOSE			:  '<-';
-UPPER_BOUND			    :  '<:';
-LOWER_BOUND			    :  '>:';
-INNER_CLASS			:  '#';
+UPPER_BOUND		:  '<:';
+LOWER_BOUND	    :  '>:';
+INNER_CLASS		:  '#';
 AT		  	    :  '@';
-VIEW				:  '<%';
+VIEW			:  '<%';
 
 SLASH			:  '\\';
 
@@ -774,7 +776,7 @@ EXTENDS			:  'extends';
 FINAL			:  'final';
 FINALLY			:  'finally';
 FOR				:  'for';
-FOR_SOME			:  'forSome';
+FOR_SOME		:  'forSome';
 IF				:  'if';
 IMPLICIT		:  'implicit';
 IMPORT			:  'import';

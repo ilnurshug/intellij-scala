@@ -153,7 +153,7 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testProgram17(): Unit = {
-    doTest("val a = <?xml version=\"1.0\" encoding=\"utf-8\" ?>", "def")
+    doTest("val a = <?xml version=\"1.0\" ?>", "def")
   }
 
   def testProgam18(): Unit = {
