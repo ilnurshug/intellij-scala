@@ -364,7 +364,7 @@ pattern2RefPat    : referencePattern
                   | pattern3 ;
 
 referencePattern  : id ;
-namingPattern     : id '@' pattern3 ;
+namingPattern     : ('_' | id) '@' pattern3 ;
 
 pattern3          : simplePattern subPattern3 ;
 
@@ -496,7 +496,7 @@ templateStat      : import_
                   ;// | ;
                   
 selfType          : id ( ':'  type)?  '=>' 
-                  | 'this'  ':'  type  '=>' ;
+                  | ('this' | '_')  ':'  type  '=>' ;
 
 import_           : 'import'  importExpr ( ','  importExpr)* ;
 
@@ -650,7 +650,7 @@ id                : ID
                   | EPT
                   | TLD
                   //| ASSIGN
-                  | UNDER
+                  //| UNDER
                   ;//| FUNTYPE;
 
 semi              :  SEMICOLON | Nl+ ;
