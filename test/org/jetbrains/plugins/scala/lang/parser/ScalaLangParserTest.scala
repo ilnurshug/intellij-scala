@@ -157,7 +157,7 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testProgam18(): Unit = {
-    doTest("class A{\n  def getIterator = nodes\n    \t  . filter . map . elements\n}")
+    doTest("class ArrowAssoc[A](x: A) {\n  def -> [B](y: B): Tuple2[A, B] = Tuple2(x, y)\n  def ?[B](y: B): Tuple2[A, B] = ->(y)\n}")
   }
 
   def testExperiment(): Unit = {

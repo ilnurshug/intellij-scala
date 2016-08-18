@@ -40,11 +40,25 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypesEx;
 import org.jetbrains.plugins.scala.lang.lexer.ScalaXmlTokenTypes;
 import com.intellij.psi.tree.*;
 import org.jetbrains.plugins.scala.lang.parser.*;
+import org.antlr.jetbrains.adaptor.lexer.*;
 }
 
 @parser::members {
-Boolean isVarId() {
-    return Character.isLowerCase(getCurrentToken().getText().charAt(0));
+boolean isVarId() {
+    boolean f = Character.isLowerCase(getCurrentToken().getText().charAt(0));
+    return f;
+}
+
+String originalText = null;
+
+@Override
+public void setTokenStream(TokenStream input) {
+    this._input = null;
+    this.reset();
+    this._input = input;
+    if (input == null) originalText = "";
+    else originalText = ((PSITokenSource)_input.getTokenSource()).getBuilder().getOriginalText().toString();
+    //System.out.println(originalText);
 }
 
 int getOccurrenceCount(char c) {
@@ -56,29 +70,36 @@ int getOccurrenceCount(char c) {
     int prevTokenStart = prevToken.getStartIndex();
     int curTokenStart = curToken.getStartIndex();
 
-    String substr = _input.getTokenSource().getInputStream().getText(new Interval(prevTokenStart, curTokenStart));
+    //String substr = originalText.substring(prevTokenStart, curTokenStart);
+    int cnt = 0;
 
-    return StringUtil.getOccurrenceCount(substr, c);
+    for (int i = prevTokenStart; i < curTokenStart; i++) {
+        if (originalText.charAt(i) == c) cnt++;
+    }
+
+    //return StringUtil.getOccurrenceCount(substr, c);
+
+    return cnt;
 }
 
-Boolean isSingleNl() {
+boolean isSingleNl() {
     int nlCount = getOccurrenceCount('\n');
 
     return (nlCount == 1);
 }
 
-Boolean isNl() {
+boolean isNl() {
     return (getOccurrenceCount('\n') >= 1);
 }
 
-Boolean equalTo(String s) {
+boolean equalTo(String s) {
     Token curToken = getCurrentToken();
     if (curToken == null) return false;
 
     return curToken.getText().compareTo(s) == 0;
 }
 
-Boolean lookAhead(IElementType... tokens) {
+boolean lookAhead(IElementType... tokens) {
     for (int i = 0; i < tokens.length; i++) {
         CustomPSITokenSource.CommonTokenAdaptor t = (CustomPSITokenSource.CommonTokenAdaptor)_input.LT(i + 1);
 
@@ -96,7 +117,7 @@ emptyNl           :  ;
 testRule2         : {lookAhead(ScalaTokenTypes.kTHIS) && !lookAhead(ScalaTokenTypes.kTHIS, ScalaTokenTypes.tDOT)}? thisReference;
 
 program           : blockExpr
-                  | selfType?  templateStat? ( (SEMICOLON | {isNl()}? )  templateStat)*    // for debug purposes
+                  | selfType?  templateStatSeq    // for debug purposes
                   | compilationUnit
                   | block;                                            // for debug purposes
 
@@ -209,7 +230,15 @@ typeArgs          : '['  type ( ','  type)*  ']';
 
 types             : ( '=>'  type | type  '*' | type) ( ','  ( '=>'  type | type  '*' | type))*;
 
-refinement        : Nl? '{'  refineStat? ( (SEMICOLON | {isNl()}? emptyNl)  refineStat)*  '}';
+refinement        : Nl? '{'  refineStatSeq  '}';
+
+refineStatSeq     : refineStat refineStatSub
+                  | ;
+
+refineStatSub     : {isNl()}? emptyNl refineStat refineStatSub
+                  | SEMICOLON refineStat refineStatSub
+                  | SEMICOLON refineStatSub
+                  | ;
 
 refineStat        : dcl
                   | typeDefinition
@@ -317,7 +346,7 @@ subBlock          : {isNl()}? emptyNl resultExpr
                   | SEMICOLON resultExpr
                   | {isNl()}? emptyNl blockStat subBlock
                   | SEMICOLON blockStat subBlock
-                  | SEMICOLON
+                  | SEMICOLON subBlock
                   | ;
 
 blockNode         : block ;
@@ -487,7 +516,15 @@ annotations       : (annotation)* ;
 annotationsNonEmpty
                   : ({!isNl()}? annotation)+ ;
 
-templateBody      : Nl?  '{'  selfType?  templateStat? ( (SEMICOLON | {isNl()}? emptyNl)  templateStat)*  '}' ;
+templateBody      : Nl?  '{'  selfType?  templateStatSeq  '}' ;
+
+templateStatSeq   : templateStat templateStatSeqSub
+                  | ;
+
+templateStatSeqSub: {isNl()}? emptyNl templateStat templateStatSeqSub
+                  | SEMICOLON templateStat templateStatSeqSub
+                  | SEMICOLON templateStatSeqSub
+                  | ;
 
 templateStat      : import_
                   | def
@@ -622,7 +659,12 @@ constrExpr        : selfInvocation
 constrBlock       : '{'  selfInvocation ( (SEMICOLON | {isNl()}? emptyNl)  blockStat)*  '}' ;
 selfInvocation    : 'this'  argumentExprs ({!isNl()}? argumentExprs)* ;
 
-topStatSeq        : topStat ( (SEMICOLON | {isNl()}? emptyNl)  topStat)*
+topStatSeq        : topStat topStatSeqSub
+                  | ;
+
+topStatSeqSub     : {isNl()}? emptyNl topStat topStatSeqSub
+                  | SEMICOLON topStat topStatSeqSub
+                  | SEMICOLON topStatSeqSub
                   | ;
 
 topStat           : tmplDef

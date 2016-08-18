@@ -14,6 +14,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.plugins.scala.lang.ScalaLangParser;
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes;
 import org.jetbrains.plugins.scala.lang.parser.ScalaLangVisitorImpl;
 
@@ -41,10 +42,12 @@ public abstract class CustomANTLRParserAdaptor extends ANTLRParserAdaptor {
         ParseTree parseTree = null;
         PsiBuilder.Marker rollbackMarker = builder.mark();
         try {
+            long millis = System.currentTimeMillis();
             parseTree = parse(parser, root);
+            System.out.println(System.currentTimeMillis()- millis);
 
-            ParseTreeToDot conv = new ParseTreeToDot();
-            System.out.println(conv.convert(parseTree));
+            //ParseTreeToDot conv = new ParseTreeToDot();
+            //System.out.println(conv.convert(parseTree));
         }
         finally {
             rollbackMarker.rollbackTo();
@@ -54,8 +57,10 @@ public abstract class CustomANTLRParserAdaptor extends ANTLRParserAdaptor {
         if (root != null) rootMarker = builder.mark();
 
         //ParseTreeWalker.DEFAULT.walk(listener, parseTree);
+        long millis = System.currentTimeMillis();
         ScalaLangVisitorImpl visitor = new ScalaLangVisitorImpl(builder, language, parser);
         visitor.visit(parseTree);
+        System.out.println(System.currentTimeMillis()- millis);
 
         while (!builder.eof()) {
             ProgressIndicatorProvider.checkCanceled();

@@ -45,11 +45,7 @@ class CompilationUnitTest extends SimpleTestCase {
   }
 
   def testCompilationUnit() {
-    doTest(
-      """package a
-         package b
-         package c"""
-    )
+    doTest("val x: Int = 1")
   }
 
   def testCompilationUnit2(): Unit = {

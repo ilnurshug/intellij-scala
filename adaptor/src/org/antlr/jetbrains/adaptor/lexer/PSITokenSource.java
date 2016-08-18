@@ -82,6 +82,10 @@ public class PSITokenSource implements TokenSource {
 		return new CharSequenceCharStream(text, text.length(), getSourceName());
 	}
 
+	public PsiBuilder getBuilder() {
+		return builder;
+	}
+
 	@Override
 	public String getSourceName() {
 		return CharStream.UNKNOWN_SOURCE_NAME;
