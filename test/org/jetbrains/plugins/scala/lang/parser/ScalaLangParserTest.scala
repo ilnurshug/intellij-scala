@@ -145,7 +145,7 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testProgram15(): Unit = {
-    doTest("case Some => g", "caseClauses")
+    doTest("case Some(a@Some(),_*) => a", "caseClauses")
   }
 
   def testProgram16(): Unit = {
