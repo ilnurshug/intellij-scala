@@ -408,7 +408,24 @@ class ScalaLangVisitorImpl(builder: PsiBuilder, language: Language, parser: Pars
 
   override def visitXmlPatterns(ctx: XmlPatternsContext): Unit = visit(ctx, ScalaElementTypes.PATTERNS)
 
+  override def visitExpr1Sub(ctx: Expr1SubContext): Unit = {
+    val marker = builder.mark()
 
+    visitChildren(ctx)
+
+    if (ctx.expr() != null) {
+      marker.done(ScalaElementTypes.ASSIGN_STMT)
+    }
+    else if (ctx.ascription() != null) {
+      marker.done(ScalaElementTypes.TYPED_EXPR_STMT)
+    }
+    else if (ctx.caseClauses() != null) {
+      marker.done(ScalaElementTypes.MATCH_STMT)
+    }
+    else {
+      marker.drop()
+    }
+  }
 
   override def visitTerminal(node: TerminalNode): Unit = builder.advanceLexer()
 

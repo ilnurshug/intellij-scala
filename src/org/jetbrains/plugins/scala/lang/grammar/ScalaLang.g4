@@ -226,8 +226,7 @@ sequenceArg       : '_' '*' ;
 expr              : (bindings | id | '_')  '=>'  expr
                   | expr1 ;
 
-expr1             : assignStmt
-                  | ifStmt
+expr1             : ifStmt
                   | whileStmt
                   | tryStmt
                   | doStmt
@@ -235,9 +234,17 @@ expr1             : assignStmt
                   | throwStmt
                   | implicitClosure
                   | returnStmt
+                  | expr1Sub ;
+                  /*| assignStmt
                   | typedExprStmt
                   | matchStmt
-                  | postfixExpr ;
+                  | postfixExpr ;*/
+
+expr1Sub          : postfixExpr (
+                        '=' expr
+                      | ascription
+                      | 'match'  '{'  caseClauses  '}'
+                    )?;
 //-----------------------------------------------------------------------------
 ifStmt            : 'if'  '('  expr  ')'  Nl*  expr ( (SEMICOLON | {isNl()}? emptyNl)?  'else'  expr)? ;
 
@@ -404,7 +411,7 @@ namingPattern2    : ('_' | ID)  '@'  seqWildcard ;
 patterns          : patternSeq
                   | seqWildcard ;
 
-patternSeq        : pattern ( ','  pattern)+ ','?
+patternSeq        : pattern ( ','  (seqWildcard | pattern))+ ','?
                   | pattern ',' ;
 seqWildcard       : '_' '*' ;
 
@@ -642,7 +649,7 @@ id                : ID
                   | OP_3
                   | EPT
                   | TLD
-                  | ASSIGN
+                  //| ASSIGN
                   | UNDER
                   ;//| FUNTYPE;
 

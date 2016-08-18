@@ -129,7 +129,7 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testProgram11(): Unit = {
-    doTest("Container {type }", "type")
+    doTest("val q\"(..$args) = $body\" = tt\nargs match { case r\"${a: Int}\" => 1 }", "block")
   }
 
   def testProgram12(): Unit = {
