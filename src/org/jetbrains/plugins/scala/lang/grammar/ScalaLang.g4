@@ -41,24 +41,44 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaXmlTokenTypes;
 import com.intellij.psi.tree.*;
 import org.jetbrains.plugins.scala.lang.parser.*;
 import org.antlr.jetbrains.adaptor.lexer.*;
+import java.util.*;
 }
 
 @parser::members {
+
+String originalText = null;
+
+Deque<Boolean> newlinesEnabled = null;
+
+void disableNewlines() {
+    newlinesEnabled.push(false);
+}
+
+void enableNewlines() {
+    newlinesEnabled.push(true);
+}
+
+void restoreNewlinesState() {
+    assert(!newlinesEnabled.isEmpty());
+    newlinesEnabled.pop();
+}
+
 boolean isVarId() {
     boolean f = Character.isLowerCase(getCurrentToken().getText().charAt(0));
     return f;
 }
-
-String originalText = null;
 
 @Override
 public void setTokenStream(TokenStream input) {
     this._input = null;
     this.reset();
     this._input = input;
+
     if (input == null) originalText = "";
     else originalText = ((PSITokenSource)_input.getTokenSource()).getBuilder().getOriginalText().toString();
-    //System.out.println(originalText);
+    System.out.println(originalText);
+
+    newlinesEnabled = new ArrayDeque<Boolean>();
 }
 
 int getOccurrenceCount(char c) {
@@ -83,12 +103,22 @@ int getOccurrenceCount(char c) {
 }
 
 boolean isSingleNl() {
+    if (!newlinesEnabled.isEmpty() && !newlinesEnabled.peek()) return false;
+
     int nlCount = getOccurrenceCount('\n');
 
     return (nlCount == 1);
 }
 
+boolean isSingleNlOrNone() {
+    if (!newlinesEnabled.isEmpty() && !newlinesEnabled.peek()) return true;
+
+    return (getOccurrenceCount('\n') <= 1);
+}
+
 boolean isNl() {
+    if (!newlinesEnabled.isEmpty() && !newlinesEnabled.peek()) return false;
+
     return (getOccurrenceCount('\n') >= 1);
 }
 
@@ -110,7 +140,7 @@ boolean lookAhead(IElementType... tokens) {
 
 }
 
-testRule          : id ({isNl()}? emptyNl id)+ ;
+testRule          : id ({System.out.println("b");} {isNl()}? emptyNl id {System.out.println("a");})+ ;
 
 emptyNl           :  ;
 
@@ -193,7 +223,7 @@ wildcardType      : '_' ('>:' type)? ('<:' type)? ;
 
 existentialType   : infixType  existentialClause ;
 
-existentialClause : 'forSome'  '{'  existentialDcl ( (SEMICOLON | {isNl()}? emptyNl)  existentialDcl)*  '}';
+existentialClause : 'forSome'  '{' {enableNewlines();}  existentialDcl ( (SEMICOLON | {isNl()}? emptyNl)  existentialDcl)*  '}' {restoreNewlinesState();} ;
 
 existentialDcl    : typeDeclaration
                   | valueDeclaration;
@@ -216,7 +246,7 @@ simpleType        : simpleType  typeArgs
 simpleTypeSub     : stableIdRef
                   | (kThisReference | thisReference | pathRef) '.' 'type'
                   | '(' ')'
-                  | '('  types ','? ')';
+                  | '(' {disableNewlines();} types ','? ')' {restoreNewlinesState();} ;
 
 kThisReference    : 'this' ;
 
@@ -226,11 +256,11 @@ simpleTypeNoMultipleSQBrackets
                   | simpleTypeNoMultipleSQBrackets '#' id
                   | simpleTypeSub ;
 
-typeArgs          : '['  type ( ','  type)*  ']';
+typeArgs          : '[' {disableNewlines();} type ( ','  type)*  ']' {restoreNewlinesState();} ;
 
 types             : ( '=>'  type | type  '*' | type) ( ','  ( '=>'  type | type  '*' | type))*;
 
-refinement        : Nl? '{'  refineStatSeq  '}';
+refinement        : Nl? '{' {enableNewlines();} refineStatSeq  '}' {restoreNewlinesState();} ;
 
 refineStatSeq     : refineStat refineStatSub
                   | ;
@@ -275,18 +305,20 @@ expr1Sub          : postfixExpr (
                       | 'match'  '{'  caseClauses  '}'
                     )?;
 //-----------------------------------------------------------------------------
-ifStmt            : 'if'  '('  expr  ')'  Nl*  expr ( (SEMICOLON | {isNl()}? emptyNl)?  'else'  expr)? ;
+exprInParen       : '(' {disableNewlines();} expr ')' {restoreNewlinesState();} ;
 
-whileStmt         : 'while'  '('  expr  ')'  Nl*  expr ;
+ifStmt            : 'if'  exprInParen Nl*  expr ( (SEMICOLON | {isNl()}? emptyNl)?  'else'  expr)? ;
+
+whileStmt         : 'while'  exprInParen Nl*  expr ;
 
 tryStmt           : tryBlock catchBlock? finallyBlock? ;
-tryBlock          : 'try' ('{'  block  '}'  |  expr) ;
+tryBlock          : 'try' ('{' {enableNewlines();} block  '}' {restoreNewlinesState();} |  expr) ;
 catchBlock        : 'catch'  expr /*'{'  caseClauses  '}'*/ ;
 finallyBlock      : 'finally'  expr ;
 
-doStmt            : 'do'  expr  (SEMICOLON | {isNl()}? emptyNl)?  'while'  '('  expr  ')' ;
+doStmt            : 'do'  expr  (SEMICOLON | {isNl()}? emptyNl)?  'while'  exprInParen ;
 
-forStmt           : 'for'  ('('  enumerators  ')' | '{'  enumerators  '}')  Nl*  'yield'?  expr ;
+forStmt           : 'for'  ('(' {disableNewlines();} enumerators  ')' {restoreNewlinesState();} | '{' {enableNewlines();} enumerators  '}' {restoreNewlinesState();})  Nl*  'yield'?  expr ;
 
 throwStmt         : 'throw'  expr ;
 
@@ -298,7 +330,7 @@ assignStmt        : postfixExpr '=' expr ;
 
 typedExprStmt     : postfixExpr  ascription ;
 
-matchStmt         : postfixExpr  'match'  '{'  caseClauses  '}' ;
+matchStmt         : postfixExpr  'match'  '{' {enableNewlines();} caseClauses  '}' {restoreNewlinesState();} ;
 //-----------------------------------------------------------------------------
 postfixExpr       : infixExpr ( {!isNl()}? id  Nl?)? ;
 
@@ -321,7 +353,7 @@ extendsBlock      : classTemplate | templateBody ;
 simpleExpr1       : literal
                   | '_'
                   | (thisReference | pathRefExpr)
-                  | '(' (exprs ','?)? ')'
+                  | '(' {disableNewlines();} (exprs ','?)? ')' {restoreNewlinesState();}
                   | (newTemplate | blockExpr) '.' id
                   | simpleExpr1 '_'? '.' id
                   | (newTemplate | blockExpr) typeArgs
@@ -331,12 +363,12 @@ simpleExpr1       : literal
 
 exprs             : expr (  ','  expr)* ;
 
-argumentExprs     : '('  exprs?  ')' 
-                  | '('  (exprs  ',' )? postfixExpr  ':' '_' '*' ')' 
+argumentExprs     : '(' {disableNewlines();}  exprs?  ')' {restoreNewlinesState();}
+                  //| '(' {disableNewlines();} (exprs  ',' )? postfixExpr  ':' '_' '*' ')' {restoreNewlinesState();}
                   | Nl?  blockExpr ;
                   
-blockExpr         : '{'  caseClauses  '}'
-                  | '{'  block  '}' ;
+blockExpr         : '{' {enableNewlines();} caseClauses  '}' {restoreNewlinesState();}
+                  | '{' {enableNewlines();} block  '}' {restoreNewlinesState();} ;
 
 block             : resultExpr
                   | blockStat subBlock
@@ -373,7 +405,7 @@ generatorNoGuard  : pattern1  '<-'  expr ;
 
 caseClauses       : caseClause+ ;
 
-caseClause        : 'case'  pattern  guard?  '=>'  blockNode ;
+caseClause        : 'case' {disableNewlines();} pattern  guard?  '=>' {restoreNewlinesState();} blockNode ;
   
 guard             : 'if'  postfixExpr ;
 
@@ -413,9 +445,9 @@ simplePattern     : wildcardPattern
 wildcardPattern   : '_' ;
 
 patternInParenthesis
-                  : '(' pattern ')' ;
+                  : '(' {disableNewlines();} pattern ')' {restoreNewlinesState();} ;
 
-tuplePattern      : '(' (patterns)? ')' ;
+tuplePattern      : '(' {disableNewlines();} (patterns)? ')' {restoreNewlinesState();} ;
 
 interpolationPattern
                   : interpolatedStringPattern;
@@ -427,7 +459,7 @@ stableReferencePattern
 
 constructorPattern: stableIdRef patternArgs ;
 
-patternArgs       : '(' patternArgsSub ')' ;
+patternArgs       : '(' {disableNewlines();} patternArgsSub ')' {restoreNewlinesState();} ;
 
 patternArgsSub    : (pattern ( ','  pattern)*  ',' )? seqWildcard
                   | (pattern ( ','  pattern)*  ',' )? namingPattern2
@@ -444,11 +476,11 @@ patternSeq        : pattern ( ','  (seqWildcard | pattern))+ ','?
                   | pattern ',' ;
 seqWildcard       : '_' '*' ;
 
-typeParamClause   : '['  variantTypeParam ( ','  variantTypeParam)*  ']' ;
+typeParamClause   : '[' {disableNewlines();}  variantTypeParam ( ','  variantTypeParam)*  ']' {restoreNewlinesState();} ;
 
 variantTypeParam  : annotationsNonEmpty? (OP_1|OP_2)? (id | '_')  typeParamClause? ( '>:'  type)? ( '<:'  type)? ('<%'  type)* ( ':'  type)* ;
 
-funTypeParamClause: '['  typeParam ( ','  typeParam)*  ']' ;
+funTypeParamClause: '[' {disableNewlines();} typeParam ( ','  typeParam)*  ']' {restoreNewlinesState();} ;
 
 typeParam         : annotationsNonEmpty? (id | '_')  typeParamClause? ( '>:'  type)? ( '<:'  type)?
                     ('<%'  type)* ( ':'  type)* ;
@@ -457,9 +489,9 @@ paramClauses      : implicitParamClause
                   | paramClause* implicitParamClause?;
 
 implicitParamClause
-                  : ( Nl?  '('  'implicit'  params  ')') ;
+                  : Nl?  '(' {disableNewlines();} 'implicit'  params  ')' {restoreNewlinesState();} ;
 
-paramClause       : Nl?  '('  params? ')'  ;
+paramClause       : Nl?  '(' {disableNewlines();} params? ')' {restoreNewlinesState();} ;
 
 params            : param ( ','  param)* ;
 
@@ -475,16 +507,16 @@ classParamClauses : implicitClassParamClause
                   | classParamClause* implicitClassParamClause? ;
 
 implicitClassParamClause
-                  : Nl?  '(' 'implicit'  classParams ')' ;
+                  : Nl?  '(' {disableNewlines();} 'implicit'  classParams ')' {restoreNewlinesState();} ;
 
-classParamClause  : Nl?  '(' classParams? ')'  ;
+classParamClause  : Nl?  '(' {disableNewlines();} classParams? ')' {restoreNewlinesState();} ;
 
 classParams       : classParam ( ','  classParam)* ;
 
 classParam        : annotations  modifiersOrEmpty  ( 'val' |  'var')?
                     id  ':'  paramType ( '='  expr)? ;
                     
-bindings          : '('  (binding ( ','  binding )*)?  ')' ;
+bindings          : '(' {disableNewlines();} (binding ( ','  binding )*)?  ')' {restoreNewlinesState();} ;
 
 binding           : (id | '_') ( ':'  paramType)? ;
 
@@ -502,11 +534,11 @@ localModifier     : 'abstract'
                   
 accessModifier    : ('private'  | 'protected' )  accessQualifier? ;
 
-accessQualifier   : '['  (id | 'this')  ']' ;
+accessQualifier   : '[' {disableNewlines();}  (id | 'this')  ']' {restoreNewlinesState();} ;
 
 annotation        : '@' annotationExpr ;
 
-annotationExpr    : constrAnnotation ( {getOccurrenceCount('\n') <= 1}? emptyNl '{' (nameValuePair (',' nameValuePair)*)? '}' )?;
+annotationExpr    : constrAnnotation ( {isSingleNlOrNone()}? emptyNl '{' {enableNewlines();} (nameValuePair (',' nameValuePair)*)? '}' {restoreNewlinesState();} )?;
 
 nameValuePair     : 'val' id '=' prefixExpr ;
 
@@ -516,7 +548,7 @@ annotations       : (annotation)* ;
 annotationsNonEmpty
                   : ({!isNl()}? annotation)+ ;
 
-templateBody      : Nl?  '{'  selfType?  templateStatSeq  '}' ;
+templateBody      : Nl?  '{' {enableNewlines();} selfType?  templateStatSeq  '}' {restoreNewlinesState();} ;
 
 templateStatSeq   : templateStat templateStatSeqSub
                   | ;
@@ -540,7 +572,7 @@ import_           : 'import'  importExpr ( ','  importExpr)* ;
 importExpr        : stableIdRef ('.' '_' | '.' importSelectors)
                   | stableIdRef ;
 
-importSelectors   : '{'  ( importSelector  ',')* ('_' | importSelector)  '}' ;
+importSelectors   : '{' {enableNewlines();} ( importSelector  ',')* ('_' | importSelector)  '}' {restoreNewlinesState();} ;
 
 importSelector    : reference ( '=>'  id |  '=>'  '_')? ;
  
@@ -599,7 +631,7 @@ funDef            : 'this'  paramClauses ('='  constrExpr |  {isSingleNl()}? emp
                   | funSig ( ':'  type)?  '='  expr
                   | funSig  Nl?  blockWithBraces ;
 
-blockWithBraces   : '{'  block  '}' ;
+blockWithBraces   : '{' {enableNewlines();}  block  '}' {restoreNewlinesState();} ;
 
 typeDef           :  id  typeParamClause?  '='  type ;
 
@@ -648,16 +680,23 @@ constr            : annotTypeNoMultipleSQBrackets  ({!isNl()}? argumentExprsPare
 annotTypeNoMultipleSQBrackets
                   : simpleTypeNoMultipleSQBrackets  annotationsNonEmpty? ;
 
-argumentExprsParen: '('  exprs?  ')'
-                  | '('  (exprs  ',' )? postfixExpr  ':' '_' '*' ')' ;
+argumentExprsParen: '(' {disableNewlines();}  exprs?  ')' {restoreNewlinesState();}
+                  //| '('  (exprs  ',' )? postfixExpr  ':' '_' '*' ')'
+                  ;
 
-earlyDefs         : '{'  (patVarDef ( (SEMICOLON | {isNl()}? emptyNl)  patVarDef )* )?  '}'   ;
+earlyDefs         : '{' {enableNewlines();} (patVarDef ( (SEMICOLON | {isNl()}? emptyNl)  patVarDef )* )?  '}' {restoreNewlinesState();}  ;
 
 constrExpr        : selfInvocation 
                   | constrBlock ;
                   
-constrBlock       : '{'  selfInvocation ( (SEMICOLON | {isNl()}? emptyNl)  blockStat)*  '}' ;
-selfInvocation    : 'this'  argumentExprs ({!isNl()}? argumentExprs)* ;
+constrBlock       : '{' {enableNewlines();} selfInvocation? blockStatSeqSub  '}' {restoreNewlinesState();} ;
+
+blockStatSeqSub   : {isNl()}? emptyNl blockStat blockStatSeqSub
+                  | SEMICOLON blockStat blockStatSeqSub
+                  | SEMICOLON blockStatSeqSub
+                  | ;
+
+selfInvocation    : 'this'  (argumentExprs ({!isNl()}? argumentExprs)*)? ;
 
 topStatSeq        : topStat topStatSeqSub
                   | ;
@@ -673,7 +712,7 @@ topStat           : tmplDef
                   | packageObject
                   ;// | ;
                     
-packaging         : 'package'  qualId  Nl?  '{'  topStatSeq  '}' ;
+packaging         : 'package'  qualId  Nl?  '{' {enableNewlines();} topStatSeq  '}' {restoreNewlinesState();} ;
 
 packageObject     : emptyAnnotations emptyModifiers 'package'  'object'  objectDef ;
 
@@ -697,7 +736,7 @@ id                : ID
 
 semi              :  SEMICOLON | Nl+ ;
 
-xmlExpr           :    xmlContent (element)* ;
+xmlExpr           :    {disableNewlines();} xmlContent (element)* {restoreNewlinesState();} ;
 
 element           :    emptyElemTag
                   |    sTag content eTag ;
@@ -730,12 +769,12 @@ xmlAttribute      :    XML_NAME XML_EQ attValue ;
 attValue          :    XML_ATTRIBUTE_VALUE_START_DELIMITER (XML_ATTRIBUTE_VALUE_TOKEN | XML_CHAR_ENTITY_REF)* XML_ATTRIBUTE_VALUE_END_DELIMITER
                   |    scalaExpr ;
 
-scalaExpr         :    SCALA_IN_XML_INJECTION_START blockNode ';'? SCALA_IN_XML_INJECTION_END ;
+scalaExpr         :    SCALA_IN_XML_INJECTION_START {enableNewlines();} blockNode ';'? SCALA_IN_XML_INJECTION_END {restoreNewlinesState();} ;
 
 charData          :    XML_DATA_CHARACTERS | XML_CHAR_ENTITY_REF ;
 
-xmlPattern        :    emptyElemTagP
-                  |    sTagP contentP eTagP ;
+xmlPattern        :    {disableNewlines();} emptyElemTagP {restoreNewlinesState();}
+                  |    {disableNewlines();} sTagP contentP eTagP {restoreNewlinesState();} ;
 
 emptyElemTagP     :    '<' XML_NAME '/>' ;
 
@@ -752,7 +791,7 @@ content1P         :    cDSect
                   |    scalaPatterns
                   |    xmlPattern;
 
-scalaPatterns     :    SCALA_IN_XML_INJECTION_START xmlPatterns SCALA_IN_XML_INJECTION_END ;
+scalaPatterns     :    SCALA_IN_XML_INJECTION_START {enableNewlines();} xmlPatterns SCALA_IN_XML_INJECTION_END {restoreNewlinesState();} ;
 
 xmlPatterns       :    patternArgsSub ;
 

@@ -45,7 +45,12 @@ class CompilationUnitTest extends SimpleTestCase {
   }
 
   def testCompilationUnit() {
-    doTest("val x: Int = 1")
+    doTest("""class BufferedSource{
+             |  override lazy val iter = (
+             |    Iterator
+             |    continually (codec wrap charReader.read())
+             |  )
+             |}""".stripMargin)
   }
 
   def testCompilationUnit2(): Unit = {

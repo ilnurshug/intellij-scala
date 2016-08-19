@@ -157,7 +157,10 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testProgam18(): Unit = {
-    doTest("class ArrowAssoc[A](x: A) {\n  def -> [B](y: B): Tuple2[A, B] = Tuple2(x, y)\n  def ?[B](y: B): Tuple2[A, B] = ->(y)\n}")
+    doTest("""(
+             |    Iterator
+             |    continually (codec wrap charReader.read())
+             |  )""".stripMargin, "simpleExpr1")
   }
 
   def testExperiment(): Unit = {
@@ -198,7 +201,7 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testExperiment3(): Unit = {
-    doTest("a \n b \n c", "testRule")
+    doTest("A \n B \n C", "testRule")
   }
 
   def testExperiment4(): Unit = {
