@@ -263,6 +263,7 @@ types             : ( '=>'  type | type  '*' | type) ( ','  ( '=>'  type | type 
 refinement        : Nl? '{' {enableNewlines();} refineStatSeq  '}' {restoreNewlinesState();} ;
 
 refineStatSeq     : refineStat refineStatSub
+                  | refineStatSub
                   | ;
 
 refineStatSub     : {isNl()}? emptyNl refineStat refineStatSub
@@ -343,7 +344,11 @@ subInfixExpr      : {!isNl()}? id typeArgs? Nl? prefixExpr subInfixExpr
 
 prefixExpr        : ('-' | '+' | '~' | '!')? simpleExpr ;
 
-simpleExpr        : newTemplate | blockExpr | placeholderExpr | simpleExpr1 ;
+simpleExpr        : placeholderExpr
+                  //| newTemplate
+                  //| blockExpr
+                  | simpleExpr1
+                  ;
 
 placeholderExpr   : simpleExpr1 '_' ;
 
@@ -354,11 +359,11 @@ simpleExpr1       : literal
                   | '_'
                   | (thisReference | pathRefExpr)
                   | '(' {disableNewlines();} (exprs ','?)? ')' {restoreNewlinesState();}
-                  | (newTemplate | blockExpr) '.' id
+                  | (newTemplate | blockExpr) ('.' id)?
                   | simpleExpr1 '_'? '.' id
-                  | (newTemplate | blockExpr) typeArgs
+                  | (newTemplate | blockExpr) (typeArgs)?
                   | simpleExpr1 '_'? typeArgs
-                  | simpleExpr1 argumentExprs
+                  | simpleExpr1 {!equalTo("(") || !isNl()}? argumentExprs
                   | xmlExpr;
 
 exprs             : expr (  ','  expr)* ;
@@ -372,6 +377,7 @@ blockExpr         : '{' {enableNewlines();} caseClauses  '}' {restoreNewlinesSta
 
 block             : resultExpr
                   | blockStat subBlock
+                  | subBlock
                   | ;
 
 subBlock          : {isNl()}? emptyNl resultExpr
@@ -551,6 +557,7 @@ annotationsNonEmpty
 templateBody      : Nl?  '{' {enableNewlines();} selfType?  templateStatSeq  '}' {restoreNewlinesState();} ;
 
 templateStatSeq   : templateStat templateStatSeqSub
+                  | templateStatSeqSub
                   | ;
 
 templateStatSeqSub: {isNl()}? emptyNl templateStat templateStatSeqSub
@@ -627,7 +634,7 @@ varDef            : patDef
 
 macroDef          : funSig (':' type)? '=' 'macro' qualId typeArgs? ;
 
-funDef            : 'this'  paramClauses ('='  constrExpr |  {isSingleNl()}? emptyNl constrBlock)
+funDef            : 'this'  paramClauses ('='  constrExpr |  {isSingleNlOrNone()}? emptyNl constrBlock)
                   | funSig ( ':'  type)?  '='  expr
                   | funSig  Nl?  blockWithBraces ;
 
@@ -699,6 +706,7 @@ blockStatSeqSub   : {isNl()}? emptyNl blockStat blockStatSeqSub
 selfInvocation    : 'this'  (argumentExprs ({!isNl()}? argumentExprs)*)? ;
 
 topStatSeq        : topStat topStatSeqSub
+                  | topStatSeqSub
                   | ;
 
 topStatSeqSub     : {isNl()}? emptyNl topStat topStatSeqSub
