@@ -57,10 +57,10 @@ public abstract class CustomANTLRParserAdaptor extends ANTLRParserAdaptor {
         if (root != null) rootMarker = builder.mark();
 
         //ParseTreeWalker.DEFAULT.walk(listener, parseTree);
-        long millis = System.currentTimeMillis();
+        //long millis = System.currentTimeMillis();
         ScalaLangVisitorImpl visitor = new ScalaLangVisitorImpl(builder, language, parser);
         visitor.visit(parseTree);
-        System.out.println(System.currentTimeMillis()- millis);
+        //System.out.println(System.currentTimeMillis()- millis);
 
         while (!builder.eof()) {
             ProgressIndicatorProvider.checkCanceled();

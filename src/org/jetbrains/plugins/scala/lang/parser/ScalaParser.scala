@@ -13,6 +13,7 @@ class ScalaParser extends PsiParser {
   protected val program: Program = Program
 
   def parse(root: IElementType, builder: PsiBuilder): ASTNode = {
+    val timestamp: Long = System.currentTimeMillis
     root match {
       case ScalaElementTypes.BLOCK_EXPR =>
         blockExpr.parse(new ScalaPsiBuilderImpl(builder))
@@ -21,6 +22,8 @@ class ScalaParser extends PsiParser {
         program.parse(new ScalaPsiBuilderImpl(builder))
         rootMarker.done(root)
     }
-    builder.getTreeBuilt
+    val t = builder.getTreeBuilt
+    println(System.currentTimeMillis - timestamp)
+    t
   }
 }

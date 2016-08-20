@@ -36,7 +36,7 @@ class ScalaLangParserTest extends SimpleTestCase
     val node = builder.getTreeBuilt
 
     val converter = new ASTTreeToDot()
-    //println(converter.convert(node))
+    println(converter.convert(node))
 
     node.getPsi
   }
@@ -133,11 +133,11 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testProgram12(): Unit = {
-    doTest("class A{ var a,b,c: Type }")
+    doTest("1 + \n2", "simpleExpr")
   }
 
   def testProgram13(): Unit = {
-    doTest("import a.b.{a, b, c => d}")
+    doTest("1 + /*\n*/\n2", "simpleExpr")
   }
 
   def testProgram14(): Unit = {
@@ -291,9 +291,9 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testExperiment2(): Unit = {
-    //val s = "class A{def a(){}\n def b(){}\n val a = 1\n}"
+    val s = "class A{def a(){}\n def b(){}\n val a = 1\n}"
     //val s = "case a | b => g"
-    val s = "| : _ = => <- <: >: # @ <% \\ + - * ! ~"
+    //val s = "| : _ = => <- <: >: # @ <% \\ + - * ! ~"
 
     val parserDefinition = new ScalaParserDefinition()
 
@@ -301,10 +301,10 @@ class ScalaLangParserTest extends SimpleTestCase
     val builder: ScalaPsiBuilderImpl = new ScalaPsiBuilderImpl(tmp)
 
     while(!builder.eof()) {
-      print(builder.getTokenType.toString)
+      println(builder.getTokenType.toString + " " + builder.getCurrentOffset + " " + builder.rawTokenIndex + " " + builder.rawTokenTypeStart(1))
 
-      if (builder.getTokenText.contains("\n")) println(1)
-      else println()
+      //if (builder.getTokenText.contains("\n")) println(1)
+      //else println()
 
       builder.advanceLexer()
     }

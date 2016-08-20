@@ -128,15 +128,21 @@ public class CustomPSITokenSource extends PSITokenSource {
     public class CommonTokenAdaptor extends CommonToken {
         private final CommonToken token;
         private final IElementType type;
+        private final int rawTokenIndex;
 
-        public CommonTokenAdaptor(CommonToken token, IElementType type) {
+        public CommonTokenAdaptor(CommonToken token, IElementType type, int rawTokenIndex) {
             super(-1);
             this.token = token;
             this.type = type;
+            this.rawTokenIndex = rawTokenIndex;
         }
 
         public IElementType getTokenType() {
             return type;
+        }
+
+        public int rawTokenIndex() {
+            return rawTokenIndex;
         }
 
         @Override
@@ -240,7 +246,8 @@ public class CustomPSITokenSource extends PSITokenSource {
         ProgressIndicatorProvider.checkCanceled();
 
         int type = convertScalaTokenTypeToInt(builder.getTokenType(), builder.getTokenText());
-        return new CommonTokenAdaptor((CommonToken) nextTokenHelper(type), builder.getTokenType());
+        int index = builder.rawTokenIndex();
+        return new CommonTokenAdaptor((CommonToken) nextTokenHelper(type), builder.getTokenType(), index);
     }
 
     private int convertScalaTokenTypeToInt(IElementType t, String tokenText) {

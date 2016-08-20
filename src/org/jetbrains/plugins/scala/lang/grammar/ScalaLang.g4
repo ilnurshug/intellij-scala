@@ -42,11 +42,13 @@ import com.intellij.psi.tree.*;
 import org.jetbrains.plugins.scala.lang.parser.*;
 import org.antlr.jetbrains.adaptor.lexer.*;
 import java.util.*;
+import com.intellij.lang.PsiBuilder;
 }
 
 @parser::members {
 
 String originalText = null;
+PsiBuilder builder = null;
 
 Deque<Boolean> newlinesEnabled = null;
 
@@ -59,6 +61,9 @@ void enableNewlines() {
 }
 
 void restoreNewlinesState() {
+    if (newlinesEnabled.isEmpty()) {
+        System.out.println("newlinesEnabled stack is empty");
+    }
     assert(!newlinesEnabled.isEmpty());
     newlinesEnabled.pop();
 }
@@ -74,52 +79,77 @@ public void setTokenStream(TokenStream input) {
     this.reset();
     this._input = input;
 
-    if (input == null) originalText = "";
-    else originalText = ((PSITokenSource)_input.getTokenSource()).getBuilder().getOriginalText().toString();
-    System.out.println(originalText);
+    if (input == null) {
+        builder = null;
+        originalText = "";
+    }
+    else {
+        builder = ((PSITokenSource)_input.getTokenSource()).getBuilder();
+        originalText = builder.getOriginalText().toString();
+    }
+    //System.out.println(originalText);
 
     newlinesEnabled = new ArrayDeque<Boolean>();
 }
 
 int getOccurrenceCount(char c) {
-    CommonToken curToken = (CommonToken)_input.LT(1);
-    CommonToken prevToken = (CommonToken)_input.LT(-1);
+    return getOccurrenceCount(c, 1);
+}
+
+int getOccurrenceCount(char c, int offset) {
+    if (builder == null) return 0;
+
+    int pos = builder.rawTokenIndex();
+
+    int prev = (offset == 1 ? -1 : offset - 1);
+    System.out.println(pos);
+
+    CustomPSITokenSource.CommonTokenAdaptor curToken = (CustomPSITokenSource.CommonTokenAdaptor)_input.LT(offset);
+    CustomPSITokenSource.CommonTokenAdaptor prevToken = (CustomPSITokenSource.CommonTokenAdaptor)_input.LT(prev);
 
     if (curToken == null || prevToken == null) return 0;
 
-    int prevTokenStart = prevToken.getStartIndex();
-    int curTokenStart = curToken.getStartIndex();
+    int prevTokenStart = prevToken.rawTokenIndex();
+    int curTokenStart = curToken.rawTokenIndex();
 
-    //String substr = originalText.substring(prevTokenStart, curTokenStart);
-    int cnt = 0;
+    System.out.println(originalText.substring(prevToken.getStartIndex(), curToken.getStartIndex()));
 
-    for (int i = prevTokenStart; i < curTokenStart; i++) {
-        if (originalText.charAt(i) == c) cnt++;
+    int firstPos = (prevTokenStart < pos ? prevTokenStart - pos : pos - prevTokenStart);
+    int count = 0;
+    for (int i = prevTokenStart + 1, delta = 1; i < curTokenStart; i++, delta++) {
+        IElementType t = builder.rawLookup(firstPos + delta);
+
+        if (ScalaTokenTypes.COMMENTS_TOKEN_SET.contains(t)) continue;
+
+        int start = builder.rawTokenTypeStart(firstPos + delta);
+        int end   = builder.rawTokenTypeStart(firstPos + delta + 1);
+
+        String substr = originalText.substring(start, end);
+
+        System.out.println(substr);
+
+        count += StringUtil.getOccurrenceCount(substr, c);
     }
 
-    //return StringUtil.getOccurrenceCount(substr, c);
+    return count;
+}
 
-    return cnt;
+int countNewlineBeforeToken(int offset) {
+    if (!newlinesEnabled.isEmpty() && !newlinesEnabled.peek()) return 0;
+
+    return getOccurrenceCount('\n', offset);
 }
 
 boolean isSingleNl() {
-    if (!newlinesEnabled.isEmpty() && !newlinesEnabled.peek()) return false;
-
-    int nlCount = getOccurrenceCount('\n');
-
-    return (nlCount == 1);
+    return (countNewlineBeforeToken(1) == 1);
 }
 
 boolean isSingleNlOrNone() {
-    if (!newlinesEnabled.isEmpty() && !newlinesEnabled.peek()) return true;
-
-    return (getOccurrenceCount('\n') <= 1);
+    return (countNewlineBeforeToken(1) <= 1);
 }
 
 boolean isNl() {
-    if (!newlinesEnabled.isEmpty() && !newlinesEnabled.peek()) return false;
-
-    return (getOccurrenceCount('\n') >= 1);
+    return (countNewlineBeforeToken(1) > 0);
 }
 
 boolean equalTo(String s) {
@@ -140,7 +170,7 @@ boolean lookAhead(IElementType... tokens) {
 
 }
 
-testRule          : id ({System.out.println("b");} {isNl()}? emptyNl id {System.out.println("a");})+ ;
+testRule          : id ({isNl()}? emptyNl id)+ ;
 
 emptyNl           :  ;
 
@@ -339,7 +369,8 @@ postfixExpr       : infixExpr ( {!isNl()}? id  Nl?)? ;
                   | prefixExpr ;*/
 infixExpr         : prefixExpr subInfixExpr ;
 
-subInfixExpr      : {!isNl()}? id typeArgs? Nl? prefixExpr subInfixExpr
+subInfixExpr      : {!isNl()}? id typeArgs Nl? prefixExpr subInfixExpr
+                  | {!isNl() && countNewlineBeforeToken(2) <= 1}? id Nl? prefixExpr subInfixExpr
                   | ;
 
 prefixExpr        : ('-' | '+' | '~' | '!')? simpleExpr ;
