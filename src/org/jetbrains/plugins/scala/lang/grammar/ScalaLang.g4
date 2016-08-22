@@ -317,7 +317,7 @@ typeArgs          : '[' {disableNewlines();} type ( ','  type)*  ']' {restoreNew
 
 types             : ( '=>'  type | type  '*' | type) ( ','  ( '=>'  type | type  '*' | type))*;
 
-refinement        : Nl? '{' {enableNewlines();} refineStatSeq  '}' {restoreNewlinesState();} ;
+refinement        : {isSingleNlOrNone()}? '{' {enableNewlines();} refineStatSeq  '}' {restoreNewlinesState();} ;
 
 refineStatSeq     : refineStat refineStatSub
                   | refineStatSub
@@ -392,12 +392,10 @@ matchStmt         : postfixExpr  'match'  '{' {enableNewlines();} caseClauses  '
 //-----------------------------------------------------------------------------
 postfixExpr       : infixExpr ( {!isNl()}? id  Nl?)? ;
 
-/*infixExpr         : infixExpr  id  Nl?  infixExpr
-                  | prefixExpr ;*/
 infixExpr         : prefixExpr subInfixExpr ;
 
 subInfixExpr      : {!isNl()}? id typeArgs Nl? prefixExpr subInfixExpr
-                  | {!isNl() && countNewlineBeforeToken(2) <= 1}? id Nl? prefixExpr subInfixExpr
+                  | {!isNl() && countNewlineBeforeToken(2) <= 1}? id prefixExpr subInfixExpr
                   | ;
 
 prefixExpr        : ('-' | '+' | '~' | '!')? simpleExpr ;
@@ -493,7 +491,7 @@ namingPattern     : ('_' | id) '@' pattern3 ;
 
 pattern3          : simplePattern subPattern3 ;
 
-subPattern3       : {!equalTo("|")}? id  Nl?  simplePattern subPattern3
+subPattern3       : {!equalTo("|")}? id  {isSingleNlOrNone()}?  simplePattern subPattern3
                   | ;
 //-----------------------------------------------------------------------------
 simplePattern     : wildcardPattern
@@ -553,9 +551,9 @@ paramClauses      : implicitParamClause
                   | paramClause* implicitParamClause?;
 
 implicitParamClause
-                  : Nl?  '(' {disableNewlines();} 'implicit'  params  ')' {restoreNewlinesState();} ;
+                  : {isSingleNlOrNone()}?  '(' {disableNewlines();} 'implicit'  params  ')' {restoreNewlinesState();} ;
 
-paramClause       : Nl?  '(' {disableNewlines();} params? ')' {restoreNewlinesState();} ;
+paramClause       : {isSingleNlOrNone()}?  '(' {disableNewlines();} params? ')' {restoreNewlinesState();} ;
 
 params            : param ( ','  param)* ;
 
@@ -571,9 +569,9 @@ classParamClauses : implicitClassParamClause
                   | classParamClause* implicitClassParamClause? ;
 
 implicitClassParamClause
-                  : Nl?  '(' {disableNewlines();} 'implicit'  classParams ')' {restoreNewlinesState();} ;
+                  : {isSingleNlOrNone()}?  '(' {disableNewlines();} 'implicit'  classParams ')' {restoreNewlinesState();} ;
 
-classParamClause  : Nl?  '(' {disableNewlines();} classParams? ')' {restoreNewlinesState();} ;
+classParamClause  : {isSingleNlOrNone()}?  '(' {disableNewlines();} classParams? ')' {restoreNewlinesState();} ;
 
 classParams       : classParam ( ','  classParam)* ;
 
@@ -612,7 +610,7 @@ annotations       : (annotation)* ;
 annotationsNonEmpty
                   : ({!isNl()}? annotation)+ ;
 
-templateBody      : Nl?  '{' {enableNewlines();} selfType?  templateStatSeq  '}' {restoreNewlinesState();} ;
+templateBody      : {isSingleNlOrNone()}?  '{' {enableNewlines();} selfType?  templateStatSeq  '}' {restoreNewlinesState();} ;
 
 templateStatSeq   : templateStat templateStatSeqSub
                   | templateStatSeqSub
@@ -692,9 +690,9 @@ varDef            : patDef
 
 macroDef          : funSig (':' type)? '=' 'macro' qualId typeArgs? ;
 
-funDef            : 'this'  paramClauses ('='  constrExpr |  {isSingleNlOrNone()}? emptyNl constrBlock)
+funDef            : 'this'  paramClauses ('='  constrExpr |  {isSingleNlOrNone()}? constrBlock)
                   | funSig ( ':'  type)?  '='  expr
-                  | funSig  Nl?  blockWithBraces ;
+                  | funSig  {isSingleNlOrNone()}?  blockWithBraces ;
 
 blockWithBraces   : '{' {enableNewlines();}  block  '}' {restoreNewlinesState();} ;
 
@@ -778,7 +776,7 @@ topStat           : tmplDef
                   | packageObject
                   ;// | ;
                     
-packaging         : 'package'  qualId  Nl?  '{' {enableNewlines();} topStatSeq  '}' {restoreNewlinesState();} ;
+packaging         : 'package'  qualId  {isSingleNlOrNone()}?  '{' {enableNewlines();} topStatSeq  '}' {restoreNewlinesState();} ;
 
 packageObject     : emptyAnnotations emptyModifiers 'package'  'object'  objectDef ;
 
