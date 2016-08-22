@@ -15,9 +15,6 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes;
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypesEx;
 import org.jetbrains.plugins.scala.lang.lexer.ScalaXmlTokenTypes;
 
-/**
- * Created by ilnur on 06.08.16.
- */
 public class CustomPSITokenSource extends PSITokenSource {
 
     private final HashMap<IElementType, Integer> map = new HashMap<IElementType, Integer>();
@@ -53,7 +50,6 @@ public class CustomPSITokenSource extends PSITokenSource {
         map.put(ScalaTokenTypes.tSYMBOL, ScalaLangParser.SymbolLiteral);
         map.put(ScalaTokenTypes.tINTEGER, ScalaLangParser.IntegerLiteral);
         map.put(ScalaTokenTypes.tFLOAT, ScalaLangParser.FloatingPointLiteral);
-        //map.put(ScalaTokenTypes.tWHITE_SPACE_IN_LINE, ScalaLangParser.WHITE_SPACE_IN_LINE);
         map.put(ScalaTokenTypes.tINTERPOLATED_STRING_INJECTION, ScalaLangParser.STRING_INJECTION);
         map.put(ScalaTokenTypes.tINTERPOLATED_STRING, ScalaLangParser.InterpolatedString);
         map.put(ScalaTokenTypes.tINTERPOLATED_MULTILINE_STRING, ScalaLangParser.InterpolatedMultilineString);
@@ -102,7 +98,6 @@ public class CustomPSITokenSource extends PSITokenSource {
         map.put(ScalaTokenTypes.tLINE_COMMENT, ScalaLangParser.LINE_COMMENT);
         map.put(ScalaTokenTypes.tBLOCK_COMMENT, ScalaLangParser.BLOCK_COMMENT);
         map.put(ScalaTokenTypes.tSH_COMMENT, ScalaLangParser.SH_COMMENT);
-
         map.put(ScalaXmlTokenTypes.XML_START_TAG_START(), ScalaLangParser.XML_START_TAG_START);
         map.put(ScalaXmlTokenTypes.XML_NAME(), ScalaLangParser.XML_NAME);
         map.put(ScalaXmlTokenTypes.XML_EMPTY_ELEMENT_END(), ScalaLangParser.XML_EMPTY_ELEMENT_END);
@@ -153,9 +148,6 @@ public class CustomPSITokenSource extends PSITokenSource {
         else if (tokenText.compareTo("*") == 0) return ScalaLangParser.OP_3;
         else if (tokenText.compareTo("!") == 0) return ScalaLangParser.EPT;
         else if (tokenText.compareTo("~") == 0) return ScalaLangParser.TLD;
-        //else if (tokenText.compareTo("=") == 0) return ScalaLangParser.ASSIGN;
-        //else if (tokenText.compareTo("_") == 0) return ScalaLangParser.UNDER;
-        //else if (tokenText.compareTo("=>") == 0) return ScalaLangParser.FUNTYPE;
         else return ScalaLangParser.ID;
     }
 

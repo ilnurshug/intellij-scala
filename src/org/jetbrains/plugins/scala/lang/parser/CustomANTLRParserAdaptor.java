@@ -10,9 +10,6 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.jetbrains.plugins.scala.lang.parser.ScalaLangVisitorImpl;
 
-/**
- * Created by ilnur on 06.08.16.
- */
 public abstract class CustomANTLRParserAdaptor extends ANTLRParserAdaptor {
     public CustomANTLRParserAdaptor(Language language, Parser parser) {
         super(language, parser);

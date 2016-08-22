@@ -23,17 +23,10 @@ class ScalaLangVisitorImpl(language: Language, parser: Parser, val builder: PsiB
 
   def isPattern: Boolean = patternStack != 0
 
+
   override def visitTestRule(ctx: TestRuleContext): Unit = visit(ctx, ScalaElementTypes.BLOCK_EXPR)
 
-
-  override def visitEnumerator(ctx: EnumeratorContext): Unit = {
-    val marker = builder.mark()
-
-    visitChildren(ctx)
-
-    if (ctx.pattern1() != null) marker.done(ScalaElementTypes.ENUMERATOR)
-    else marker.drop()
-  }
+  override def visitEnumerator(ctx: EnumeratorContext): Unit = visit(ctx, ScalaElementTypes.ENUMERATOR, ctx.pattern1() != null)
 
   override def visitKThisReference(ctx: KThisReferenceContext): Unit = visit(ctx, ScalaElementTypes.THIS_REFERENCE)
 
@@ -83,11 +76,11 @@ class ScalaLangVisitorImpl(language: Language, parser: Parser, val builder: PsiB
 
   override def visitInfixType(ctx: InfixTypeContext): Unit = InfixTypeVisitor.visit(this, ctx)
 
-  override def visitCompoundType(ctx: CompoundTypeContext): Unit = CompoundTypeVisitor.visit(this, ctx)
+  override def visitCompoundType(ctx: CompoundTypeContext): Unit = visit(ctx, ScalaElementTypes.COMPOUND_TYPE, ctx.refinement() != null || ctx.annotType().size() > 1)
 
-  override def visitAnnotType(ctx: AnnotTypeContext): Unit = AnnotTypeVisitor.visit(this, ctx)
+  override def visitAnnotType(ctx: AnnotTypeContext): Unit = visit(ctx, ScalaElementTypes.ANNOT_TYPE, ctx.annotationsNonEmpty() != null)
 
-  override def visitAnnotTypeNoMultipleSQBrackets(ctx: AnnotTypeNoMultipleSQBracketsContext): Unit = AnnotTypeNoMultipleSQBracketsVisitor.visit(this, ctx)
+  override def visitAnnotTypeNoMultipleSQBrackets(ctx: AnnotTypeNoMultipleSQBracketsContext): Unit = visit(ctx, ScalaElementTypes.ANNOT_TYPE, ctx.annotationsNonEmpty() != null)
 
   override def visitSimpleTypeNoMultipleSQBrackets(ctx: SimpleTypeNoMultipleSQBracketsContext): Unit = SimpleTypeNoMultipleSQBracketsVisitor.visit(this, ctx)
 
@@ -97,7 +90,7 @@ class ScalaLangVisitorImpl(language: Language, parser: Parser, val builder: PsiB
 
   override def visitTypeArgs(ctx: TypeArgsContext): Unit = TypeArgsVisitor.visit(this, ctx)
 
-  override def visitTypes(ctx: TypesContext): Unit = TypesVisitor.visit(this, ctx)
+  override def visitTypes(ctx: TypesContext): Unit = visit(ctx, ScalaElementTypes.TYPES, ctx.`type`().size() > 1)
 
   override def visitRefinement(ctx: RefinementContext): Unit = visit(ctx, ScalaElementTypes.REFINEMENT)
 
@@ -225,7 +218,7 @@ class ScalaLangVisitorImpl(language: Language, parser: Parser, val builder: PsiB
 
   override def visitGuard(ctx: GuardContext): Unit = visit(ctx, ScalaElementTypes.GUARD)
 
-  override def visitPattern(ctx: PatternContext): Unit = PatternVisitor.visit(this, ctx)
+  override def visitPattern(ctx: PatternContext): Unit = visit(ctx, ScalaElementTypes.PATTERN, ctx.getChildCount > 1)
 
   override def visitTypedPattern(ctx: TypedPatternContext): Unit = visit(ctx, ScalaElementTypes.TYPED_PATTERN)
 
@@ -343,27 +336,11 @@ class ScalaLangVisitorImpl(language: Language, parser: Parser, val builder: PsiB
 
   override def visitPackaging(ctx: PackagingContext): Unit = visit(ctx, ScalaElementTypes.PACKAGING)
 
-  // ???
-  override def visitPackageDcl(ctx: PackageDclContext): Unit = {
-    val marker = builder.mark()
-
-    visitChildren(ctx)
-
-    if (ctx.topStatSeq() != null) marker.drop()
-    else marker.done(ScalaElementTypes.PACKAGING)
-  }
-
+  override def visitPackageDcl(ctx: PackageDclContext): Unit = visit(ctx, ScalaElementTypes.PACKAGING, ctx.topStatSeq() == null)
 
   override def visitXmlExpr(ctx: XmlExprContext): Unit = visit(ctx, ScalaElementTypes.XML_EXPR)
 
-  override def visitElement(ctx: ElementContext): Unit = {
-    val marker = builder.mark()
-
-    visitChildren(ctx)
-
-    if (ctx.emptyElemTag() != null) marker.drop()
-    else marker.done(ScalaElementTypes.XML_ELEMENT)
-  }
+  override def visitElement(ctx: ElementContext): Unit = visit(ctx, ScalaElementTypes.XML_ELEMENT, ctx.emptyElemTag() == null)
 
   override def visitEmptyElemTag(ctx: EmptyElemTagContext): Unit = visit(ctx, ScalaElementTypes.XML_EMPTY_TAG)
 
@@ -414,10 +391,8 @@ class ScalaLangVisitorImpl(language: Language, parser: Parser, val builder: PsiB
     converter.visitErrorNode(node)
   }
 
-  def visit(ctx: ParserRuleContext, element: IElementType) = {
-    val marker = builder.mark()
-    visitChildren(ctx)
-    marker.done(element)
+  def visit(ctx: ParserRuleContext, element: IElementType): Unit = {
+    visit(ctx, element, p = true)
   }
 
   def visit(ctx: ParserRuleContext, element: IElementType, left: WhitespacesAndCommentsBinder, afterDone: Boolean = false) = {
@@ -426,5 +401,14 @@ class ScalaLangVisitorImpl(language: Language, parser: Parser, val builder: PsiB
     visitChildren(ctx)
     marker.done(element)
     if (afterDone) marker.setCustomEdgeTokenBinders(left, null)
+  }
+
+  def visit(ctx: ParserRuleContext, element: IElementType, p: Boolean): Unit = {
+    val marker = builder.mark()
+    visitChildren(ctx)
+    if (p)
+      marker.done(element)
+    else
+      marker.drop()
   }
 }

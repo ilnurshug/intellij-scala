@@ -29,37 +29,27 @@ object ExprVisitor extends VisitorHelper[ExprContext] {
 
         builder.advanceLexer() //Ate id
 
-        builder.getTokenType match {
-          case ScalaTokenTypes.tFUNTYPE =>
-            val psm = pmarker.precede // 'parameter clause'
-            val pssm = psm.precede // 'parameter list'
-            pmarker.done(ScalaElementTypes.PARAM)
-            psm.done(ScalaElementTypes.PARAM_CLAUSE)
-            pssm.done(ScalaElementTypes.PARAM_CLAUSES)
+        val psm = pmarker.precede // 'parameter clause'
+        val pssm = psm.precede // 'parameter list'
+        pmarker.done(ScalaElementTypes.PARAM)
+        psm.done(ScalaElementTypes.PARAM_CLAUSE)
+        pssm.done(ScalaElementTypes.PARAM_CLAUSES)
 
-            builder.advanceLexer() //Ate =>
-            //if (!parse(builder)) builder error ErrMsg("wrong.expression")
-            visit(visitor, context.expr())
+        builder.advanceLexer() //Ate =>
 
-            exprMarker.done(ScalaElementTypes.FUNCTION_EXPR)
-            return
-          case _ =>
-            pmarker.drop()
-            exprMarker.rollbackTo()
-        }
+        visit(visitor, context.expr())
+
+        exprMarker.done(ScalaElementTypes.FUNCTION_EXPR)
 
       case ScalaTokenTypes.tLPARENTHESIS =>
-
-        //BindingsVisitor.visit(visitor, builder, context.bindings(), args)
         visitor.visitBindings(context.bindings())
 
         builder.advanceLexer() //Ate =>
         visit(visitor, context.expr())
         exprMarker.done(ScalaElementTypes.FUNCTION_EXPR)
-        return
+
 
       case _ => exprMarker.drop()
     }
-
   }
 }

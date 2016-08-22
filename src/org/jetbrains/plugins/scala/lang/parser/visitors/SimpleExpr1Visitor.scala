@@ -10,15 +10,17 @@ import org.jetbrains.plugins.scala.lang.ScalaLangParser.SimpleExpr1Context
 import org.jetbrains.plugins.scala.lang.parser.{ScalaElementTypes, ScalaLangVisitorImpl}
 
 /*
+
 simpleExpr1       : literal
-                  | path
                   | '_'
-                  | '(' (exprs ','?)? ')'
-                  | ('new' (classTemplate | templateBody) | blockExpr) '.' id
+                  | (thisReference | pathRefExpr)
+                  | '(' {disableNewlines();} (exprs ','?)? ')' {restoreNewlinesState();}
+                  | (newTemplate | blockExpr) ('.' id)?
                   | simpleExpr1 '_'? '.' id
-                  | ('new' (classTemplate | templateBody) | blockExpr) typeArgs
+                  | (newTemplate | blockExpr) (typeArgs)?
                   | simpleExpr1 '_'? typeArgs
-                  | simpleExpr1 argumentExprs ;
+                  | simpleExpr1 {!equalTo("(") || !isNl()}? argumentExprs
+                  | xmlExpr;
 
  */
 
