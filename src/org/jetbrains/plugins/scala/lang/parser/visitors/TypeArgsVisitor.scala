@@ -11,16 +11,13 @@ import org.jetbrains.plugins.scala.lang.parser.{ScalaElementTypes, ScalaLangVisi
 typeArgs          : '['  type ( ','  type)*  ']';
  */
 
-object TypeArgsVisitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
-    val builder = visitor.getBuilder
+object TypeArgsVisitor extends VisitorHelper[TypeArgsContext] {
+  override def visit(visitor: ScalaLangVisitorImpl, context: TypeArgsContext): Unit = {
+    val builder = visitor.builder
     val marker = builder.mark()
-    val context = ctx.asInstanceOf[TypeArgsContext]
 
-    val isPattern: Boolean = if (visitor.isPattern.nonEmpty) visitor.isPattern.top else false
-
-    if (!isPattern) {
-      visitor.visitChildren(ctx)
+    if (!visitor.isPattern) {
+      visitor.visitChildren(context)
     }
     else {
       builder.advanceLexer() // ate '['

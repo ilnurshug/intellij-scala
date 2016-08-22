@@ -12,10 +12,10 @@ import org.jetbrains.plugins.scala.lang.parser.{ScalaElementTypes, ScalaLangVisi
 infixType         : compoundType (  id  Nl?  compoundType)*;
  */
 
-object InfixTypeVisitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
-    val builder: PsiBuilder = visitor.getBuilder
-    val context = ctx.asInstanceOf[InfixTypeContext]
+object InfixTypeVisitor extends VisitorHelper[InfixTypeContext] {
+
+  override def visit(visitor: ScalaLangVisitorImpl, context: InfixTypeContext): Unit = {
+    val builder: PsiBuilder = visitor.builder
 
     var typeIdx = 0
     val typeCount = context.compoundOrWildType().size()

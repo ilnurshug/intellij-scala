@@ -15,14 +15,13 @@ import scala.collection.mutable
 /**
   * Created by ilnur on 06.08.16.
   */
-class ScalaLangVisitorImpl(builder: PsiBuilder, language: Language, parser: Parser) extends ScalaLangBaseVisitor[Unit] {
+class ScalaLangVisitorImpl(language: Language, parser: Parser, val builder: PsiBuilder) extends ScalaLangBaseVisitor[Unit] {
 
-  def getBuilder = builder
+  private val converter: ANTLRParseTreeToPSIConverter = new ANTLRParseTreeToPSIConverter(language, parser, builder)
 
-  val converter: ANTLRParseTreeToPSIConverter = new ANTLRParseTreeToPSIConverter(language, parser, builder)
+  private var patternStack = 0
 
-  var isPattern: mutable.Stack[Boolean] = new mutable.Stack[Boolean]
-
+  def isPattern: Boolean = patternStack != 0
 
   override def visitTestRule(ctx: TestRuleContext): Unit = visit(ctx, ScalaElementTypes.BLOCK_EXPR)
 
@@ -103,9 +102,9 @@ class ScalaLangVisitorImpl(builder: PsiBuilder, language: Language, parser: Pars
   override def visitRefinement(ctx: RefinementContext): Unit = visit(ctx, ScalaElementTypes.REFINEMENT)
 
   override def visitTypePat(ctx: TypePatContext): Unit = {
-    isPattern.push(true)
+    patternStack += 1
     visit(ctx, ScalaElementTypes.TYPE_PATTERN)
-    isPattern.pop()
+    patternStack -= 1
   }
 
   override def visitSequenceArg(ctx: SequenceArgContext): Unit = visit(ctx, ScalaElementTypes.SEQUENCE_ARG)
@@ -372,12 +371,6 @@ class ScalaLangVisitorImpl(builder: PsiBuilder, language: Language, parser: Pars
 
   override def visitETag(ctx: ETagContext): Unit = visit(ctx, ScalaElementTypes.XML_END_TAG)
 
-  //override def visitContent(ctx: ContentContext): Unit = super.visitContent(ctx)
-
-  //override def visitContent1(ctx: Content1Context): Unit = super.visitContent1(ctx)
-
-  //override def visitXmlContent(ctx: XmlContentContext): Unit = super.visitXmlContent(ctx)
-
   override def visitComment(ctx: CommentContext): Unit = visit(ctx, ScalaElementTypes.XML_COMMENT)
 
   override def visitCDSect(ctx: CDSectContext): Unit = visit(ctx, ScalaElementTypes.XML_CD_SECT)
@@ -386,12 +379,6 @@ class ScalaLangVisitorImpl(builder: PsiBuilder, language: Language, parser: Pars
 
   override def visitXmlAttribute(ctx: XmlAttributeContext): Unit = visit(ctx, ScalaElementTypes.XML_ATTRIBUTE)
 
-  //override def visitAttValue(ctx: AttValueContext): Unit = super.visitAttValue(ctx)
-
-  //override def visitScalaExpr(ctx: ScalaExprContext): Unit = super.visitScalaExpr(ctx)
-
-  //override def visitCharData(ctx: CharDataContext): Unit = super.visitCharData(ctx)
-
   override def visitXmlPattern(ctx: XmlPatternContext): Unit = visit(ctx, ScalaElementTypes.XML_PATTERN)
 
   override def visitEmptyElemTagP(ctx: EmptyElemTagPContext): Unit = visit(ctx, ScalaElementTypes.XML_EMPTY_TAG)
@@ -399,12 +386,6 @@ class ScalaLangVisitorImpl(builder: PsiBuilder, language: Language, parser: Pars
   override def visitSTagP(ctx: STagPContext): Unit = visit(ctx, ScalaElementTypes.XML_START_TAG)
 
   override def visitETagP(ctx: ETagPContext): Unit = visit(ctx, ScalaElementTypes.XML_END_TAG)
-
-  //override def visitContentP(ctx: ContentPContext): Unit = super.visitContentP(ctx)
-
-  //override def visitContent1P(ctx: Content1PContext): Unit = super.visitContent1P(ctx)
-
-  //override def visitScalaPatterns(ctx: ScalaPatternsContext): Unit = super.visitScalaPatterns(ctx)
 
   override def visitXmlPatterns(ctx: XmlPatternsContext): Unit = visit(ctx, ScalaElementTypes.PATTERNS)
 

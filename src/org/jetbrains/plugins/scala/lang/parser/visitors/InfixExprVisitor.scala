@@ -12,10 +12,9 @@ import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils._
 infixExpr         : prefixExpr (id typeArgs? Nl? prefixExpr)* ;
  */
 
-object InfixExprVisitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
-    val builder = visitor.getBuilder
-    val context: InfixExprContext = ctx.asInstanceOf[InfixExprContext]
+object InfixExprVisitor extends VisitorHelper[InfixExprContext] {
+  override def visit(visitor: ScalaLangVisitorImpl, context: InfixExprContext): Unit = {
+    val builder = visitor.builder
 
     type MStack[X] = _root_.scala.collection.mutable.Stack[X]
 

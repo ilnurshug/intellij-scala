@@ -10,10 +10,9 @@ import org.jetbrains.plugins.scala.lang.parser.{ScalaElementTypes, ScalaLangVisi
 prefixExpr        : ('-' | '+' | '~' | '!')? simpleExpr ;
  */
 
-object PrefixExprVisitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
-    val builder = visitor.getBuilder
-    val context: PrefixExprContext = ctx.asInstanceOf[PrefixExprContext]
+object PrefixExprVisitor extends VisitorHelper[PrefixExprContext] {
+  override def visit(visitor: ScalaLangVisitorImpl, context: PrefixExprContext): Unit = {
+    val builder = visitor.builder
 
     builder.getTokenText match {
       case "-" | "+" | "~" | "!" =>
@@ -22,7 +21,6 @@ object PrefixExprVisitor extends VisitorHelper {
         builder.advanceLexer()
         refExpr.done(ScalaElementTypes.REFERENCE_EXPRESSION)
 
-        //SimpleExprVisitor.visit(visitor, builder, context.simpleExpr(), args)
         visitor.visitSimpleExpr(context.simpleExpr())
 
         prefixMarker.done(ScalaElementTypes.PREFIX_EXPR);

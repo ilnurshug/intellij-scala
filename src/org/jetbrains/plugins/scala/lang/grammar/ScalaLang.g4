@@ -105,8 +105,8 @@ int getOccurrenceCount(char c, int offset) {
     int prev = (offset == 1 ? -1 : offset - 1);
     //System.out.println(pos);
 
-    CustomPSITokenSource.CommonTokenAdaptor curToken = (CustomPSITokenSource.CommonTokenAdaptor)_input.LT(offset);
-    CustomPSITokenSource.CommonTokenAdaptor prevToken = (CustomPSITokenSource.CommonTokenAdaptor)_input.LT(prev);
+    CommonTokenAdaptor curToken = (CommonTokenAdaptor)_input.LT(offset);
+    CommonTokenAdaptor prevToken = (CommonTokenAdaptor)_input.LT(prev);
 
     if (curToken == null || prevToken == null) return 0;
 
@@ -140,7 +140,7 @@ int countNewlineBeforeToken(int offset) {
 
     int pos = builder.rawTokenIndex();
 
-    CustomPSITokenSource.CommonTokenAdaptor curToken = (CustomPSITokenSource.CommonTokenAdaptor)_input.LT(offset);
+    CommonTokenAdaptor curToken = (CommonTokenAdaptor)_input.LT(offset);
 
     if (curToken == null) return 0;
 
@@ -188,7 +188,7 @@ boolean equalTo(String s) {
 
 boolean lookAhead(IElementType... tokens) {
     for (int i = 0; i < tokens.length; i++) {
-        CustomPSITokenSource.CommonTokenAdaptor t = (CustomPSITokenSource.CommonTokenAdaptor)_input.LT(i + 1);
+        CommonTokenAdaptor t = (CommonTokenAdaptor)_input.LT(i + 1);
 
         if (t == null || t.getTokenType() != tokens[i]) return false;
     }
@@ -362,7 +362,7 @@ expr1Sub          : postfixExpr (
                       | ascription
                       | 'match'  '{'  caseClauses  '}'
                     )?;
-//-----------------------------------------------------------------------------
+
 exprInParen       : '(' {disableNewlines();} expr ')' {restoreNewlinesState();} ;
 
 ifStmt            : 'if'  exprInParen Nl*  expr ( (SEMICOLON | {isNl()}? emptyNl)?  'else'  expr)? ;
@@ -389,7 +389,7 @@ assignStmt        : postfixExpr '=' expr ;
 typedExprStmt     : postfixExpr  ascription ;
 
 matchStmt         : postfixExpr  'match'  '{' {enableNewlines();} caseClauses  '}' {restoreNewlinesState();} ;
-//-----------------------------------------------------------------------------
+
 postfixExpr       : infixExpr ( {!isNl()}? id  Nl?)? ;
 
 infixExpr         : prefixExpr subInfixExpr ;
@@ -401,8 +401,6 @@ subInfixExpr      : {!isNl()}? id typeArgs Nl? prefixExpr subInfixExpr
 prefixExpr        : ('-' | '+' | '~' | '!')? simpleExpr ;
 
 simpleExpr        : placeholderExpr
-                  //| newTemplate
-                  //| blockExpr
                   | simpleExpr1
                   ;
 
@@ -425,7 +423,6 @@ simpleExpr1       : literal
 exprs             : expr (  ','  expr)* ;
 
 argumentExprs     : '(' {disableNewlines();}  exprs?  ')' {restoreNewlinesState();}
-                  //| '(' {disableNewlines();} (exprs  ',' )? postfixExpr  ':' '_' '*' ')' {restoreNewlinesState();}
                   | {isSingleNlOrNone()}? blockExpr ;
                   
 blockExpr         : '{' {enableNewlines();} caseClauses  '}' {restoreNewlinesState();}
@@ -456,11 +453,10 @@ resultExpr        : bindings  '=>'  blockNode
 
 enumerators       : generator  ( ((SEMICOLON | {isNl()}? emptyNl)  enumerator | guard) )* ;
 
-enumerator        : generator // no enumerator
-                  | guard // no enumerator
-                  | 'val'? pattern1 '=' expr ; // enumerator
+enumerator        : generator
+                  | guard
+                  | 'val'? pattern1 '=' expr ;
 
-//generator         : pattern1  '<-'  expr ( semi?  guard |  semi  pattern1  '='  expr)* ;
 generator         : generatorNoGuard guard? ;
 
 generatorNoGuard  : pattern1  '<-'  expr ;
@@ -493,7 +489,7 @@ pattern3          : simplePattern subPattern3 ;
 
 subPattern3       : {!equalTo("|")}? id  {isSingleNlOrNone()}?  simplePattern subPattern3
                   | ;
-//-----------------------------------------------------------------------------
+
 simplePattern     : wildcardPattern
                   | tuplePattern
                   | {isVarId()}? referencePattern
@@ -530,7 +526,7 @@ patternArgsSub    : (pattern ( ','  pattern)*  ',' )? seqWildcard
 
 namingPattern2    : ('_' | ID)  '@'  seqWildcard ;
 
-//-----------------------------------------------------------------------------
+
 patterns          : patternSeq
                   | seqWildcard ;
 
@@ -674,12 +670,12 @@ def               : patternDefinition
                   | typeDefinition
                   | templateDefinition ;
 
-patternDefinition        : annotations modifiersOrEmpty 'val'  patDef ;
-variableDefinition       : annotations modifiersOrEmpty 'var'  varDef ;
-macroDefinition          : annotations modifiersOrEmpty 'def'  macroDef ;
-functionDefinition       : annotations modifiersOrEmpty 'def'  funDef ;
-typeDefinition           : annotations modifiersOrEmpty 'type'  Nl*  typeDef ;
-templateDefinition       : tmplDef ;
+patternDefinition : annotations modifiersOrEmpty 'val'  patDef ;
+variableDefinition: annotations modifiersOrEmpty 'var'  varDef ;
+macroDefinition   : annotations modifiersOrEmpty 'def'  macroDef ;
+functionDefinition: annotations modifiersOrEmpty 'def'  funDef ;
+typeDefinition    : annotations modifiersOrEmpty 'type'  Nl*  typeDef ;
+templateDefinition: tmplDef ;
                   
 patDef            : patternList (':'  type)?  '='  expr ;
 
@@ -744,7 +740,6 @@ annotTypeNoMultipleSQBrackets
                   : simpleTypeNoMultipleSQBrackets  annotationsNonEmpty? ;
 
 argumentExprsParen: '(' {disableNewlines();}  exprs?  ')' {restoreNewlinesState();}
-                  //| '('  (exprs  ',' )? postfixExpr  ':' '_' '*' ')'
                   ;
 
 earlyDefs         : '{' {enableNewlines();} (patVarDef ( (SEMICOLON | {isNl()}? emptyNl)  patVarDef )* )?  '}' {restoreNewlinesState();}  ;
@@ -794,70 +789,66 @@ id                : ID
                   | OP_3
                   | EPT
                   | TLD
-                  //| ASSIGN
-                  //| UNDER
-                  ;//| FUNTYPE;
+                  ;
 
-semi              :  SEMICOLON | Nl+ ;
+semi              : SEMICOLON | Nl+ ;
 
-xmlExpr           :    {disableNewlines();} xmlContent (element)* {restoreNewlinesState();} ;
+xmlExpr           : {disableNewlines();} xmlContent (element)* {restoreNewlinesState();} ;
 
-element           :    emptyElemTag
-                  |    sTag content eTag ;
+element           : emptyElemTag
+                  | sTag content eTag ;
 
-emptyElemTag      :    '<' XML_NAME (xmlAttribute)*  '/>' ;
+emptyElemTag      : '<' XML_NAME (xmlAttribute)*  '/>' ;
 
-sTag              :    '<' XML_NAME (xmlAttribute)*  '>' ;
+sTag              : '<' XML_NAME (xmlAttribute)*  '>' ;
 
-eTag              :    '</' XML_NAME '>' ;
+eTag              : '</' XML_NAME '>' ;
 
-content           :    charData? (content1 charData?)* ;
+content           : charData? (content1 charData?)* ;
 
-content1          :    xmlContent
-                  //|    xmlReference
-                  |    scalaExpr ;
+content1          : xmlContent
+                  | scalaExpr ;
 
-xmlContent        :    element
-                  |    cDSect
-                  |    pI
-                  |    comment ;
+xmlContent        : element
+                  | cDSect
+                  | pI
+                  | comment ;
 
-comment           :    '<!--' '-->' ; // ???
+comment           : '<!--' XML_COMMENT_CHARACTERS '-->' ;
 
-cDSect            :    '<![CDATA[' (XML_DATA_CHARACTERS | scalaExpr) ']]>' ;
+cDSect            : '<![CDATA[' (XML_DATA_CHARACTERS | scalaExpr) ']]>' ;
 
-pI                :    '<?' XML_NAME xmlAttribute* XML_TAG_CHARACTERS? '?>' ;
+pI                : '<?' XML_NAME xmlAttribute* XML_TAG_CHARACTERS? '?>' ;
 
-xmlAttribute      :    XML_NAME XML_EQ attValue ;
+xmlAttribute      : XML_NAME XML_EQ attValue ;
 
-attValue          :    XML_ATTRIBUTE_VALUE_START_DELIMITER (XML_ATTRIBUTE_VALUE_TOKEN | XML_CHAR_ENTITY_REF)* XML_ATTRIBUTE_VALUE_END_DELIMITER
-                  |    scalaExpr ;
+attValue          : XML_ATTRIBUTE_VALUE_START_DELIMITER (XML_ATTRIBUTE_VALUE_TOKEN | XML_CHAR_ENTITY_REF)* XML_ATTRIBUTE_VALUE_END_DELIMITER
+                  | scalaExpr ;
 
-scalaExpr         :    SCALA_IN_XML_INJECTION_START {enableNewlines();} blockNode ';'? SCALA_IN_XML_INJECTION_END {restoreNewlinesState();} ;
+scalaExpr         : SCALA_IN_XML_INJECTION_START {enableNewlines();} blockNode ';'? SCALA_IN_XML_INJECTION_END {restoreNewlinesState();} ;
 
-charData          :    XML_DATA_CHARACTERS | XML_CHAR_ENTITY_REF ;
+charData          : XML_DATA_CHARACTERS | XML_CHAR_ENTITY_REF ;
 
-xmlPattern        :    {disableNewlines();} emptyElemTagP {restoreNewlinesState();}
-                  |    {disableNewlines();} sTagP contentP eTagP {restoreNewlinesState();} ;
+xmlPattern        : {disableNewlines();} emptyElemTagP {restoreNewlinesState();}
+                  | {disableNewlines();} sTagP contentP eTagP {restoreNewlinesState();} ;
 
-emptyElemTagP     :    '<' XML_NAME '/>' ;
+emptyElemTagP     : '<' XML_NAME '/>' ;
 
-sTagP             :    '<' XML_NAME '>' ;
+sTagP             : '<' XML_NAME '>' ;
 
-eTagP             :    '</' XML_NAME '>' ;
+eTagP             : '</' XML_NAME '>' ;
 
-contentP          :    charData? (content1P charData?)* ;
+contentP          : charData? (content1P charData?)* ;
 
-content1P         :    cDSect
-                  |    comment
-                  |    pI
-                  //|    xmlReference
-                  |    scalaPatterns
-                  |    xmlPattern;
+content1P         : cDSect
+                  | comment
+                  | pI
+                  | scalaPatterns
+                  | xmlPattern;
 
-scalaPatterns     :    SCALA_IN_XML_INJECTION_START {enableNewlines();} xmlPatterns SCALA_IN_XML_INJECTION_END {restoreNewlinesState();} ;
+scalaPatterns     : SCALA_IN_XML_INJECTION_START {enableNewlines();} xmlPatterns SCALA_IN_XML_INJECTION_END {restoreNewlinesState();} ;
 
-xmlPatterns       :    patternArgsSub ;
+xmlPatterns       : patternArgsSub ;
 
 
 // Lexer
@@ -888,6 +879,7 @@ XML_TAG_CHARACTERS      : PrintableChar+;
 XML_ATTRIBUTE_VALUE_TOKEN
                         : PrintableChar+;
 XML_CHAR_ENTITY_REF     : PrintableChar+;
+XML_COMMENT_CHARACTERS  : PrintableChar+;
 
 
 VDASH           :  '|';

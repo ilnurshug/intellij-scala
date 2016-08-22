@@ -10,10 +10,9 @@ import org.jetbrains.plugins.scala.lang.parser.{ScalaElementTypes, ScalaLangVisi
 postfixExpr       : infixExpr ( id  Nl?)? ;
  */
 
-object PostfixExprVisitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
-    val context: PostfixExprContext = ctx.asInstanceOf[PostfixExprContext]
-    val builder = visitor.getBuilder
+object PostfixExprVisitor extends VisitorHelper[PostfixExprContext] {
+  override def visit(visitor: ScalaLangVisitorImpl, context: PostfixExprContext): Unit = {
+    val builder = visitor.builder
     if (context.id() == null) {
       visitor.visitChildren(context)
       return
@@ -21,7 +20,6 @@ object PostfixExprVisitor extends VisitorHelper {
 
     val postfixMarker = builder.mark
 
-    //InfixExprVisitor.visit(visitor, builder, context.infixExpr(), args)
     visitor.visitInfixExpr(context.infixExpr())
 
     val refMarker = builder.mark

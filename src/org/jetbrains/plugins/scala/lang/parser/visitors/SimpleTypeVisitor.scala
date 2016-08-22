@@ -17,10 +17,9 @@ simpleTypeSub     : stableIdRef
                   | '('  types ','? ')';
  */
 
-object SimpleTypeVisitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
-    val context = ctx.asInstanceOf[SimpleTypeContext]
-    val builder = visitor.getBuilder
+object SimpleTypeVisitor extends VisitorHelper[SimpleTypeContext] {
+  override def visit(visitor: ScalaLangVisitorImpl, context: SimpleTypeContext): Unit = {
+    val builder = visitor.builder
 
     val marker = builder.mark()
 
@@ -38,10 +37,9 @@ object SimpleTypeVisitor extends VisitorHelper {
   }
 }
 
-object SimpleTypeSubVisitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
-    val context = ctx.asInstanceOf[SimpleTypeSubContext]
-    val builder = visitor.getBuilder
+object SimpleTypeSubVisitor extends VisitorHelper[SimpleTypeSubContext] {
+  override def visit(visitor: ScalaLangVisitorImpl, context: SimpleTypeSubContext): Unit = {
+    val builder = visitor.builder
 
     val marker = builder.mark()
 
@@ -61,10 +59,9 @@ object SimpleTypeSubVisitor extends VisitorHelper {
   }
 }
 
-object SimpleTypeNoMultipleSQBracketsVisitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
-    val context = ctx.asInstanceOf[SimpleTypeNoMultipleSQBracketsContext]
-    val builder = visitor.getBuilder
+object SimpleTypeNoMultipleSQBracketsVisitor extends VisitorHelper[SimpleTypeNoMultipleSQBracketsContext] {
+  override def visit(visitor: ScalaLangVisitorImpl, context: SimpleTypeNoMultipleSQBracketsContext): Unit = {
+    val builder = visitor.builder
 
     // simpleTypeNoMultipleSQBrackets '#' id typeArgs
     if (context.id() != null && context.typeArgs() != null) {
@@ -85,7 +82,7 @@ object SimpleTypeNoMultipleSQBracketsVisitor extends VisitorHelper {
     else {
       val marker = builder.mark()
 
-      visitor.visitChildren(ctx)
+      visitor.visitChildren(context)
 
       if (context.typeArgs() != null) {
         marker.done(ScalaElementTypes.TYPE_GENERIC_CALL)

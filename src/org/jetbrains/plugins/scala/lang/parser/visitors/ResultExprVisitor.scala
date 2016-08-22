@@ -12,10 +12,9 @@ resultExpr        : bindings  '=>'  blockNode
                   | ('implicit'?  id | '_')  ':'  paramType '=>'  blockNode ;
  */
 
-object ResultExprVisitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
-    val context = ctx.asInstanceOf[ResultExprContext]
-    val builder = visitor.getBuilder
+object ResultExprVisitor extends VisitorHelper[ResultExprContext] {
+  override def visit(visitor: ScalaLangVisitorImpl, context: ResultExprContext): Unit = {
+    val builder = visitor.builder
 
     val resultMarker = builder.mark
     val backupMarker = builder.mark
@@ -40,7 +39,7 @@ object ResultExprVisitor extends VisitorHelper {
       if (ScalaTokenTypes.tCOLON == builder.getTokenType) {
         builder.advanceLexer() // ate ':'
         val pt = builder.mark
-        //`type`.parse(builder, isPattern = false)
+        //`type`.parse(builder, patternStack = false)
         visitor.visitCompoundType(context.compoundType())
         pt.done(ScalaElementTypes.PARAM_TYPE)
       }

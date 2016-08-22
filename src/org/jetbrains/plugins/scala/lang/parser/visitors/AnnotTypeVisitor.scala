@@ -5,12 +5,12 @@ import scala.collection.mutable
 import org.antlr.v4.runtime.ParserRuleContext
 import org.jetbrains.plugins.scala.lang.ScalaLangParser.{AnnotTypeContext, AnnotTypeNoMultipleSQBracketsContext}
 import org.jetbrains.plugins.scala.lang.parser.{ScalaElementTypes, ScalaLangVisitorImpl}
-object AnnotTypeVisitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
-    val context = ctx.asInstanceOf[AnnotTypeContext]
-    val marker = visitor.getBuilder.mark()
+object AnnotTypeVisitor extends VisitorHelper[AnnotTypeContext] {
 
-    visitor.visitChildren(ctx)
+  override def visit(visitor: ScalaLangVisitorImpl, context: AnnotTypeContext): Unit = {
+    val marker = visitor.builder.mark()
+
+    visitor.visitChildren(context)
 
     if (context.annotationsNonEmpty() != null)
       marker.done(ScalaElementTypes.ANNOT_TYPE)
@@ -20,12 +20,12 @@ object AnnotTypeVisitor extends VisitorHelper {
 }
 
 
-object AnnotTypeNoMultipleSQBracketsVisitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
-    val context = ctx.asInstanceOf[AnnotTypeNoMultipleSQBracketsContext]
-    val marker = visitor.getBuilder.mark()
+object AnnotTypeNoMultipleSQBracketsVisitor extends VisitorHelper[AnnotTypeNoMultipleSQBracketsContext] {
 
-    visitor.visitChildren(ctx)
+  override def visit(visitor: ScalaLangVisitorImpl, context: AnnotTypeNoMultipleSQBracketsContext): Unit = {
+    val marker = visitor.builder.mark()
+
+    visitor.visitChildren(context)
 
     if (context.annotationsNonEmpty() != null)
       marker.done(ScalaElementTypes.ANNOT_TYPE)

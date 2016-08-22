@@ -5,10 +5,9 @@ import scala.collection.mutable
 import org.antlr.v4.runtime.ParserRuleContext
 import org.jetbrains.plugins.scala.lang.ScalaLangParser.ConstrExprContext
 import org.jetbrains.plugins.scala.lang.parser.{ScalaElementTypes, ScalaLangVisitorImpl}
-object ConstrExprVisitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
-    val context = ctx.asInstanceOf[ConstrExprContext]
-    val builder = visitor.getBuilder
+object ConstrExprVisitor extends VisitorHelper[ConstrExprContext] {
+  override def visit(visitor: ScalaLangVisitorImpl, context: ConstrExprContext): Unit = {
+    val builder = visitor.builder
     val marker = builder.mark()
 
     if (context.selfInvocation() != null) {

@@ -5,10 +5,9 @@ import scala.collection.mutable
 import org.antlr.v4.runtime.ParserRuleContext
 import org.jetbrains.plugins.scala.lang.ScalaLangParser.Pattern3Context
 import org.jetbrains.plugins.scala.lang.parser.{ErrMsg, ScalaElementTypes, ScalaLangVisitorImpl}
-object Pattern3Visitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
-    val context = ctx.asInstanceOf[Pattern3Context]
-    val builder = visitor.getBuilder
+object Pattern3Visitor extends VisitorHelper[Pattern3Context] {
+  override def visit(visitor: ScalaLangVisitorImpl, context: Pattern3Context): Unit = {
+    val builder = visitor.builder
 
 
     type Stack[X] = _root_.scala.collection.mutable.Stack[X]

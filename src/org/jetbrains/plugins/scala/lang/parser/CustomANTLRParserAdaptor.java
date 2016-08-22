@@ -2,20 +2,12 @@ package org.jetbrains.plugins.scala.lang.parser;
 
 import com.intellij.lang.*;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Key;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.tree.TokenSet;
-import com.intellij.util.diff.FlyweightCapableTreeStructure;
 import org.antlr.jetbrains.adaptor.parser.ANTLRParserAdaptor;
 import org.antlr.jetbrains.adaptor.parser.ErrorStrategyAdaptor;
 import org.antlr.jetbrains.adaptor.parser.SyntaxErrorListener;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.plugins.scala.lang.ScalaLangParser;
-import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes;
 import org.jetbrains.plugins.scala.lang.parser.ScalaLangVisitorImpl;
 
 /**
@@ -58,7 +50,7 @@ public abstract class CustomANTLRParserAdaptor extends ANTLRParserAdaptor {
 
         //ParseTreeWalker.DEFAULT.walk(listener, parseTree);
         //long millis = System.currentTimeMillis();
-        ScalaLangVisitorImpl visitor = new ScalaLangVisitorImpl(builder, language, parser);
+        ScalaLangVisitorImpl visitor = new ScalaLangVisitorImpl(language, parser, builder);
         visitor.visit(parseTree);
         //System.out.println(System.currentTimeMillis()- millis);
 

@@ -22,9 +22,8 @@ simpleExpr1       : literal
 
  */
 
-object SimpleExpr1Visitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
-    val context: SimpleExpr1Context = ctx.asInstanceOf[SimpleExpr1Context]
+object SimpleExpr1Visitor extends VisitorHelper[SimpleExpr1Context] {
+  override def visit(visitor: ScalaLangVisitorImpl, context: SimpleExpr1Context): Unit = {
 
     if (context.pathRefExpr() != null) {
       //PathVisitor.visit(visitor, builder, context.path(), args)
@@ -32,14 +31,14 @@ object SimpleExpr1Visitor extends VisitorHelper {
       return
     }
 
-    val marker = visitor.getBuilder.mark()
+    val marker = visitor.builder.mark()
 
-    val idx: Int = getTerminalNodeIndexByText(context, "_")
+    val idx: Int = VisitorHelper.getTerminalNodeIndexByText(context, "_")
     idx match {
       case -1 =>    // not found
-        visitor.visitChildren(ctx)
+        visitor.visitChildren(context)
       case _ =>     // found
-        val phmarker = visitor.getBuilder.mark()
+        val phmarker = visitor.builder.mark()
         var i:Int = 0
         while (i <= idx) {
           context.getChild(i).accept(visitor)
@@ -52,41 +51,40 @@ object SimpleExpr1Visitor extends VisitorHelper {
         }
     }
 
-    val childCount:Int = ctx.getChildCount
+    val childCount:Int = context.getChildCount
     if (childCount > 1) {
-      if (ctx.getChild(childCount - 1).isInstanceOf[RuleNode]) {
-        val lastChild = ctx.getChild(childCount - 1).asInstanceOf[RuleNode]
-        val r: Int = lastChild.getRuleContext.getRuleIndex
+      context.getChild(childCount - 1) match {
+        case lastChild: RuleNode =>
+          val r: Int = lastChild.getRuleContext.getRuleIndex
 
-        r match {
-          case  ScalaLangParser.`RULE_argumentExprs` =>
-            marker.done (ScalaElementTypes.METHOD_CALL)
-          case ScalaLangParser.`RULE_typeArgs` =>
-            marker.done (ScalaElementTypes.GENERIC_CALL)
-          case ScalaLangParser.`RULE_id` =>
-            if (hasTerminalNode (ctx, ".")) marker.done (ScalaElementTypes.REFERENCE_EXPRESSION)
-            else marker.drop()
-          case _ =>
-            marker.drop ()
-        }
-      }
-      else {
-        val lastChild = ctx.getChild(childCount - 1).asInstanceOf[TerminalNode]
-        val t: Int = lastChild.getSymbol.getType
-        if (t == ScalaLangParser.`RPARENTHESIS`) {
-          if (context.exprs() != null) {
-            if (hasTerminalNode(ctx, ",") || context.exprs().getChildCount > 1) {
-              marker.done(ScalaElementTypes.TUPLE)
+          r match {
+            case  ScalaLangParser.`RULE_argumentExprs` =>
+              marker.done (ScalaElementTypes.METHOD_CALL)
+            case ScalaLangParser.`RULE_typeArgs` =>
+              marker.done (ScalaElementTypes.GENERIC_CALL)
+            case ScalaLangParser.`RULE_id` =>
+              if (VisitorHelper.hasTerminalNode (context, ".")) marker.done (ScalaElementTypes.REFERENCE_EXPRESSION)
+              else marker.drop()
+            case _ =>
+              marker.drop ()
+          }
+        case lastChild: TerminalNode =>
+          val t: Int = lastChild.getSymbol.getType
+
+          if (t == ScalaLangParser.`RPARENTHESIS`) {
+            if (context.exprs() != null) {
+              if (VisitorHelper.hasTerminalNode(context, ",") || context.exprs().getChildCount > 1) {
+                marker.done(ScalaElementTypes.TUPLE)
+              }
+              else {
+                marker.done(ScalaElementTypes.PARENT_EXPR)
+              }
             }
             else {
-              marker.done(ScalaElementTypes.PARENT_EXPR)
+              marker.done(ScalaElementTypes.UNIT_EXPR)
             }
           }
-          else {
-            marker.done(ScalaElementTypes.UNIT_EXPR)
-          }
-        }
-        else marker.drop()
+          else marker.drop()
       }
     }
     else {

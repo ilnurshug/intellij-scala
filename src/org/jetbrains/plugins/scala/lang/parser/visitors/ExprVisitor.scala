@@ -12,10 +12,9 @@ expr              : (bindings | id | '_')  '=>'  expr
                   | expr1 ;
  */
 
-object ExprVisitor extends VisitorHelper {
-  override def visit(visitor: ScalaLangVisitorImpl, ctx: ParserRuleContext): Unit = {
-    val context: ExprContext = ctx.asInstanceOf[ExprContext]
-    val builder = visitor.getBuilder
+object ExprVisitor extends VisitorHelper[ExprContext] {
+  override def visit(visitor: ScalaLangVisitorImpl, context: ExprContext): Unit = {
+    val builder = visitor.builder
 
     if (context.expr1() != null) {
       visitor.visitExpr1(context.expr1())
