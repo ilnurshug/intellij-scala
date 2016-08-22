@@ -316,6 +316,6 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testExperiment4(): Unit = {
-    doTest("def a(){}; def b(){} \n\n def c(){}", "block")
+    doTest("1 + /*\n\n*/\n2")
   }
 }

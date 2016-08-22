@@ -43,6 +43,7 @@ import org.jetbrains.plugins.scala.lang.parser.*;
 import org.antlr.jetbrains.adaptor.lexer.*;
 import java.util.*;
 import com.intellij.lang.PsiBuilder;
+import org.jetbrains.plugins.scala.lang.*;
 }
 
 @parser::members {
@@ -102,7 +103,7 @@ int getOccurrenceCount(char c, int offset) {
     int pos = builder.rawTokenIndex();
 
     int prev = (offset == 1 ? -1 : offset - 1);
-    System.out.println(pos);
+    //System.out.println(pos);
 
     CustomPSITokenSource.CommonTokenAdaptor curToken = (CustomPSITokenSource.CommonTokenAdaptor)_input.LT(offset);
     CustomPSITokenSource.CommonTokenAdaptor prevToken = (CustomPSITokenSource.CommonTokenAdaptor)_input.LT(prev);
@@ -112,7 +113,7 @@ int getOccurrenceCount(char c, int offset) {
     int prevTokenStart = prevToken.rawTokenIndex();
     int curTokenStart = curToken.rawTokenIndex();
 
-    System.out.println(originalText.substring(prevToken.getStartIndex(), curToken.getStartIndex()));
+    //System.out.println(originalText.substring(prevToken.getStartIndex(), curToken.getStartIndex()));
 
     int firstPos = (prevTokenStart < pos ? prevTokenStart - pos : pos - prevTokenStart);
     int count = 0;
@@ -126,7 +127,7 @@ int getOccurrenceCount(char c, int offset) {
 
         String substr = originalText.substring(start, end);
 
-        System.out.println(substr);
+        //System.out.println(substr);
 
         count += StringUtil.getOccurrenceCount(substr, c);
     }
@@ -135,9 +136,35 @@ int getOccurrenceCount(char c, int offset) {
 }
 
 int countNewlineBeforeToken(int offset) {
-    if (!newlinesEnabled.isEmpty() && !newlinesEnabled.peek()) return 0;
+    if (builder == null || !newlinesEnabled.isEmpty() && !newlinesEnabled.peek()) return 0;
 
-    return getOccurrenceCount('\n', offset);
+    int pos = builder.rawTokenIndex();
+
+    CustomPSITokenSource.CommonTokenAdaptor curToken = (CustomPSITokenSource.CommonTokenAdaptor)_input.LT(offset);
+
+    if (curToken == null) return 0;
+
+    int curTokenStart = curToken.rawTokenIndex();
+
+    int firstPos = (curTokenStart < pos ? curTokenStart - pos : pos - curTokenStart);
+    int i = 1;
+    while (i < curTokenStart && TokenSets.WHITESPACE_OR_COMMENT_SET().contains(builder.rawLookup(firstPos - i)))
+        i += 1;
+
+    String textBefore = originalText.substring(builder.rawTokenTypeStart(firstPos - i + 1), builder.rawTokenTypeStart(firstPos));
+    if (!textBefore.contains("\n")) return 0;
+    String[] lines = ("start " + textBefore + " end").split("\n");
+
+    boolean exists = false;
+
+    for (i = 0; i < lines.length && !exists; i++) {
+        boolean f = true;
+        for (int j = 0; j < lines[i].length(); j++)
+            f &= StringUtil.isWhiteSpace(lines[i].charAt(j));
+        exists = exists || f;
+    }
+
+    return (exists ? 2 : 1);
 }
 
 boolean isSingleNl() {
