@@ -428,7 +428,7 @@ exprs             : expr (  ','  expr)* ;
 
 argumentExprs     : '(' {disableNewlines();}  exprs?  ')' {restoreNewlinesState();}
                   //| '(' {disableNewlines();} (exprs  ',' )? postfixExpr  ':' '_' '*' ')' {restoreNewlinesState();}
-                  | Nl?  blockExpr ;
+                  | {isSingleNlOrNone()}? blockExpr ;
                   
 blockExpr         : '{' {enableNewlines();} caseClauses  '}' {restoreNewlinesState();}
                   | '{' {enableNewlines();} block  '}' {restoreNewlinesState();} ;
