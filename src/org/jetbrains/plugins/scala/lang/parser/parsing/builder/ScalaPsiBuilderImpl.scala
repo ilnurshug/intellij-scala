@@ -32,6 +32,8 @@ class ScalaPsiBuilderImpl(builder: PsiBuilder)
     */
   private def countNewlineBeforeCurrentToken(): Int = {
     if (newlinesEnabled.nonEmpty && !newlinesEnabled.top) return 0
+    if (builder.eof) return 0
+    if (!ParserUtils.elementCanStartStatement(builder.getTokenType, builder.asInstanceOf[ScalaPsiBuilder])) return 0
 
     ScalaPsiBuilderImpl.countNewlineBeforeCurrentToken(this)
   }
@@ -55,7 +57,6 @@ class ScalaPsiBuilderImpl(builder: PsiBuilder)
 object ScalaPsiBuilderImpl {
   def countNewlineBeforeCurrentToken(builder: PsiBuilder): Int = {
     if (builder.eof) return 0
-    if (!ParserUtils.elementCanStartStatement(builder.getTokenType, builder.asInstanceOf[ScalaPsiBuilder])) return 0
 
     var i = 1
     while (i < builder.getCurrentOffset && TokenSets.WHITESPACE_OR_COMMENT_SET.contains(builder.rawLookup(-i))) i += 1

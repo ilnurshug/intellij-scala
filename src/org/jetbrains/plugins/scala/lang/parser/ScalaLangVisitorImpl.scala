@@ -8,6 +8,7 @@ import org.antlr.v4.runtime.{ANTLRErrorListener, Parser, ParserRuleContext}
 import org.antlr.v4.runtime.tree.{ErrorNode, RuleNode, TerminalNode}
 import org.jetbrains.plugins.scala.lang.ScalaLangBaseVisitor
 import org.jetbrains.plugins.scala.lang.ScalaLangParser._
+import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.visitors._
 
 import scala.collection.mutable
@@ -385,7 +386,13 @@ class ScalaLangVisitorImpl(language: Language, parser: Parser, val builder: PsiB
     }
   }
 
-  override def visitTerminal(node: TerminalNode): Unit = builder.advanceLexer()
+  override def visitTerminal(node: TerminalNode): Unit = {
+    node.getSymbol.asInstanceOf[CommonTokenAdaptor].getTokenType match {
+      case ScalaTokenTypes.tWHITE_SPACE_IN_LINE => ()
+      case _ => builder.advanceLexer()
+    }
+  }
+
 
   override def visitErrorNode(node: ErrorNode): Unit = {
     converter.visitErrorNode(node)
