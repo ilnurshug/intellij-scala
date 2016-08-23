@@ -319,4 +319,26 @@ class ScalaLangParserTest extends SimpleTestCase
   def testExperiment4(): Unit = {
     doTest("1 +[Int] /*\n\n*/\n2")
   }
+
+  def testExperiment5(): Unit = {
+    ScalaParserDefinition.omitWhitespaces = false
+
+    val s = "a \n b \n\n c"
+    doTest(s, "testNlRule")
+
+    val parserDefinition = new ScalaParserDefinition()
+
+    val tmp = PsiBuilderFactory.getInstance.createBuilder(parserDefinition, new ScalaLexer(), s)
+    val builder: ScalaPsiBuilderImpl = new ScalaPsiBuilderImpl(tmp)
+
+    while(!builder.eof()) {
+      print(builder.getTokenType.toString)
+
+      if (builder.getTokenText.contains("\n")) println(1)
+      else println()
+
+      builder.advanceLexer()
+    }
+    assert(true)
+  }
 }

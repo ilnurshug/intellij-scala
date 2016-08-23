@@ -203,6 +203,8 @@ emptyNl           :  ;
 
 testRule2         : {lookAhead(ScalaTokenTypes.kTHIS) && !lookAhead(ScalaTokenTypes.kTHIS, ScalaTokenTypes.tDOT)}? thisReference;
 
+testNlRule        : id (Nl+ id)+ ;
+
 program           : blockExpr
                   | selfType?  templateStatSeq    // for debug purposes
                   | compilationUnit

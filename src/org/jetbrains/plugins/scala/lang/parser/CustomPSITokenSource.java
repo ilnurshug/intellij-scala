@@ -2,6 +2,7 @@ package org.jetbrains.plugins.scala.lang.parser;
 
 import com.intellij.lang.PsiBuilder;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.containers.HashMap;
 import org.antlr.jetbrains.adaptor.lexer.PSITokenSource;
@@ -18,6 +19,8 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaXmlTokenTypes;
 public class CustomPSITokenSource extends PSITokenSource {
 
     private final HashMap<IElementType, Integer> map = new HashMap<IElementType, Integer>();
+    private int nlCount = 0;
+    private CommonTokenAdaptor lastNlToken = null;
 
     public CustomPSITokenSource(PsiBuilder builder) {
         super(builder);
@@ -124,16 +127,39 @@ public class CustomPSITokenSource extends PSITokenSource {
     public Token nextToken() {
         ProgressIndicatorProvider.checkCanceled();
 
-        int type = convertScalaTokenTypeToInt(builder.getTokenType(), builder.getTokenText());
-        int index = builder.rawTokenIndex();
-        return new CommonTokenAdaptor((CommonToken) nextTokenHelper(type), builder.getTokenType(), index);
+        if (nlCount == 0) {
+            int type = convertScalaTokenTypeToInt(builder.getTokenType(), builder.getTokenText());
+            int index = builder.rawTokenIndex();
+            CommonTokenAdaptor t = new CommonTokenAdaptor((CommonToken) nextTokenHelper(type), builder.getTokenType(), index);
+
+            if (type == ScalaLangParser.Nl && nlCount > 0) {
+                lastNlToken = t;
+            }
+            else {
+                lastNlToken = null;
+            }
+
+            return t;
+        }
+        else {
+            nlCount--;
+            return lastNlToken;
+        }
     }
 
     private int convertScalaTokenTypeToInt(IElementType t, String tokenText) {
         if (t == null) return Token.EOF;
         else if (t == ScalaTokenTypes.tWHITE_SPACE_IN_LINE) {
-            if (tokenText.contains("\n")) return ScalaLangParser.Nl;
-            else return ScalaLangParser.WHITE_SPACE_IN_LINE;
+            int c = StringUtil.getOccurrenceCount(tokenText, '\n');
+
+            if (c > 0) {
+                nlCount += c - 1;
+                return ScalaLangParser.Nl;
+            }
+            else {
+                // this statement should be unreachable
+                return ScalaLangParser.WHITE_SPACE_IN_LINE;
+            }
         }
         else if (t == ScalaTokenTypes.tIDENTIFIER || t == ScalaTokenTypes.tINTERPOLATED_STRING_ID) return identifierTextToTokenType(tokenText);
         else {

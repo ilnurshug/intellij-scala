@@ -19,7 +19,7 @@ public abstract class CustomANTLRParserAdaptor extends ANTLRParserAdaptor {
     protected ASTNode parse(PsiBuilder builder, IElementType root, boolean buildTree) {
         ProgressIndicatorProvider.checkCanceled();
 
-        builder = new PsiBuilderAdaptor(builder);
+        //builder = new PsiBuilderAdaptor(builder);
 
         TokenSource source = new CustomPSITokenSource(builder);
 
@@ -35,8 +35,8 @@ public abstract class CustomANTLRParserAdaptor extends ANTLRParserAdaptor {
             parseTree = parse(parser, root);
             System.out.println(System.currentTimeMillis()- millis);
 
-            //ParseTreeToDot conv = new ParseTreeToDot();
-            //System.out.println(conv.convert(parseTree));
+            ParseTreeToDot conv = new ParseTreeToDot();
+            System.out.println(conv.convert(parseTree));
         }
         finally {
             rollbackMarker.rollbackTo();
@@ -47,6 +47,8 @@ public abstract class CustomANTLRParserAdaptor extends ANTLRParserAdaptor {
 
         //ParseTreeWalker.DEFAULT.walk(listener, parseTree);
         //long millis = System.currentTimeMillis();
+
+
         ScalaLangVisitorImpl visitor = new ScalaLangVisitorImpl(language, parser, builder);
         visitor.visit(parseTree);
         //System.out.println(System.currentTimeMillis()- millis);
