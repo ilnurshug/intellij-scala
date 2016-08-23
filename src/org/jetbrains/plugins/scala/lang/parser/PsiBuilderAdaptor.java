@@ -24,7 +24,7 @@ public class PsiBuilderAdaptor implements PsiBuilder {
         builder.advanceLexer();
         // данный код необходим только если в ParserDefinition в качестве WS
         // используется пустой TokenSet
-        while (true) {
+        /*while (true) {
             IElementType tokenType = builder.getTokenType();
 
             if (tokenType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE) {
@@ -36,7 +36,7 @@ public class PsiBuilderAdaptor implements PsiBuilder {
             } else {
                 break;
             }
-        }
+        }*/
 
         //System.out.println("after " + builder.getTokenText());
         //return;

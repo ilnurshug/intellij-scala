@@ -54,10 +54,10 @@ public class PSITokenSource implements TokenSource {
 
 		TokenIElementType ideaTType = (TokenIElementType)builder.getTokenType();
 		int type = ideaTType!=null ? ideaTType.getANTLRTokenType() : Token.EOF;
-		return nextTokenHelper(type);
+		return nextTokenHelper(type, true);
 	}
 
-	protected Token nextTokenHelper(int type) {
+	protected Token nextTokenHelper(int type, boolean advance) {
 		int channel = Token.DEFAULT_CHANNEL;
 		Pair<TokenSource, CharStream> source = new Pair<TokenSource, CharStream>(this, null);
 		String text = builder.getTokenText();
@@ -68,7 +68,7 @@ public class PSITokenSource implements TokenSource {
 		int line = 0;
 		int charPositionInLine = 0;
 		Token t = tokenFactory.create(source, type, text, channel, start, stop, line, charPositionInLine);
-		builder.advanceLexer();
+		if (advance) builder.advanceLexer();
 //		System.out.println("TOKEN: "+t);
 		return t;
 	}

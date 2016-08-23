@@ -49,8 +49,9 @@ class ScalaParserDefinition extends ScalaParserDefinitionWrapper {
     if (ScalaParserDefinition.useOldParser)
       whitespacesTokenSet
     else {
-      if (ScalaParserDefinition.omitWhitespaces) whitespacesTokenSet
-      else TokenSet.EMPTY
+      //if (ScalaParserDefinition.omitWhitespaces) whitespacesTokenSet
+      //else TokenSet.EMPTY
+      whitespacesTokenSet
     }
   }
 

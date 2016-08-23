@@ -32,16 +32,8 @@ class ScalaPsiBuilderImpl(builder: PsiBuilder)
     */
   private def countNewlineBeforeCurrentToken(): Int = {
     if (newlinesEnabled.nonEmpty && !newlinesEnabled.top) return 0
-    if (eof) return 0
-    if (!ParserUtils.elementCanStartStatement(getTokenType, this)) return 0
 
-    var i = 1
-    while (i < getCurrentOffset && TokenSets.WHITESPACE_OR_COMMENT_SET.contains(rawLookup(-i))) i += 1
-    val textBefore = getOriginalText.subSequence(rawTokenTypeStart(-i + 1), rawTokenTypeStart(0)).toString
-    if (!textBefore.contains('\n')) return 0
-    val lines = s"start $textBefore end".split('\n')
-    if (lines.exists(_.forall(StringUtil.isWhiteSpace))) 2
-    else 1
+    ScalaPsiBuilderImpl.countNewlineBeforeCurrentToken(this)
   }
 
   def isNewlinesEnabled: Boolean = newlinesEnabled.isEmpty || newlinesEnabled.top
@@ -57,5 +49,20 @@ class ScalaPsiBuilderImpl(builder: PsiBuilder)
   def restoreNewlinesState {
     assert(newlinesEnabled.nonEmpty)
     newlinesEnabled.pop()
+  }
+}
+
+object ScalaPsiBuilderImpl {
+  def countNewlineBeforeCurrentToken(builder: PsiBuilder): Int = {
+    if (builder.eof) return 0
+    if (!ParserUtils.elementCanStartStatement(builder.getTokenType, builder.asInstanceOf[ScalaPsiBuilder])) return 0
+
+    var i = 1
+    while (i < builder.getCurrentOffset && TokenSets.WHITESPACE_OR_COMMENT_SET.contains(builder.rawLookup(-i))) i += 1
+    val textBefore = builder.getOriginalText.subSequence(builder.rawTokenTypeStart(-i + 1), builder.rawTokenTypeStart(0)).toString
+    if (!textBefore.contains('\n')) return 0
+    val lines = s"start $textBefore end".split('\n')
+    if (lines.exists(_.forall(StringUtil.isWhiteSpace))) 2
+    else 1
   }
 }

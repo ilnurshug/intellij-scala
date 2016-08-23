@@ -15,11 +15,13 @@ import org.jetbrains.plugins.scala.lang.ScalaLangParser;
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes;
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypesEx;
 import org.jetbrains.plugins.scala.lang.lexer.ScalaXmlTokenTypes;
+import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilderImpl$;
 
 public class CustomPSITokenSource extends PSITokenSource {
 
     private final HashMap<IElementType, Integer> map = new HashMap<IElementType, Integer>();
     private int nlCount = 0;
+    private boolean advance = false;
     private CommonTokenAdaptor lastNlToken = null;
 
     public CustomPSITokenSource(PsiBuilder builder) {
@@ -127,40 +129,39 @@ public class CustomPSITokenSource extends PSITokenSource {
     public Token nextToken() {
         ProgressIndicatorProvider.checkCanceled();
 
-        if (nlCount == 0) {
+        if (ScalaParserDefinition$.MODULE$.omitWhitespaces()) {
             int type = convertScalaTokenTypeToInt(builder.getTokenType(), builder.getTokenText());
             int index = builder.rawTokenIndex();
-            CommonTokenAdaptor t = new CommonTokenAdaptor((CommonToken) nextTokenHelper(type), builder.getTokenType(), index);
-
-            if (type == ScalaLangParser.Nl && nlCount > 0) {
-                lastNlToken = t;
-            }
-            else {
-                lastNlToken = null;
-            }
-
-            return t;
+            return new CommonTokenAdaptor((CommonToken) nextTokenHelper(type, true), builder.getTokenType(), index);
         }
         else {
-            nlCount--;
-            return lastNlToken;
+            if (nlCount == 0) {
+                int count = advance ? 0 : ScalaPsiBuilderImpl$.MODULE$.countNewlineBeforeCurrentToken(builder);
+
+                if (count == 0) {
+                    advance = false;
+
+                    int type = convertScalaTokenTypeToInt(builder.getTokenType(), builder.getTokenText());
+                    int index = builder.rawTokenIndex();
+                    return new CommonTokenAdaptor((CommonToken) nextTokenHelper(type, true), builder.getTokenType(), index);
+                } else {
+                    nlCount = count - 1;
+                    advance = true;
+
+                    int type = ScalaLangParser.Nl;
+                    int index = builder.rawTokenIndex() - 1;
+                    lastNlToken = new CommonTokenAdaptor((CommonToken) nextTokenHelper(type, false), ScalaTokenTypes.tWHITE_SPACE_IN_LINE, index);
+                    return lastNlToken;
+                }
+            } else {
+                nlCount--;
+                return lastNlToken;
+            }
         }
     }
 
     private int convertScalaTokenTypeToInt(IElementType t, String tokenText) {
         if (t == null) return Token.EOF;
-        else if (t == ScalaTokenTypes.tWHITE_SPACE_IN_LINE) {
-            int c = StringUtil.getOccurrenceCount(tokenText, '\n');
-
-            if (c > 0) {
-                nlCount += c - 1;
-                return ScalaLangParser.Nl;
-            }
-            else {
-                // this statement should be unreachable
-                return ScalaLangParser.WHITE_SPACE_IN_LINE;
-            }
-        }
         else if (t == ScalaTokenTypes.tIDENTIFIER || t == ScalaTokenTypes.tINTERPOLATED_STRING_ID) return identifierTextToTokenType(tokenText);
         else {
             if (map.containsKey(t)) return map.get(t);
