@@ -33,8 +33,8 @@ public abstract class CustomANTLRParserAdaptor extends ANTLRParserAdaptor {
             parseTree = parse(parser, root);
             System.out.println(System.currentTimeMillis()- millis);
 
-            //ParseTreeToDot conv = new ParseTreeToDot();
-            //System.out.println(conv.convert(parseTree));
+            ParseTreeToDot conv = new ParseTreeToDot();
+            System.out.println(conv.convert(parseTree));
         }
         finally {
             rollbackMarker.rollbackTo();

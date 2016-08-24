@@ -91,7 +91,7 @@ stableIdRefExpr   :  stableIdRefExpr Nl* '.' Nl* id
                   |  superReference Nl* '.' Nl* id
                   |  id ;
 
-superReference    : (reference Nl* '.')? Nl* 'super' Nl* (classQualifier)? ;
+superReference    : (reference Nl* '.' Nl*)? 'super' (Nl* classQualifier)? ;
 
 classQualifier    : '[' Nl* id Nl* ']' ;
 
@@ -102,11 +102,11 @@ type              : typeType
 
 typeType          : infixType Nl* '=>' Nl* type ;
 
-wildcardType      : '_' Nl* ('>:' Nl* type)? Nl* ('<:' Nl* type)? ;
+wildcardType      : '_' (Nl* '>:' Nl* type)? (Nl* '<:' Nl* type)? ;
 
 existentialType   : infixType Nl* existentialClause ;
 
-existentialClause : 'forSome' Nl* '{' /*{enableNewlines();}*/ Nl* existentialDcl ( /* (SEMICOLON | {isNl()}? emptyNl) */ semi  existentialDcl)* Nl* '}' /*{restoreNewlinesState();}*/ ;
+existentialClause : 'forSome' Nl* '{' /*{enableNewlines();}*/ Nl* existentialDcl ( semi  existentialDcl)* Nl* '}' /*{restoreNewlinesState();}*/ ;
 
 existentialDcl    : typeDeclaration
                   | valueDeclaration;
@@ -117,7 +117,7 @@ compoundOrWildType: wildcardType2 | compoundType ;
 
 wildcardType2     : '_' ;
 
-compoundType      : annotType (Nl* 'with' Nl*  annotType)* Nl* refinement?
+compoundType      : annotType (Nl* 'with' Nl* annotType)* refinement?
                   | refinement;
 
 annotType         : simpleType  annotationsNonEmpty?;
@@ -141,15 +141,15 @@ simpleTypeNoMultipleSQBrackets
 
 typeArgs          : '[' /*{disableNewlines();}*/ Nl* type ( Nl* ',' Nl* type)* Nl* ']' /*{restoreNewlinesState();}*/ ;
 
-types             : Nl* ( '=>' Nl* type | type Nl* '*' | type) Nl* ( ',' Nl* ( '=>' Nl* type | type Nl* '*' | type) Nl*)*;
+types             : ( '=>' Nl* type | type Nl* '*' | type) (Nl* ',' Nl* ( '=>' Nl* type | type Nl* '*' | type) )*;
 
-refinement        : /*{isSingleNlOrNone()}?*/ Nl? '{' /*{enableNewlines();}*/ Nl* refineStatSeq Nl* '}' /*{restoreNewlinesState();}*/ ;
+refinement        : Nl? '{' /*{enableNewlines();}*/ refineStatSeq '}' /*{restoreNewlinesState();}*/ ;
 
 refineStatSeq     : refineStat refineStatSub
                   | refineStatSub
                   | ;
 
-refineStatSub     : /*{isNl()}? emptyNl*/ Nl+ refineStat refineStatSub
+refineStatSub     : Nl+ refineStat refineStatSub
                   | SEMICOLON refineStat refineStatSub
                   | SEMICOLON refineStatSub
                   | ;
@@ -178,10 +178,6 @@ expr1             : ifStmt
                   | implicitClosure
                   | returnStmt
                   | expr1Sub ;
-                  /*| assignStmt
-                  | typedExprStmt
-                  | matchStmt
-                  | postfixExpr ;*/
 
 expr1Sub          : postfixExpr Nl* (
                         '=' Nl* expr
@@ -191,40 +187,33 @@ expr1Sub          : postfixExpr Nl* (
 
 exprInParen       : '(' /*{disableNewlines();}*/ Nl* expr Nl* ')' /*{restoreNewlinesState();}*/ ;
 
-ifStmt            : 'if' Nl* exprInParen Nl*  expr ( /*(SEMICOLON | {isNl()}? emptyNl)?*/ semi?  'else' Nl* expr)? ;
+ifStmt            : 'if' Nl* exprInParen Nl*  expr ( semi?  'else' Nl* expr)? ;
 
 whileStmt         : 'while' Nl* exprInParen Nl*  expr ;
 
-tryStmt           : tryBlock Nl* catchBlock? Nl* finallyBlock? ;
+tryStmt           : tryBlock (Nl* catchBlock)? (Nl* finallyBlock)? ;
 tryBlock          : 'try' Nl* ('{' /*{enableNewlines();}*/ Nl* block Nl* '}' /*{restoreNewlinesState();}*/ |  expr) ;
 catchBlock        : 'catch' Nl*  expr ;
 finallyBlock      : 'finally' Nl* expr ;
 
-doStmt            : 'do' Nl* expr  /*(SEMICOLON | {isNl()}? emptyNl)?*/ semi?  'while' Nl* exprInParen ;
+doStmt            : 'do' Nl* expr semi?  'while' Nl* exprInParen ;
 
-forStmt           : 'for' Nl* ('(' /*{disableNewlines();}*/ Nl* enumerators Nl* ')' /*{restoreNewlinesState();}*/ | '{' Nl* /*{enableNewlines();}*/ enumerators Nl* '}' /*{restoreNewlinesState();}*/)  Nl*  'yield'? Nl* expr ;
+forStmt           : 'for' Nl* ('(' /*{disableNewlines();}*/ Nl* enumerators Nl* ')' /*{restoreNewlinesState();}*/ | '{' Nl* /*{enableNewlines();}*/ enumerators Nl* '}' /*{restoreNewlinesState();}*/)  (Nl*  'yield')? Nl* expr ;
 
 throwStmt         : 'throw' Nl* expr ;
 
 implicitClosure   : 'implicit' Nl* id Nl* '=>' Nl* expr ;
 
-returnStmt        : 'return'  (/*{!isNl()}?*/ expr)? ;
+returnStmt        : 'return'  expr? ;
 
-assignStmt        : postfixExpr Nl* '=' Nl* expr ;
-
-typedExprStmt     : postfixExpr Nl* ascription ;
-
-matchStmt         : postfixExpr Nl* 'match' Nl* '{' /*{enableNewlines();}*/ Nl* caseClauses Nl* '}' /*{restoreNewlinesState();}*/ ;
-
-postfixExpr       : infixExpr ( /*{!isNl()}?*/ id  Nl?)? ;
+postfixExpr       : infixExpr (id  Nl?)? ;
 
 infixExpr         : prefixExpr subInfixExpr ;
 
-subInfixExpr      : /*{!isNl()}?*/ id typeArgs Nl? prefixExpr subInfixExpr
-                  | /*{!isNl() && countNewlineBeforeToken(2) <= 1}?*/ id Nl? prefixExpr subInfixExpr
+subInfixExpr      : id typeArgs? Nl? prefixExpr subInfixExpr
                   | ;
 
-prefixExpr        : ('-' | '+' | '~' | '!')? Nl* simpleExpr ;
+prefixExpr        : (('-' | '+' | '~' | '!') Nl*)?  simpleExpr ;
 
 simpleExpr        : placeholderExpr
                   | simpleExpr1
@@ -243,7 +232,6 @@ simpleExpr1       : literal
                   | simpleExpr1 Nl* '_'? Nl* '.' Nl* id
                   | (newTemplate | blockExpr) (Nl* typeArgs)?
                   | simpleExpr1 Nl* '_'? Nl* typeArgs
-                  //| simpleExpr1 /*{!equalTo("(") || !isNl()}?*/ argumentExprs
                   | simpleExpr1 argumentExprsBlock
                   | simpleExpr1 argumentExprsParen
                   | xmlExpr;
@@ -251,9 +239,12 @@ simpleExpr1       : literal
 exprs             : expr ( Nl* ',' Nl* expr)* ;
 
 argumentExprs     : '(' /*{disableNewlines();}*/ Nl* exprs? Nl*  ')' /*{restoreNewlinesState();}*/
-                  | /*{isSingleNlOrNone()}?*/ Nl? blockExpr ;
+                  | Nl? blockExpr ;
 
-argumentExprsBlock: /*{isSingleNlOrNone()}?*/ Nl? blockExpr ;
+argumentExprsNoNl : '(' /*{disableNewlines();}*/ Nl* exprs? Nl*  ')' /*{restoreNewlinesState();}*/
+                  | blockExpr ;
+
+argumentExprsBlock: Nl? blockExpr ;
                   
 blockExpr         : '{' /*{enableNewlines();}*/ Nl* caseClauses Nl* '}' /*{restoreNewlinesState();}*/
                   | '{' /*{enableNewlines();}*/ Nl* block Nl* '}' /*{restoreNewlinesState();}*/ ;
@@ -263,9 +254,9 @@ block             : resultExpr
                   | subBlock
                   | ;
 
-subBlock          : /*{isNl()}?*/ Nl+ resultExpr
+subBlock          : Nl+ resultExpr
                   | SEMICOLON resultExpr
-                  | /*{isNl()}?*/ Nl+ blockStat subBlock
+                  | Nl+ blockStat subBlock
                   | SEMICOLON blockStat subBlock
                   | SEMICOLON subBlock
                   | ;
@@ -279,19 +270,19 @@ blockStat         : import_
                   | ;
 
 resultExpr        : bindings Nl* '=>' Nl* blockNode
-                  | ('implicit'? Nl* id | '_')  (Nl* ':' Nl* compoundType)? Nl* '=>' Nl* blockNode ;
+                  | (('implicit' Nl*)? id | '_')  (Nl* ':' Nl* compoundType)? Nl* '=>' Nl* blockNode ;
 
-enumerators       : generator  ( ( /*(SEMICOLON | {isNl()}? emptyNl)*/ semi  enumerator | guard) )* ;
+enumerators       : generator  (Nl* ( semi Nl* enumerator | guard) )* ;
 
 enumerator        : generator
                   | guard
-                  | 'val'? pattern1 Nl* '=' Nl* expr ;
+                  | ('val' Nl*)? pattern1 Nl* '=' Nl* expr ;
 
-generator         : generatorNoGuard Nl* guard? ;
+generator         : generatorNoGuard (Nl* guard)? ;
 
 generatorNoGuard  : pattern1 Nl* '<-' Nl* expr ;
 
-caseClauses       : (caseClause Nl*)+ ;
+caseClauses       : caseClause (Nl* caseClause)* ;
 
 caseClause        : 'case' /*{disableNewlines();}*/ Nl* pattern Nl* guard? Nl* '=>' Nl* /*{restoreNewlinesState();}*/ blockNode ;
   
@@ -313,13 +304,15 @@ pattern2RefPat    : referencePattern
                   | pattern3 ;
 
 referencePattern  : id ;
+
 referencePatternVarId
                   : VARID ;
+
 namingPattern     : ('_' | VARID) Nl* '@' Nl* pattern3 ;
 
 pattern3          : simplePattern subPattern3 ;
 
-subPattern3       : idNoVDash  /*{isSingleNlOrNone()}?*/ Nl?  simplePattern Nl* subPattern3
+subPattern3       : idNoVDash  Nl?  simplePattern Nl* subPattern3
                   | ;
 
 simplePattern     : wildcardPattern
@@ -362,29 +355,29 @@ namingPattern2    : ('_' | VARID) Nl* '@' Nl* seqWildcard ;
 patterns          : patternSeq
                   | seqWildcard ;
 
-patternSeq        : pattern ( Nl* ',' Nl* (seqWildcard | pattern))+ Nl* ','?
+patternSeq        : pattern ( Nl* ',' Nl* (seqWildcard | pattern))+ (Nl* ',')?
                   | pattern Nl* ',' ;
 seqWildcard       : '_' Nl* '*' ;
 
 typeParamClause   : '[' /*{disableNewlines();}*/ Nl*  variantTypeParam (Nl* ',' Nl* variantTypeParam)* Nl* ']' /*{restoreNewlinesState();}*/ ;
 
-variantTypeParam  : annotationsNonEmpty? Nl* (OP_1|OP_2)? Nl* (id | '_') Nl*  typeParamClause? (Nl* '>:' Nl* type)? (Nl* '<:' Nl* type)? (Nl* '<%' Nl* type)* (Nl* ':' Nl* type)* ;
+variantTypeParam  : (annotationsNonEmpty Nl*)?  ((OP_1|OP_2) Nl*)? (id | '_') Nl*  typeParamClause? (Nl* '>:' Nl* type)? (Nl* '<:' Nl* type)? (Nl* '<%' Nl* type)* (Nl* ':' Nl* type)* ;
 
 funTypeParamClause: '[' /*{disableNewlines();}*/ Nl* typeParam (Nl* ',' Nl* typeParam)* Nl* ']' /*{restoreNewlinesState();}*/ ;
 
-typeParam         : annotationsNonEmpty? Nl* (id | '_') Nl* typeParamClause? (Nl* '>:' Nl* type)? (Nl* '<:' Nl* type)? (Nl* '<%' Nl*  type)* (Nl* ':' Nl* type)* ;
+typeParam         : (annotationsNonEmpty Nl*)? (id | '_') (Nl* typeParamClause)? (Nl* '>:' Nl* type)? (Nl* '<:' Nl* type)? (Nl* '<%' Nl*  type)* (Nl* ':' Nl* type)* ;
                          
 paramClauses      : implicitParamClause
                   | paramClause* implicitParamClause?;
 
 implicitParamClause
-                  : /*{isSingleNlOrNone()}?*/ Nl?  '(' /*{disableNewlines();}*/ Nl* 'implicit' Nl* params Nl* ')' /*{restoreNewlinesState();}*/ ;
+                  : Nl?  '(' /*{disableNewlines();}*/ Nl* 'implicit' Nl* params Nl* ')' /*{restoreNewlinesState();}*/ ;
 
-paramClause       : /*{isSingleNlOrNone()}?*/ Nl?  '(' /*{disableNewlines();}*/ Nl* params? Nl* ')' /*{restoreNewlinesState();}*/ ;
+paramClause       : Nl?  '(' /*{disableNewlines();}*/ Nl* params? Nl* ')' /*{restoreNewlinesState();}*/ ;
 
 params            : param ( Nl* ',' Nl* param)* ;
 
-param             : annotations emptyModifiers Nl* id  ( Nl* ':' Nl*  paramType)? ( Nl* '=' Nl* expr)? ;
+param             : annotations Nl* emptyModifiers Nl* id  ( Nl* ':' Nl*  paramType)? ( Nl* '=' Nl* expr)? ;
 
 emptyModifiers    : ;
 
@@ -396,13 +389,13 @@ classParamClauses : implicitClassParamClause
                   | classParamClause* implicitClassParamClause? ;
 
 implicitClassParamClause
-                  : /*{isSingleNlOrNone()}?*/ Nl?  '(' /*{disableNewlines();}*/ Nl* 'implicit' Nl* classParams Nl* ')' /*{restoreNewlinesState();}*/ ;
+                  : Nl?  '(' /*{disableNewlines();}*/ Nl* 'implicit' Nl* classParams Nl* ')' /*{restoreNewlinesState();}*/ ;
 
-classParamClause  : /*{isSingleNlOrNone()}?*/ Nl?  '(' /*{disableNewlines();}*/ Nl* classParams? Nl* ')' /*{restoreNewlinesState();}*/ ;
+classParamClause  : Nl?  '(' /*{disableNewlines();}*/ Nl* classParams? Nl* ')' /*{restoreNewlinesState();}*/ ;
 
 classParams       : classParam (Nl* ',' Nl* classParam)* ;
 
-classParam        : annotations  modifiersOrEmpty  ( 'val' |  'var')? Nl* id Nl* ':' Nl* paramType ( Nl* '=' Nl* expr)? ;
+classParam        : annotations Nl* modifiersOrEmpty Nl* ( 'val' |  'var')? Nl* id Nl* ':' Nl* paramType ( Nl* '=' Nl* expr)? ;
                     
 bindings          : '(' /*{disableNewlines();}*/ Nl* (binding ( Nl* ',' Nl* binding )*)? Nl* ')' /*{restoreNewlinesState();}*/ ;
 
@@ -412,7 +405,8 @@ modifier          : localModifier
                   | accessModifier
                   | 'override' ;
 
-modifiersOrEmpty  : (modifier Nl*)* ;
+modifiersOrEmpty  : modifier (Nl* modifier)*
+                  | ;
                   
 localModifier     : 'abstract'
                   | 'final'
@@ -420,29 +414,30 @@ localModifier     : 'abstract'
                   | 'implicit'
                   | 'lazy' ;
                   
-accessModifier    : ('private'  | 'protected' ) Nl* accessQualifier? ;
+accessModifier    : ('private'  | 'protected' ) (Nl* accessQualifier)? ;
 
 accessQualifier   : '[' /*{disableNewlines();}*/ Nl* (id | 'this') Nl* ']' /*{restoreNewlinesState();}*/ ;
 
 annotation        : '@' Nl* annotationExpr ;
 
-annotationExpr    : constrAnnotation ( /*{isSingleNlOrNone()}? emptyNl*/ Nl? '{' /*{enableNewlines();}*/ Nl* (nameValuePair (Nl* ',' Nl* nameValuePair)*)? Nl* '}' /*{restoreNewlinesState();}*/ )?;
+annotationExpr    : constrAnnotation ( Nl? '{' /*{enableNewlines();}*/ Nl* (nameValuePair (Nl* ',' Nl* nameValuePair)*)? Nl* '}' /*{restoreNewlinesState();}*/ )?;
 
 nameValuePair     : 'val' Nl* id '=' Nl* prefixExpr ;
 
-constrAnnotation  : simpleType  (/*{!isNl()}?*/ argumentExprsParen)*;
+constrAnnotation  : simpleType  argumentExprsParen*;
 
-annotations       : (Nl* annotation Nl*)* ;
+annotations       : annotation (Nl* annotation)*
+                  | ;
 annotationsNonEmpty
-                  : (/*{!isNl()}?*/ annotation)+ ;
+                  : annotation+ ;
 
-templateBody      : /*{isSingleNlOrNone()}?*/ Nl?  '{' /*{enableNewlines();}*/ Nl* selfType?  templateStatSeq Nl* '}' /*{restoreNewlinesState();}*/ ;
+templateBody      : Nl?  '{' /*{enableNewlines();}*/ Nl* selfType?  templateStatSeq Nl* '}' /*{restoreNewlinesState();}*/ ;
 
 templateStatSeq   : templateStat templateStatSeqSub
                   | templateStatSeqSub
                   | ;
 
-templateStatSeqSub: /*{isNl()}? emptyNl*/ Nl+ templateStat templateStatSeqSub
+templateStatSeqSub: Nl+ templateStat templateStatSeqSub
                   | SEMICOLON templateStat templateStatSeqSub
                   | SEMICOLON templateStatSeqSub
                   | ;
@@ -470,15 +465,15 @@ dcl               : valueDeclaration
                   | functionDeclaration
                   | typeDeclaration ;
 
-valueDeclaration  : annotations modifiersOrEmpty Nl*  'val' Nl*   valDcl ;
+valueDeclaration  : annotations Nl* modifiersOrEmpty Nl*  'val' Nl*   valDcl ;
 
 variableDeclaration
-                  : annotations modifiersOrEmpty Nl*  'var' Nl*  varDcl ;
+                  : annotations Nl* modifiersOrEmpty Nl*  'var' Nl*  varDcl ;
 
 functionDeclaration
-                  : annotations modifiersOrEmpty Nl*  'def' Nl*  funDcl ;
+                  : annotations Nl* modifiersOrEmpty Nl*  'def' Nl*  funDcl ;
 
-typeDeclaration   : annotations modifiersOrEmpty Nl*  'type'  Nl*  typeDcl ;
+typeDeclaration   : annotations Nl* modifiersOrEmpty Nl*  'type'  Nl*  typeDcl ;
 
 valDcl            : ids Nl*  ':' Nl*  type ;
 
@@ -486,9 +481,9 @@ varDcl            : ids Nl*  ':' Nl*  type ;
 
 funDcl            : funSig (Nl*  ':' Nl*  type)? ;
 
-funSig            : id Nl*  funTypeParamClause? Nl*   paramClauses ;
+funSig            : id (Nl*  funTypeParamClause)? paramClauses ;
 
-typeDcl           : id Nl*  typeParamClause?  (Nl*  '>:' Nl*  type)? (Nl*  '<:' Nl*  type)? ;
+typeDcl           : id (Nl*  typeParamClause)?  (Nl*  '>:' Nl*  type)? (Nl*  '<:' Nl*  type)? ;
 
 patVarDef         : patternDefinition
                   | variableDefinition;
@@ -500,11 +495,11 @@ def               : patternDefinition
                   | typeDefinition
                   | templateDefinition ;
 
-patternDefinition : annotations modifiersOrEmpty Nl* 'val' Nl*  patDef ;
-variableDefinition: annotations modifiersOrEmpty Nl* 'var' Nl*  varDef ;
-macroDefinition   : annotations modifiersOrEmpty Nl* 'def' Nl*  macroDef ;
-functionDefinition: annotations modifiersOrEmpty Nl* 'def' Nl*  funDef ;
-typeDefinition    : annotations modifiersOrEmpty Nl* 'type'  Nl*  typeDef ;
+patternDefinition : annotations Nl* modifiersOrEmpty Nl* 'val' Nl*  patDef ;
+variableDefinition: annotations Nl* modifiersOrEmpty Nl* 'var' Nl*  varDef ;
+macroDefinition   : annotations Nl* modifiersOrEmpty Nl* 'def' Nl*  macroDef ;
+functionDefinition: annotations Nl* modifiersOrEmpty Nl* 'def' Nl*  funDef ;
+typeDefinition    : annotations Nl* modifiersOrEmpty Nl* 'type'  Nl*  typeDef ;
 templateDefinition: tmplDef ;
                   
 patDef            : patternList (Nl*  ':' Nl*  type)? Nl*  '=' Nl*  expr ;
@@ -512,65 +507,64 @@ patDef            : patternList (Nl*  ':' Nl*  type)? Nl*  '=' Nl*  expr ;
 patternList       : pattern2RefPat (Nl*  ',' Nl*  pattern2RefPat)* ;
 
 varDef            : patDef
-                  | ids Nl*  ':'Nl*   type Nl*  '=' Nl*  '_' ;
+                  | ids Nl* ':' Nl* type Nl* '=' Nl* '_' ;
 
-macroDef          : funSig (Nl*  ':' Nl*  type)? Nl*  '=' Nl*  'macro' Nl*  qualId Nl*  typeArgs? ;
+macroDef          : funSig (Nl*  ':' Nl*  type)? Nl*  '=' Nl*  'macro' Nl*  qualId (Nl*  typeArgs)? ;
 
-funDef            : 'this' paramClauses ('=' Nl*  constrExpr |  /*{isSingleNlOrNone()}?*/ Nl? constrBlock)
+funDef            : 'this' paramClauses ('=' Nl*  constrExpr | Nl? constrBlock)
                   | funSig ( Nl* ':' Nl* type)? Nl*  '=' Nl*  expr
-                  | funSig  /*{isSingleNlOrNone()}?*/ Nl?  blockWithBraces ;
+                  | funSig Nl? blockWithBraces ;
 
 blockWithBraces   : '{' /*{enableNewlines();}*/ Nl*  block Nl* '}' /*{restoreNewlinesState();}*/ ;
 
-typeDef           :  id Nl* typeParamClause? Nl* '=' Nl* type ;
+typeDef           : id Nl* typeParamClause? Nl* '=' Nl* type ;
 
 tmplDef           : classDefinition
                   | objectDefinition
                   | traitDefinition ;
 
-classDefinition   : annotations modifiersOrCase Nl* 'class' Nl* classDef ;
+classDefinition   : annotations Nl* modifiersOrCase Nl* 'class' Nl* classDef ;
 
-objectDefinition  : annotations modifiersOrCase Nl* 'object' Nl* objectDef ;
+objectDefinition  : annotations Nl* modifiersOrCase Nl* 'object' Nl* objectDef ;
 
-traitDefinition   : annotations modifiersOrEmpty Nl* 'trait' Nl* traitDef ;
+traitDefinition   : annotations Nl* modifiersOrEmpty Nl* 'trait' Nl* traitDef ;
 
-modifiersOrCase   : (modifier Nl*)* Nl* 'case'? ;
+modifiersOrCase   : (modifier Nl*)* (Nl* 'case')? ;
 
-classDef          : id Nl* typeParamClause? Nl* primaryConstructor Nl* classTemplateOpt ;
+classDef          : id (Nl* typeParamClause)? primaryConstructor Nl* classTemplateOpt ;
 
 primaryConstructor: annotationsNoNl  accessModifierOrEmpty classParamClauses ;
 
-annotationsNoNl   : /*{!isNl()}?*/ annotation*
+annotationsNoNl   : annotation*
                   | ;
 
 accessModifierOrEmpty
-                  : /*{!isNl()}?*/ accessModifier ?
+                  : accessModifier ?
                   | ;
                       
-traitDef          : id Nl* typeParamClause? Nl* traitTemplateOpt ;
+traitDef          : id (Nl* typeParamClause)? Nl* traitTemplateOpt ;
 
 objectDef         : id Nl* classTemplateOpt ;
 
-classTemplateOpt  : ('extends'|UPPER_BOUND) Nl* classTemplate | (('extends'|UPPER_BOUND)? Nl* templateBody)? ;
+classTemplateOpt  : ('extends'|UPPER_BOUND) Nl* classTemplate | (('extends'|UPPER_BOUND)? templateBody)? ;
 
 traitTemplateOpt  : (('extends'|UPPER_BOUND) Nl* traitTemplate)
-                  | (('extends'|UPPER_BOUND)? Nl* templateBody)? ;
+                  | (('extends'|UPPER_BOUND)? templateBody)? ;
 
-classTemplate     : (earlyDefs Nl* 'with')? Nl* classParents Nl* templateBody? ;
+classTemplate     : (earlyDefs Nl* 'with' Nl*)?  classParents templateBody? ;
 
-traitTemplate     : (earlyDefs Nl* 'with')? Nl* traitParents Nl* templateBody? ;
+traitTemplate     : (earlyDefs Nl* 'with' Nl*)? traitParents templateBody? ;
 
-classParents      : constr ( Nl* 'with' Nl* annotType)* Nl*;
+classParents      : constr ( Nl* 'with' Nl* annotType)*;
 
-traitParents      : annotType ( Nl* 'with' Nl* annotType)* Nl* ;
+traitParents      : annotType ( Nl* 'with' Nl* annotType)* ;
 
-constr            : annotTypeNoMultipleSQBrackets  (/*{!isNl()}?*/ argumentExprsParen)* ;
+constr            : annotTypeNoMultipleSQBrackets  argumentExprsParen* ;
 
 annotTypeNoMultipleSQBrackets
                   : simpleTypeNoMultipleSQBrackets annotationsNonEmpty? ;
 
-argumentExprsParen: '(' /*{disableNewlines();}*/ Nl* exprs? Nl* ')' /*{restoreNewlinesState();}*/
-                  ;
+argumentExprsParen: '(' /*{disableNewlines();}*/ Nl* exprs? Nl* ')' /*{restoreNewlinesState();}*/ ;
 
 earlyDefs         : '{' /*{enableNewlines();}*/ Nl* (patVarDef ( /*(SEMICOLON | {isNl()}? emptyNl)*/ semi  patVarDef )* )? Nl* '}' /*{restoreNewlinesState();}*/  ;
 
@@ -579,18 +573,18 @@ constrExpr        : selfInvocation
                   
 constrBlock       : '{' /*{enableNewlines();}*/ Nl* selfInvocation? blockStatSeqSub Nl* '}' /*{restoreNewlinesState();}*/ ;
 
-blockStatSeqSub   : /*{isNl()}? emptyNl*/ Nl+ blockStat blockStatSeqSub
+blockStatSeqSub   : Nl+ blockStat blockStatSeqSub
                   | SEMICOLON blockStat blockStatSeqSub
                   | SEMICOLON blockStatSeqSub
                   | ;
 
-selfInvocation    : 'this' Nl* (argumentExprs (/*{!isNl()}?*/ argumentExprs)*)? ;
+selfInvocation    : 'this' ( Nl* argumentExprs argumentExprsNoNl*)? ;
 
 topStatSeq        : topStat topStatSeqSub
                   | topStatSeqSub
                   | ;
 
-topStatSeqSub     : /*{isNl()}? emptyNl*/ Nl+ topStat topStatSeqSub
+topStatSeqSub     : Nl+ topStat topStatSeqSub
                   | SEMICOLON topStat topStatSeqSub
                   | SEMICOLON topStatSeqSub
                   | ;
@@ -601,7 +595,7 @@ topStat           : tmplDef
                   | packageObject
                   | ;
                     
-packaging         : 'package' Nl* qualId  /*{isSingleNlOrNone()}?*/ Nl?  '{' Nl* /*{enableNewlines();}*/ topStatSeq Nl* '}' /*{restoreNewlinesState();}*/ ;
+packaging         : 'package' Nl* qualId  Nl?  '{' Nl* /*{enableNewlines();}*/ topStatSeq Nl* '}' /*{restoreNewlinesState();}*/ ;
 
 packageObject     : emptyAnnotations emptyModifiers 'package' Nl* 'object' Nl* objectDef ;
 
@@ -609,7 +603,7 @@ emptyAnnotations  : ;
 
 compilationUnit   : packageDcl ;
 
-packageDcl        : 'package'  qualId  /*(SEMICOLON | {isNl()}? emptyNl)?*/ semi? packageDcl?
+packageDcl        : 'package'  qualId  semi? packageDcl?
                   | topStatSeq ;
 
 id                : idNoVDash
@@ -618,7 +612,7 @@ id                : idNoVDash
 
 idNoVDash         : VARID
                   | ID
-                  | '\'' StringLiteral '\''
+                  | '`' StringLiteral '`'
                   | OP_1
                   | OP_2
                   | OP_3
@@ -629,18 +623,19 @@ idNoVDash         : VARID
 semi              : SEMICOLON
                   | Nl+;
 
-xmlExpr           : /*{disableNewlines();}*/ xmlContent (Nl* element Nl*)* /*{restoreNewlinesState();}*/ ;
+xmlExpr           : /*{disableNewlines();}*/ xmlContent Nl* element (Nl* element)* /*{restoreNewlinesState();}*/
+                  | /*{disableNewlines();}*/ xmlContent /*{restoreNewlinesState();}*/;
 
 element           : emptyElemTag
                   | sTag Nl* content Nl* eTag ;
 
-emptyElemTag      : '<' Nl* XML_NAME (Nl* xmlAttribute Nl*)* Nl* '/>' ;
+emptyElemTag      : '<' Nl* XML_NAME (Nl* xmlAttribute)* Nl* '/>' ;
 
-sTag              : '<' Nl* XML_NAME (Nl* xmlAttribute Nl*)* Nl* '>' ;
+sTag              : '<' Nl* XML_NAME (Nl* xmlAttribute)* Nl* '>' ;
 
 eTag              : '</' Nl* XML_NAME Nl* '>' ;
 
-content           : charData? (Nl* content1 Nl* charData? Nl*)* ;
+content           : charData? (Nl* content1 Nl* charData?)* ;
 
 content1          : xmlContent
                   | scalaExpr ;
@@ -654,7 +649,7 @@ comment           : '<!--' XML_COMMENT_CHARACTERS '-->' ;
 
 cDSect            : '<![CDATA[' Nl* (XML_DATA_CHARACTERS | scalaExpr) Nl* ']]>' ;
 
-pI                : '<?' Nl* XML_NAME  (Nl* xmlAttribute Nl*)* Nl* XML_TAG_CHARACTERS? Nl* '?>' ;
+pI                : '<?' Nl* XML_NAME  (Nl* xmlAttribute)* Nl* XML_TAG_CHARACTERS? Nl* '?>' ;
 
 xmlAttribute      : XML_NAME Nl* XML_EQ Nl* attValue ;
 
@@ -665,8 +660,8 @@ scalaExpr         : SCALA_IN_XML_INJECTION_START /*{enableNewlines();}*/ Nl* blo
 
 charData          : XML_DATA_CHARACTERS | XML_CHAR_ENTITY_REF ;
 
-xmlPattern        : /*{disableNewlines();}*/ Nl* emptyElemTagP Nl* /*{restoreNewlinesState();}*/
-                  | /*{disableNewlines();}*/ Nl* sTagP Nl* contentP Nl* eTagP Nl* /*{restoreNewlinesState();}*/ ;
+xmlPattern        : /*{disableNewlines();}*/ emptyElemTagP /*{restoreNewlinesState();}*/
+                  | /*{disableNewlines();}*/ sTagP Nl* contentP Nl* eTagP /*{restoreNewlinesState();}*/ ;
 
 emptyElemTagP     : '<' Nl* XML_NAME Nl* '/>' ;
 
@@ -674,7 +669,7 @@ sTagP             : '<' Nl* XML_NAME Nl* '>' ;
 
 eTagP             : '</' Nl* XML_NAME Nl* '>' ;
 
-contentP          : charData? (Nl* content1P Nl* charData? Nl*)* ;
+contentP          : charData? (Nl* content1P Nl* charData?)* ;
 
 content1P         : cDSect
                   | comment

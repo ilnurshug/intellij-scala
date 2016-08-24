@@ -151,7 +151,7 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testProgram17(): Unit = {
-    doTest("val a = <?xml version=\"1.0\" ?>", "def")
+    doTest("val a = <?xml version=\"1.0\" encoding=\"utf-8\" ?><Xml/>")
   }
 
   def testProgam18(): Unit = {
@@ -319,22 +319,7 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testExperiment5(): Unit = {
-    val s = "a \n b \n\n c"
-    doTest(s, "testNlRule")
-
-    val parserDefinition = new ScalaParserDefinition()
-
-    val tmp = PsiBuilderFactory.getInstance.createBuilder(parserDefinition, new ScalaLexer(), s)
-    val builder: ScalaPsiBuilderImpl = new ScalaPsiBuilderImpl(tmp)
-
-    while(!builder.eof()) {
-      print(builder.getTokenType.toString)
-
-      if (builder.getTokenText.contains("\n")) println(1)
-      else println()
-
-      builder.advanceLexer()
-    }
-    assert(true)
+    val s = "new ASDGASDF()\n(x, timestamp)"
+    doTest(s)
   }
 }

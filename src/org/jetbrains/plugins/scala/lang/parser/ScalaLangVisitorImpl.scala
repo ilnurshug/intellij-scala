@@ -143,12 +143,6 @@ class ScalaLangVisitorImpl(language: Language, parser: Parser, val builder: PsiB
 
   override def visitReturnStmt(ctx: ReturnStmtContext): Unit = visit(ctx, ScalaElementTypes.RETURN_STMT)
 
-  override def visitAssignStmt(ctx: AssignStmtContext): Unit = visit(ctx, ScalaElementTypes.ASSIGN_STMT)
-
-  override def visitTypedExprStmt(ctx: TypedExprStmtContext): Unit = visit(ctx, ScalaElementTypes.TYPED_EXPR_STMT)
-
-  override def visitMatchStmt(ctx: MatchStmtContext): Unit = visit(ctx, ScalaElementTypes.MATCH_STMT)
-
   override def visitBindings(ctx: BindingsContext): Unit = {
     val marker = builder.mark()
     visit(ctx, ScalaElementTypes.PARAM_CLAUSE)
@@ -170,6 +164,8 @@ class ScalaLangVisitorImpl(language: Language, parser: Parser, val builder: PsiB
   override def visitArgumentExprsBlock(ctx: ArgumentExprsBlockContext): Unit = visit(ctx, ScalaElementTypes.ARG_EXPRS)
 
   override def visitArgumentExprsParen(ctx: ArgumentExprsParenContext): Unit = visit(ctx, ScalaElementTypes.ARG_EXPRS)
+
+  override def visitArgumentExprsNoNl(ctx: ArgumentExprsNoNlContext): Unit = visit(ctx, ScalaElementTypes.ARG_EXPRS)
 
   override def visitArgumentExprs(ctx: ArgumentExprsContext): Unit = visit(ctx, ScalaElementTypes.ARG_EXPRS)
 
