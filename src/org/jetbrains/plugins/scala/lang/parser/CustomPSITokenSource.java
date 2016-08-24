@@ -19,17 +19,12 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilderIm
 
 public class CustomPSITokenSource extends PSITokenSource {
 
-    private final HashMap<IElementType, Integer> map = new HashMap<IElementType, Integer>();
+    private static final HashMap<IElementType, Integer> map = new HashMap<IElementType, Integer>();
     private int nlCount = 0;
     private boolean advance = false;
     private CommonTokenAdaptor lastNlToken = null;
 
-    public CustomPSITokenSource(PsiBuilder builder) {
-        super(builder);
-        fillMap();
-    }
-
-    private void fillMap() {
+    static {
         map.put(ScalaTokenTypes.tLBRACE, ScalaLangParser.LBRACE);
         map.put(ScalaTokenTypes.tRBRACE, ScalaLangParser.RBRACE);
         map.put(ScalaTokenTypes.tLSQBRACKET, ScalaLangParser.LSQBRACKET);
@@ -125,6 +120,10 @@ public class CustomPSITokenSource extends PSITokenSource {
         map.put(ScalaTokenTypesEx.SCALA_IN_XML_INJECTION_END, ScalaLangParser.SCALA_IN_XML_INJECTION_END);
     }
 
+    public CustomPSITokenSource(PsiBuilder builder) {
+        super(builder);
+    }
+
     @Override
     public Token nextToken() {
         ProgressIndicatorProvider.checkCanceled();
@@ -164,12 +163,12 @@ public class CustomPSITokenSource extends PSITokenSource {
     }
 
     private int identifierTextToTokenType(String tokenText) {
-        if 		(tokenText.compareTo("+") == 0) return ScalaLangParser.OP_1;
-        else if (tokenText.compareTo("-") == 0) return ScalaLangParser.OP_2;
-        else if (tokenText.compareTo("*") == 0) return ScalaLangParser.OP_3;
-        else if (tokenText.compareTo("!") == 0) return ScalaLangParser.EPT;
-        else if (tokenText.compareTo("~") == 0) return ScalaLangParser.TLD;
-        else if (tokenText.compareTo("|") == 0) return ScalaLangParser.VDASH;
+        if 		(tokenText.equals("+")) return ScalaLangParser.OP_1;
+        else if (tokenText.equals("-")) return ScalaLangParser.OP_2;
+        else if (tokenText.equals("*")) return ScalaLangParser.OP_3;
+        else if (tokenText.equals("!")) return ScalaLangParser.EPT;
+        else if (tokenText.equals("~")) return ScalaLangParser.TLD;
+        else if (tokenText.equals("|")) return ScalaLangParser.VDASH;
         else if (isVarId(tokenText)) return ScalaLangParser.VARID;
         else return ScalaLangParser.ID;
     }

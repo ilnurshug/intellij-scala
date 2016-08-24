@@ -34,9 +34,9 @@
 grammar ScalaLang;
 
 program           : blockExpr
-                  | selfType?  templateStatSeq    // for debug purposes
+                  | selfType?  templateStatSeq
                   | compilationUnit
-                  | block;                                            // for debug purposes
+                  | block;
 
 literal           : '-'? IntegerLiteral
                   | '-'? FloatingPointLiteral
@@ -297,7 +297,7 @@ caseClause        : 'case' /*{disableNewlines();}*/ Nl* pattern Nl* guard? Nl* '
   
 guard             : 'if' Nl* postfixExpr ;
 
-pattern           : pattern1 ( Nl* /*{equalTo("|")}? id*/ VDASH Nl* pattern1 )* ;
+pattern           : pattern1 ( Nl* VDASH Nl* pattern1 )* ;
 
 pattern1          : typedPattern
                   | pattern2 ;
@@ -319,7 +319,7 @@ namingPattern     : ('_' | VARID) Nl* '@' Nl* pattern3 ;
 
 pattern3          : simplePattern subPattern3 ;
 
-subPattern3       : /*{!equalTo("|")}? id*/ idNoVDash  /*{isSingleNlOrNone()}?*/ Nl?  simplePattern Nl* subPattern3
+subPattern3       : idNoVDash  /*{isSingleNlOrNone()}?*/ Nl?  simplePattern Nl* subPattern3
                   | ;
 
 simplePattern     : wildcardPattern
