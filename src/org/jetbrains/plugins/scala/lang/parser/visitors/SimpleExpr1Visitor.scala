@@ -60,7 +60,7 @@ object SimpleExpr1Visitor extends VisitorHelper[SimpleExpr1Context] {
           val r: Int = lastChild.getRuleContext.getRuleIndex
 
           r match {
-            case  ScalaLangParser.`RULE_argumentExprs` =>
+            case  ScalaLangParser.`RULE_argumentExprsParen` | ScalaLangParser.`RULE_argumentExprsBlock` =>
               marker.done (ScalaElementTypes.METHOD_CALL)
             case ScalaLangParser.`RULE_typeArgs` =>
               marker.done (ScalaElementTypes.GENERIC_CALL)

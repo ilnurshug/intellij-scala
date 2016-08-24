@@ -170,6 +170,8 @@ class ScalaLangVisitorImpl(language: Language, parser: Parser, val builder: PsiB
 
   override def visitArgumentExprsParen(ctx: ArgumentExprsParenContext): Unit = visit(ctx, ScalaElementTypes.ARG_EXPRS)
 
+  override def visitArgumentExprsBlock(ctx: ArgumentExprsBlockContext): Unit = visit(ctx, ScalaElementTypes.ARG_EXPRS)
+
   override def visitArgumentExprs(ctx: ArgumentExprsContext): Unit = visit(ctx, ScalaElementTypes.ARG_EXPRS)
 
   override def visitBlockExpr(ctx: BlockExprContext): Unit = visit(ctx, ScalaElementTypes.BLOCK_EXPR)

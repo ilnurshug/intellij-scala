@@ -179,13 +179,6 @@ boolean isNl() {
     return (countNewlineBeforeToken(1) > 0);
 }
 
-boolean equalTo(String s) {
-    Token curToken = getCurrentToken();
-    if (curToken == null) return false;
-
-    return curToken.getText().compareTo(s) == 0;
-}
-
 boolean lookAhead(IElementType... tokens) {
     for (int i = 0; i < tokens.length; i++) {
         CommonTokenAdaptor t = (CommonTokenAdaptor)_input.LT(i + 1);
@@ -417,10 +410,13 @@ simpleExpr1       : literal
                   | simpleExpr1 '_'? '.' id
                   | (newTemplate | blockExpr) (typeArgs)?
                   | simpleExpr1 '_'? typeArgs
-                  | simpleExpr1 {!equalTo("(") || !isNl()}? argumentExprs
+                  | simpleExpr1 argumentExprsBlock
+                  | simpleExpr1 {!isNl()}? argumentExprsParen
                   | xmlExpr;
 
 exprs             : expr (  ','  expr)* ;
+
+argumentExprsBlock: {isSingleNlOrNone()}? blockExpr ;
 
 argumentExprs     : '(' {disableNewlines();}  exprs?  ')' {restoreNewlinesState();}
                   | {isSingleNlOrNone()}? blockExpr ;
@@ -467,7 +463,7 @@ caseClause        : 'case' {disableNewlines();} pattern  guard?  '=>' {restoreNe
   
 guard             : 'if'  postfixExpr ;
 
-pattern           : pattern1 ( {equalTo("|")}? id  pattern1 )* ;
+pattern           : pattern1 ( /*{equalTo("|")}? id*/ VDASH  pattern1 )* ;
 
 pattern1          : typedPattern
                   | pattern2 ;
@@ -487,7 +483,7 @@ namingPattern     : ('_' | id) '@' pattern3 ;
 
 pattern3          : simplePattern subPattern3 ;
 
-subPattern3       : {!equalTo("|")}? id  {isSingleNlOrNone()}?  simplePattern subPattern3
+subPattern3       : /*{!equalTo("|")}? id*/ idNoVDash  {isSingleNlOrNone()}?  simplePattern subPattern3
                   | ;
 
 simplePattern     : wildcardPattern
@@ -782,8 +778,12 @@ compilationUnit   : packageDcl ;
 packageDcl        : 'package'  qualId  (SEMICOLON | {isNl()}? emptyNl)? packageDcl?
                   | topStatSeq ;
 
-id                : ID
-                  | '\'' StringLiteral '\''
+id                : idNoVDash
+                  | VDASH
+                  ;
+
+idNoVDash         : ID
+                  | '`' StringLiteral '`'
                   | OP_1
                   | OP_2
                   | OP_3

@@ -2,5 +2,20 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/NailgunRunners" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/Runners" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/SDK/scalaDevPlugin" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/ScalaRunner" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/compiler-settings" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/idea-runner" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/jps-plugin" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/macroAnnotations" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/pluginCompressorCommunity" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/pluginPackagerCommunity" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/project" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/sbtLaunchTestDownloader" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/sbtRuntimeDependencies" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/scalap" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/testJarsDownloader" vcs="svn" />
   </component>
 </project>
