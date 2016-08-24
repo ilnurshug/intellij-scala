@@ -33,154 +33,6 @@
 
 grammar ScalaLang;
 
-@parser::header {
-import com.intellij.openapi.util.text.StringUtil;
-import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes;
-import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypesEx;
-import org.jetbrains.plugins.scala.lang.lexer.ScalaXmlTokenTypes;
-import com.intellij.psi.tree.*;
-import org.jetbrains.plugins.scala.lang.parser.*;
-import org.antlr.jetbrains.adaptor.lexer.*;
-import java.util.*;
-import com.intellij.lang.PsiBuilder;
-import org.jetbrains.plugins.scala.lang.*;
-}
-
-@parser::members {
-
-String originalText = null;
-PsiBuilder builder = null;
-
-Deque<Boolean> newlinesEnabled = null;
-
-void disableNewlines() {
-    newlinesEnabled.push(false);
-}
-
-void enableNewlines() {
-    newlinesEnabled.push(true);
-}
-
-void restoreNewlinesState() {
-    if (newlinesEnabled.isEmpty()) {
-        System.out.println("newlinesEnabled stack is empty");
-    }
-    assert(!newlinesEnabled.isEmpty());
-    newlinesEnabled.pop();
-}
-
-boolean isVarId() {
-    boolean f = Character.isLowerCase(getCurrentToken().getText().charAt(0));
-    return f;
-}
-
-@Override
-public void setTokenStream(TokenStream input) {
-    this._input = null;
-    this.reset();
-    this._input = input;
-
-    if (input == null) {
-        builder = null;
-        originalText = "";
-    }
-    else {
-        builder = ((PSITokenSource)_input.getTokenSource()).getBuilder();
-        originalText = builder.getOriginalText().toString();
-    }
-    //System.out.println(originalText);
-
-    newlinesEnabled = new ArrayDeque<Boolean>();
-}
-
-int getOccurrenceCount(char c) {
-    return getOccurrenceCount(c, 1);
-}
-
-int getOccurrenceCount(char c, int offset) {
-    if (builder == null) return 0;
-
-    int pos = builder.rawTokenIndex();
-
-    int prev = (offset == 1 ? -1 : offset - 1);
-    //System.out.println(pos);
-
-    CommonTokenAdaptor curToken = (CommonTokenAdaptor)_input.LT(offset);
-    CommonTokenAdaptor prevToken = (CommonTokenAdaptor)_input.LT(prev);
-
-    if (curToken == null || prevToken == null) return 0;
-
-    int prevTokenStart = prevToken.rawTokenIndex();
-    int curTokenStart = curToken.rawTokenIndex();
-
-    //System.out.println(originalText.substring(prevToken.getStartIndex(), curToken.getStartIndex()));
-
-    int firstPos = (prevTokenStart < pos ? prevTokenStart - pos : pos - prevTokenStart);
-    int count = 0;
-    for (int i = prevTokenStart + 1, delta = 1; i < curTokenStart; i++, delta++) {
-        IElementType t = builder.rawLookup(firstPos + delta);
-
-        if (ScalaTokenTypes.COMMENTS_TOKEN_SET.contains(t)) continue;
-
-        int start = builder.rawTokenTypeStart(firstPos + delta);
-        int end   = builder.rawTokenTypeStart(firstPos + delta + 1);
-
-        String substr = originalText.substring(start, end);
-
-        //System.out.println(substr);
-
-        count += StringUtil.getOccurrenceCount(substr, c);
-    }
-
-    return count;
-}
-
-int countNewlineBeforeToken(int offset) {
-    if (builder == null || !newlinesEnabled.isEmpty() && !newlinesEnabled.peek()) return 0;
-
-    int pos = builder.rawTokenIndex();
-
-    CommonTokenAdaptor curToken = (CommonTokenAdaptor)_input.LT(offset);
-
-    if (curToken == null) return 0;
-
-    int curTokenStart = curToken.rawTokenIndex();
-
-    int firstPos = (curTokenStart < pos ? curTokenStart - pos : pos - curTokenStart);
-    int i = 1;
-    while (i < curTokenStart && TokenSets.WHITESPACE_OR_COMMENT_SET().contains(builder.rawLookup(firstPos - i)))
-        i += 1;
-
-    String textBefore = originalText.substring(builder.rawTokenTypeStart(firstPos - i + 1), builder.rawTokenTypeStart(firstPos));
-    if (!textBefore.contains("\n")) return 0;
-    String[] lines = ("start " + textBefore + " end").split("\n");
-
-    boolean exists = false;
-
-    for (i = 0; i < lines.length && !exists; i++) {
-        boolean f = true;
-        for (int j = 0; j < lines[i].length(); j++)
-            f &= StringUtil.isWhiteSpace(lines[i].charAt(j));
-        exists = exists || f;
-    }
-
-    return (exists ? 2 : 1);
-}
-
-boolean isSingleNl() {
-    return (countNewlineBeforeToken(1) == 1);
-}
-
-boolean isSingleNlOrNone() {
-    return (countNewlineBeforeToken(1) <= 1);
-}
-
-boolean isNl() {
-    return (countNewlineBeforeToken(1) > 0);
-}
-
-}
-
 program           : blockExpr
                   | selfType?  templateStatSeq    // for debug purposes
                   | compilationUnit
@@ -216,18 +68,14 @@ qualId            : qualId Nl* '.' Nl* id | id ;
 ids               : fieldId ( Nl* ',' Nl* fieldId)* ;
 fieldId           : id ;
 
-//pathRef_          : {lookAhead() && !lookAhead()}? thisReference;
-
 pathRef           :  stableIdRef Nl* '.' Nl* id
                   |  thisReference Nl* '.' Nl* id
                   |  superReference Nl* '.' Nl* id
-                  //|  thisReference
                   |  id ;
 
 pathRefExpr       :  stableIdRefExpr Nl* '.' Nl* id
                   |  thisReference Nl* '.' Nl* id
                   |  superReference Nl* '.' Nl* id
-                  //|  thisReference
                   |  id ;
 
 reference         : id ;
@@ -454,7 +302,7 @@ pattern           : pattern1 ( Nl* /*{equalTo("|")}? id*/ VDASH Nl* pattern1 )* 
 pattern1          : typedPattern
                   | pattern2 ;
 
-typedPattern      : {isVarId()}? ID Nl* ':' Nl* typePat
+typedPattern      : VARID Nl* ':' Nl* typePat
                   | '_' Nl* ':' Nl* typePat ;
 
 pattern2          : namingPattern
@@ -465,7 +313,9 @@ pattern2RefPat    : referencePattern
                   | pattern3 ;
 
 referencePattern  : id ;
-namingPattern     : ('_' | id) Nl* '@' Nl* pattern3 ;
+referencePatternVarId
+                  : VARID ;
+namingPattern     : ('_' | VARID) Nl* '@' Nl* pattern3 ;
 
 pattern3          : simplePattern subPattern3 ;
 
@@ -474,7 +324,7 @@ subPattern3       : /*{!equalTo("|")}? id*/ idNoVDash  /*{isSingleNlOrNone()}?*/
 
 simplePattern     : wildcardPattern
                   | tuplePattern
-                  | {isVarId()}? referencePattern
+                  | referencePatternVarId
                   | interpolationPattern
                   | literalPattern
                   | stableReferencePattern
@@ -506,7 +356,7 @@ patternArgsSub    : (pattern (Nl* ',' Nl* pattern)* Nl* ',' Nl*)? seqWildcard
                   | pattern (Nl* ',' Nl* pattern)*
                   | ;
 
-namingPattern2    : ('_' | ID) Nl* '@' Nl* seqWildcard ;
+namingPattern2    : ('_' | VARID) Nl* '@' Nl* seqWildcard ;
 
 
 patterns          : patternSeq
@@ -766,7 +616,8 @@ id                : idNoVDash
                   | VDASH
                   ;
 
-idNoVDash         : ID
+idNoVDash         : VARID
+                  | ID
                   | '\'' StringLiteral '\''
                   | OP_1
                   | OP_2
@@ -955,6 +806,8 @@ FloatingPointLiteral
                  |  Digit+ ExponentPart? FloatType;
 
 Nl               :  '\r'? '\n';
+
+VARID            :  Lower Idrest ;
 
 ID               : Op
                  | Upper Idrest

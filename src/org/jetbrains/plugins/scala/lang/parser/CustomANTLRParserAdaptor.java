@@ -19,8 +19,6 @@ public abstract class CustomANTLRParserAdaptor extends ANTLRParserAdaptor {
     protected ASTNode parse(PsiBuilder builder, IElementType root, boolean buildTree) {
         ProgressIndicatorProvider.checkCanceled();
 
-        //builder = new PsiBuilderAdaptor(builder);
-
         TokenSource source = new CustomPSITokenSource(builder);
 
         TokenStream tokens = new CommonTokenStream(source);

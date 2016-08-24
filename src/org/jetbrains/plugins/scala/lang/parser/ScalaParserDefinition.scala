@@ -45,15 +45,7 @@ class ScalaParserDefinition extends ScalaParserDefinitionWrapper {
 
   def getStringLiteralElements: TokenSet = ScalaTokenTypes.STRING_LITERAL_TOKEN_SET
 
-  def getWhitespaceTokens: TokenSet = {
-    if (ScalaParserDefinition.useOldParser)
-      whitespacesTokenSet
-    else {
-      //if (ScalaParserDefinition.omitWhitespaces) whitespacesTokenSet
-      //else TokenSet.EMPTY
-      whitespacesTokenSet
-    }
-  }
+  def getWhitespaceTokens: TokenSet = whitespacesTokenSet
 
   def createElement(astNode: ASTNode): PsiElement = (if (hasDotty) DottyPsiCreator else ScalaPsiCreator).createElement(astNode)
 
@@ -81,7 +73,6 @@ class ScalaParserDefinition extends ScalaParserDefinitionWrapper {
 
 object ScalaParserDefinition {
   var useOldParser = false
-  var omitWhitespaces = false
 
   var replaceTypeParsing = false
 

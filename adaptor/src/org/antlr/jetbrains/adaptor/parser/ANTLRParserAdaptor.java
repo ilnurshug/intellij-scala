@@ -56,8 +56,6 @@ public abstract class ANTLRParserAdaptor implements PsiParser {
 	protected ASTNode parse(PsiBuilder builder, IElementType root, boolean buildTree) {
 		ProgressIndicatorProvider.checkCanceled();
 
-		//builder = new PsiBuilderAdaptor(builder);
-
 		TokenSource source = new PSITokenSource(builder);
 		TokenStream tokens = new CommonTokenStream(source);
 		parser.setTokenStream(tokens);

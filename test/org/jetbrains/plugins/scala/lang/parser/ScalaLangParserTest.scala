@@ -319,8 +319,6 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testExperiment5(): Unit = {
-    ScalaParserDefinition.omitWhitespaces = false
-
     val s = "a \n b \n\n c"
     doTest(s, "testNlRule")
 
