@@ -385,8 +385,8 @@ class ScalaLangVisitorImpl(language: Language, parser: Parser, val builder: PsiB
   }
 
   override def visitTerminal(node: TerminalNode): Unit = {
-    node.getSymbol.asInstanceOf[CommonTokenAdaptor].getTokenType match {
-      case ScalaTokenTypes.tWHITE_SPACE_IN_LINE => ()
+    node.getSymbol match {
+      case _: NewLineToken =>
       case _ => builder.advanceLexer()
     }
   }

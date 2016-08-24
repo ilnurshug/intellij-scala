@@ -22,7 +22,6 @@ public class CustomPSITokenSource extends PSITokenSource {
     private static final HashMap<IElementType, Integer> map = new HashMap<IElementType, Integer>();
     private int nlCount = 0;
     private boolean advance = false;
-    private CommonTokenAdaptor lastNlToken = null;
 
     static {
         map.put(ScalaTokenTypes.tLBRACE, ScalaLangParser.LBRACE);
@@ -135,20 +134,16 @@ public class CustomPSITokenSource extends PSITokenSource {
                 advance = false;
 
                 int type = convertScalaTokenTypeToInt(builder.getTokenType(), builder.getTokenText());
-                int index = builder.rawTokenIndex();
-                return new CommonTokenAdaptor((CommonToken) nextTokenHelper(type, true), builder.getTokenType(), index);
+                return nextTokenHelper(type, true);
             } else {
                 nlCount = count - 1;
                 advance = true;
 
-                int type = ScalaLangParser.Nl;
-                int index = builder.rawTokenIndex() - 1;
-                lastNlToken = new CommonTokenAdaptor((CommonToken) nextTokenHelper(type, false), ScalaTokenTypes.tWHITE_SPACE_IN_LINE, index);
-                return lastNlToken;
+                return NewLineToken.INSTANCE;
             }
         } else {
             nlCount--;
-            return lastNlToken;
+            return NewLineToken.INSTANCE;
         }
 
     }
@@ -157,8 +152,7 @@ public class CustomPSITokenSource extends PSITokenSource {
         if (t == null) return Token.EOF;
         else if (t == ScalaTokenTypes.tIDENTIFIER || t == ScalaTokenTypes.tINTERPOLATED_STRING_ID) return identifierTextToTokenType(tokenText);
         else {
-            if (map.containsKey(t)) return map.get(t);
-            else return 1;
+            return map.getOrDefault(t, 1);
         }
     }
 

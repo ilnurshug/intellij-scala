@@ -1,20 +1,10 @@
 package org.jetbrains.plugins.scala.lang.parser
 
-import java.util.concurrent.Callable
-
 import com.intellij.lang.PsiBuilderFactory
-import com.intellij.psi.impl.source.DummyHolderFactory
-import com.intellij.psi.impl.source.tree.{FileElement, TreeElement}
-import com.intellij.psi.tree.TokenSet
-import com.intellij.psi.{PsiElement, PsiFileFactory}
-import org.antlr.v4.runtime.ParserRuleContext
-import org.antlr.v4.runtime.tree.ParseTree
-import org.jetbrains.plugins.scala.{ScalaFileType, ScalaLanguage}
+import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.base.SimpleTestCase
-import org.jetbrains.plugins.scala.lang.ScalaLangParser
 import org.jetbrains.plugins.scala.lang.lexer.ScalaLexer
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilderImpl
-import org.jetbrains.plugins.scala.lang.parser.ASTTreeToDot
 import org.junit.Assert
 
 /**
