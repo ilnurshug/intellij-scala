@@ -2,15 +2,10 @@ package org.jetbrains.plugins.scala.lang.parser;
 
 import com.intellij.lang.PsiBuilder;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.containers.HashMap;
 import org.antlr.jetbrains.adaptor.lexer.PSITokenSource;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenSource;
-import org.antlr.v4.runtime.misc.Pair;
 import org.jetbrains.plugins.scala.lang.ScalaLangParser;
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes;
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypesEx;
@@ -133,8 +128,8 @@ public class CustomPSITokenSource extends PSITokenSource {
             if (count == 0) {
                 advance = false;
 
-                int type = convertScalaTokenTypeToInt(builder.getTokenType(), builder.getTokenText());
-                return nextTokenHelper(type, true);
+                int type = convertScalaTokenTypeToInt(builder.getTokenType());
+                return nextTokenHelper(type);
             } else {
                 nlCount = count - 1;
                 advance = true;
@@ -148,28 +143,37 @@ public class CustomPSITokenSource extends PSITokenSource {
 
     }
 
-    private int convertScalaTokenTypeToInt(IElementType t, String tokenText) {
+    private int convertScalaTokenTypeToInt(IElementType t) {
         if (t == null) return Token.EOF;
-        else if (t == ScalaTokenTypes.tIDENTIFIER || t == ScalaTokenTypes.tINTERPOLATED_STRING_ID) return identifierTextToTokenType(tokenText);
+
+        if (t == ScalaTokenTypes.tIDENTIFIER || t == ScalaTokenTypes.tINTERPOLATED_STRING_ID) {
+            final String tokenText = builder.getTokenText();
+            int len = tokenText.length();
+            char first = tokenText.charAt(0);
+            char last = tokenText.charAt(len - 1);
+
+            return identifierTextToTokenType(first, last, len);
+        }
         else {
             return map.getOrDefault(t, 1);
         }
     }
 
-    private int identifierTextToTokenType(String tokenText) {
-        if 		(tokenText.equals("+")) return ScalaLangParser.OP_1;
-        else if (tokenText.equals("-")) return ScalaLangParser.OP_2;
-        else if (tokenText.equals("*")) return ScalaLangParser.OP_3;
-        else if (tokenText.equals("!")) return ScalaLangParser.EPT;
-        else if (tokenText.equals("~")) return ScalaLangParser.TLD;
-        else if (tokenText.equals("|")) return ScalaLangParser.VDASH;
-        else if (isVarId(tokenText)) return ScalaLangParser.VARID;
-        else return ScalaLangParser.ID;
+    private static int identifierTextToTokenType(char first, char last, int len) {
+        if (len == 1) {
+            switch(first) {
+                case '+': return ScalaLangParser.OP_1;
+                case '-': return ScalaLangParser.OP_2;
+                case '*': return ScalaLangParser.OP_3;
+                case '!': return ScalaLangParser.EPT;
+                case '~': return ScalaLangParser.TLD;
+                case '|': return ScalaLangParser.VDASH;
+                default:  return Character.isLowerCase(first) ? ScalaLangParser.VARID : ScalaLangParser.ID;
+            }
+        }
+        else {
+            return !Character.isLowerCase(first) || (first == '`' && last == '`') ? ScalaLangParser.ID : ScalaLangParser.VARID;
+        }
     }
 
-    private boolean isVarId(String text) {
-        int len = text.length();
-
-        return Character.isLowerCase(text.charAt(0)) && !(text.charAt(0) == '`' && text.charAt(len - 1) == '`');
-    }
 }

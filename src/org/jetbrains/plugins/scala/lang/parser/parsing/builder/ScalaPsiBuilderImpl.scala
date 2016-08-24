@@ -32,7 +32,7 @@ class ScalaPsiBuilderImpl(builder: PsiBuilder)
   private def countNewlineBeforeCurrentToken(): Int = {
     if (newlinesEnabled.nonEmpty && !newlinesEnabled.top) return 0
     if (builder.eof) return 0
-    if (!ParserUtils.elementCanStartStatement(builder.getTokenType, builder.asInstanceOf[ScalaPsiBuilder])) return 0
+    if (!ParserUtils.elementCanStartStatement(builder.getTokenType, this)) return 0
 
     ScalaPsiBuilderImpl.countNewlineBeforeCurrentToken(this)
   }
