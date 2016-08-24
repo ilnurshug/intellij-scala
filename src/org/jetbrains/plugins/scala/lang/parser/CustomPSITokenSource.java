@@ -149,8 +149,13 @@ public class CustomPSITokenSource extends PSITokenSource {
         else if (tokenText.compareTo("!") == 0) return ScalaLangParser.EPT;
         else if (tokenText.compareTo("~") == 0) return ScalaLangParser.TLD;
         else if (tokenText.compareTo("|") == 0) return ScalaLangParser.VDASH;
+        else if (isVarId(tokenText)) return ScalaLangParser.VARID;
         else return ScalaLangParser.ID;
     }
 
+    private boolean isVarId(String text) {
+        int len = text.length();
 
+        return Character.isLowerCase(text.charAt(0)) && !(text.charAt(0) == '`' && text.charAt(len - 1) == '`');
+    }
 }

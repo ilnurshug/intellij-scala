@@ -69,11 +69,6 @@ void restoreNewlinesState() {
     newlinesEnabled.pop();
 }
 
-boolean isVarId() {
-    boolean f = Character.isLowerCase(getCurrentToken().getText().charAt(0));
-    return f;
-}
-
 @Override
 public void setTokenStream(TokenStream input) {
     this._input = null;
@@ -468,7 +463,7 @@ pattern           : pattern1 ( /*{equalTo("|")}? id*/ VDASH  pattern1 )* ;
 pattern1          : typedPattern
                   | pattern2 ;
 
-typedPattern      : {isVarId()}? ID  ':'  typePat
+typedPattern      : /*{isVarId()}? id*/ VARID  ':'  typePat
                   | '_'  ':'  typePat ;
 
 pattern2          : namingPattern
@@ -479,7 +474,10 @@ pattern2RefPat    : referencePattern
                   | pattern3 ;
 
 referencePattern  : id ;
-namingPattern     : ('_' | id) '@' pattern3 ;
+referencePatternVarId
+                  : VARID ;
+
+namingPattern     : ('_' | VARID) '@' pattern3 ;
 
 pattern3          : simplePattern subPattern3 ;
 
@@ -488,7 +486,8 @@ subPattern3       : /*{!equalTo("|")}? id*/ idNoVDash  {isSingleNlOrNone()}?  si
 
 simplePattern     : wildcardPattern
                   | tuplePattern
-                  | {isVarId()}? referencePattern
+                  //| {isVarId()}? referencePattern
+                  | referencePatternVarId
                   | interpolationPattern
                   | literalPattern
                   | stableReferencePattern
@@ -520,7 +519,7 @@ patternArgsSub    : (pattern ( ','  pattern)*  ',' )? seqWildcard
                   | pattern ( ','  pattern)*
                   | ;
 
-namingPattern2    : ('_' | ID)  '@'  seqWildcard ;
+namingPattern2    : ('_' | VARID)  '@'  seqWildcard ;
 
 
 patterns          : patternSeq
@@ -782,7 +781,8 @@ id                : idNoVDash
                   | VDASH
                   ;
 
-idNoVDash         : ID
+idNoVDash         : VARID
+                  | ID
                   | '`' StringLiteral '`'
                   | OP_1
                   | OP_2
@@ -970,6 +970,10 @@ FloatingPointLiteral
                  |  Digit+ ExponentPart? FloatType;
 
 Nl               :  '\r'? '\n';
+
+VARID            :  Lower Idrest ;
+
+PLAINID          :  Upper Idrest ;
 
 ID               : Op
                  | Upper Idrest

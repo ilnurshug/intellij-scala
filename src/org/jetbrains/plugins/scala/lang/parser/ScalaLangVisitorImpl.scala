@@ -226,6 +226,8 @@ class ScalaLangVisitorImpl(language: Language, parser: Parser, val builder: PsiB
 
   override def visitReferencePattern(ctx: ReferencePatternContext): Unit = visit(ctx, ScalaElementTypes.REFERENCE_PATTERN)
 
+  override def visitReferencePatternVarId(ctx: ReferencePatternVarIdContext): Unit = visit(ctx, ScalaElementTypes.REFERENCE_PATTERN)
+
   override def visitNamingPattern(ctx: NamingPatternContext): Unit = visit(ctx, ScalaElementTypes.NAMING_PATTERN)
 
   override def visitPattern3(ctx: Pattern3Context): Unit = Pattern3Visitor.visit(this, ctx)
