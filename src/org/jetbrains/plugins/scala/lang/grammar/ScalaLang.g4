@@ -179,31 +179,7 @@ boolean isNl() {
     return (countNewlineBeforeToken(1) > 0);
 }
 
-boolean equalTo(String s) {
-    Token curToken = getCurrentToken();
-    if (curToken == null) return false;
-
-    return curToken.getText().compareTo(s) == 0;
 }
-
-boolean lookAhead(IElementType... tokens) {
-    for (int i = 0; i < tokens.length; i++) {
-        CommonTokenAdaptor t = (CommonTokenAdaptor)_input.LT(i + 1);
-
-        if (t == null || t.getTokenType() != tokens[i]) return false;
-    }
-    return true;
-}
-
-}
-
-testRule          : id ({isNl()}? emptyNl id)+ ;
-
-emptyNl           :  ;
-
-testRule2         : {lookAhead(ScalaTokenTypes.kTHIS) && !lookAhead(ScalaTokenTypes.kTHIS, ScalaTokenTypes.tDOT)}? thisReference;
-
-testNlRule        : id (Nl+ id)+ ;
 
 program           : blockExpr
                   | selfType?  templateStatSeq    // for debug purposes
@@ -419,13 +395,17 @@ simpleExpr1       : literal
                   | simpleExpr1 Nl* '_'? Nl* '.' Nl* id
                   | (newTemplate | blockExpr) (Nl* typeArgs)?
                   | simpleExpr1 Nl* '_'? Nl* typeArgs
-                  | simpleExpr1 /*{!equalTo("(") || !isNl()}?*/ argumentExprs
+                  //| simpleExpr1 /*{!equalTo("(") || !isNl()}?*/ argumentExprs
+                  | simpleExpr1 argumentExprsBlock
+                  | simpleExpr1 argumentExprsParen
                   | xmlExpr;
 
 exprs             : expr ( Nl* ',' Nl* expr)* ;
 
 argumentExprs     : '(' /*{disableNewlines();}*/ Nl* exprs? Nl*  ')' /*{restoreNewlinesState();}*/
                   | /*{isSingleNlOrNone()}?*/ Nl? blockExpr ;
+
+argumentExprsBlock: /*{isSingleNlOrNone()}?*/ Nl? blockExpr ;
                   
 blockExpr         : '{' /*{enableNewlines();}*/ Nl* caseClauses Nl* '}' /*{restoreNewlinesState();}*/
                   | '{' /*{enableNewlines();}*/ Nl* block Nl* '}' /*{restoreNewlinesState();}*/ ;
@@ -469,7 +449,7 @@ caseClause        : 'case' /*{disableNewlines();}*/ Nl* pattern Nl* guard? Nl* '
   
 guard             : 'if' Nl* postfixExpr ;
 
-pattern           : pattern1 ( Nl* {equalTo("|")}? id Nl* pattern1 )* ;
+pattern           : pattern1 ( Nl* /*{equalTo("|")}? id*/ VDASH Nl* pattern1 )* ;
 
 pattern1          : typedPattern
                   | pattern2 ;
@@ -489,7 +469,7 @@ namingPattern     : ('_' | id) Nl* '@' Nl* pattern3 ;
 
 pattern3          : simplePattern subPattern3 ;
 
-subPattern3       : {!equalTo("|")}? id  /*{isSingleNlOrNone()}?*/ Nl?  simplePattern Nl* subPattern3
+subPattern3       : /*{!equalTo("|")}? id*/ idNoVDash  /*{isSingleNlOrNone()}?*/ Nl?  simplePattern Nl* subPattern3
                   | ;
 
 simplePattern     : wildcardPattern
@@ -782,7 +762,11 @@ compilationUnit   : packageDcl ;
 packageDcl        : 'package'  qualId  /*(SEMICOLON | {isNl()}? emptyNl)?*/ semi? packageDcl?
                   | topStatSeq ;
 
-id                : ID
+id                : idNoVDash
+                  | VDASH
+                  ;
+
+idNoVDash         : ID
                   | '\'' StringLiteral '\''
                   | OP_1
                   | OP_2

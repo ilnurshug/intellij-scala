@@ -175,6 +175,7 @@ public class CustomPSITokenSource extends PSITokenSource {
         else if (tokenText.compareTo("*") == 0) return ScalaLangParser.OP_3;
         else if (tokenText.compareTo("!") == 0) return ScalaLangParser.EPT;
         else if (tokenText.compareTo("~") == 0) return ScalaLangParser.TLD;
+        else if (tokenText.compareTo("|") == 0) return ScalaLangParser.VDASH;
         else return ScalaLangParser.ID;
     }
 

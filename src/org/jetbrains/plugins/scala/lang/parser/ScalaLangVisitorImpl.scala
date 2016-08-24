@@ -25,8 +25,6 @@ class ScalaLangVisitorImpl(language: Language, parser: Parser, val builder: PsiB
   def isPattern: Boolean = patternStack != 0
 
 
-  override def visitTestRule(ctx: TestRuleContext): Unit = visit(ctx, ScalaElementTypes.BLOCK_EXPR)
-
   override def visitEnumerator(ctx: EnumeratorContext): Unit = visit(ctx, ScalaElementTypes.ENUMERATOR, ctx.pattern1() != null)
 
   override def visitKThisReference(ctx: KThisReferenceContext): Unit = visit(ctx, ScalaElementTypes.THIS_REFERENCE)
@@ -168,6 +166,8 @@ class ScalaLangVisitorImpl(language: Language, parser: Parser, val builder: PsiB
   override def visitInfixExpr(ctx: InfixExprContext): Unit = InfixExprVisitor.visit(this, ctx)
 
   override def visitPrefixExpr(ctx: PrefixExprContext): Unit = PrefixExprVisitor.visit(this, ctx)
+
+  override def visitArgumentExprsBlock(ctx: ArgumentExprsBlockContext): Unit = visit(ctx, ScalaElementTypes.ARG_EXPRS)
 
   override def visitArgumentExprsParen(ctx: ArgumentExprsParenContext): Unit = visit(ctx, ScalaElementTypes.ARG_EXPRS)
 
