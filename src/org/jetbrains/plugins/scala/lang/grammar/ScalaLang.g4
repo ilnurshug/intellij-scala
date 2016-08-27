@@ -79,7 +79,7 @@ pathRefExpr       :  stableIdRefExpr Nl* '.' Nl* id
                   |  id ;
 
 reference         : id ;
-thisReference     : (reference Nl* '.' Nl*)? Nl* 'this' ;
+thisReference     : (reference Nl* '.' Nl*)? 'this' ;
 
 stableIdRef       :  stableIdRef Nl* '.' Nl* id
                   |  thisReference Nl* '.' Nl* id
@@ -106,12 +106,12 @@ wildcardType      : '_' (Nl* '>:' Nl* type)? (Nl* '<:' Nl* type)? ;
 
 existentialType   : infixType Nl* existentialClause ;
 
-existentialClause : 'forSome' Nl* '{' /*{enableNewlines();}*/ Nl* existentialDcl ( semi  existentialDcl)* Nl* '}' /*{restoreNewlinesState();}*/ ;
+existentialClause : 'forSome' Nl* '{' /*{enableNewlines();}*/ Nl* existentialDcl ( semi existentialDcl)* Nl* '}' /*{restoreNewlinesState();}*/ ;
 
 existentialDcl    : typeDeclaration
                   | valueDeclaration;
 
-infixType         : compoundOrWildType ( /*{!isNl()}?*/ id  Nl? compoundOrWildType )*;
+infixType         : compoundOrWildType (id  Nl? compoundOrWildType )*;
 
 compoundOrWildType: wildcardType2 | compoundType ;
 
@@ -143,16 +143,7 @@ typeArgs          : '[' /*{disableNewlines();}*/ Nl* type ( Nl* ',' Nl* type)* N
 
 types             : ( '=>' Nl* type | type Nl* '*' | type) (Nl* ',' Nl* ( '=>' Nl* type | type Nl* '*' | type) )*;
 
-refinement        : Nl? '{' /*{enableNewlines();}*/ refineStatSeq '}' /*{restoreNewlinesState();}*/ ;
-
-refineStatSeq     : refineStat refineStatSub
-                  | refineStatSub
-                  | ;
-
-refineStatSub     : Nl+ refineStat refineStatSub
-                  | SEMICOLON refineStat refineStatSub
-                  | SEMICOLON refineStatSub
-                  | ;
+refinement        : Nl? '{' /*{enableNewlines();}*/ refineStat (semi refineStat)*  '}' /*{restoreNewlinesState();}*/ ;
 
 refineStat        : dcl
                   | typeDefinition
@@ -187,7 +178,7 @@ expr1Sub          : postfixExpr Nl* (
 
 exprInParen       : '(' /*{disableNewlines();}*/ Nl* expr Nl* ')' /*{restoreNewlinesState();}*/ ;
 
-ifStmt            : 'if' Nl* exprInParen Nl*  expr ( semi?  'else' Nl* expr)? ;
+ifStmt            : 'if' Nl* exprInParen Nl*  expr ( semi? 'else' Nl* expr)? ;
 
 whileStmt         : 'while' Nl* exprInParen Nl*  expr ;
 
@@ -196,7 +187,7 @@ tryBlock          : 'try' Nl* ('{' /*{enableNewlines();}*/ Nl* block Nl* '}' /*{
 catchBlock        : 'catch' Nl*  expr ;
 finallyBlock      : 'finally' Nl* expr ;
 
-doStmt            : 'do' Nl* expr semi?  'while' Nl* exprInParen ;
+doStmt            : 'do' Nl* expr semi? 'while' Nl* exprInParen ;
 
 forStmt           : 'for' Nl* ('(' /*{disableNewlines();}*/ Nl* enumerators Nl* ')' /*{restoreNewlinesState();}*/ | '{' Nl* /*{enableNewlines();}*/ enumerators Nl* '}' /*{restoreNewlinesState();}*/)  (Nl*  'yield')? Nl* expr ;
 
@@ -258,7 +249,6 @@ subBlock          : Nl+ resultExpr
                   | SEMICOLON resultExpr
                   | Nl+ blockStat subBlock
                   | SEMICOLON blockStat subBlock
-                  | SEMICOLON subBlock
                   | ;
 
 blockNode         : block ;
@@ -272,7 +262,7 @@ blockStat         : import_
 resultExpr        : bindings Nl* '=>' Nl* blockNode
                   | (('implicit' Nl*)? id | '_')  (Nl* ':' Nl* compoundType)? Nl* '=>' Nl* blockNode ;
 
-enumerators       : generator  (Nl* ( semi Nl* enumerator | guard) )* ;
+enumerators       : generator  (Nl* ( semi enumerator | guard) )* ;
 
 enumerator        : generator
                   | guard
@@ -433,15 +423,8 @@ annotationsNonEmpty
 
 templateBody      : Nl?  '{' /*{enableNewlines();}*/ Nl* selfType?  templateStatSeq Nl* '}' /*{restoreNewlinesState();}*/ ;
 
-templateStatSeq   : templateStat templateStatSeqSub
-                  | templateStatSeqSub
-                  | ;
-
-templateStatSeqSub: Nl+ templateStat templateStatSeqSub
-                  | SEMICOLON templateStat templateStatSeqSub
-                  | SEMICOLON templateStatSeqSub
-                  | ;
-
+templateStatSeq   : templateStat (semi templateStat)*
+                  ;
 templateStat      : import_
                   | def
                   | dcl
@@ -566,28 +549,16 @@ annotTypeNoMultipleSQBrackets
 
 argumentExprsParen: '(' /*{disableNewlines();}*/ Nl* exprs? Nl* ')' /*{restoreNewlinesState();}*/ ;
 
-earlyDefs         : '{' /*{enableNewlines();}*/ Nl* (patVarDef ( /*(SEMICOLON | {isNl()}? emptyNl)*/ semi  patVarDef )* )? Nl* '}' /*{restoreNewlinesState();}*/  ;
+earlyDefs         : '{' /*{enableNewlines();}*/ Nl* (patVarDef ( semi  patVarDef )* )? Nl* '}' /*{restoreNewlinesState();}*/  ;
 
 constrExpr        : selfInvocation 
                   | constrBlock ;
                   
-constrBlock       : '{' /*{enableNewlines();}*/ Nl* selfInvocation? blockStatSeqSub Nl* '}' /*{restoreNewlinesState();}*/ ;
-
-blockStatSeqSub   : Nl+ blockStat blockStatSeqSub
-                  | SEMICOLON blockStat blockStatSeqSub
-                  | SEMICOLON blockStatSeqSub
-                  | ;
+constrBlock       : '{' /*{enableNewlines();}*/ Nl* selfInvocation? blockStat (semi blockStat)* Nl* '}' /*{restoreNewlinesState();}*/ ;
 
 selfInvocation    : 'this' ( Nl* argumentExprs argumentExprsNoNl*)? ;
 
-topStatSeq        : topStat topStatSeqSub
-                  | topStatSeqSub
-                  | ;
-
-topStatSeqSub     : Nl+ topStat topStatSeqSub
-                  | SEMICOLON topStat topStatSeqSub
-                  | SEMICOLON topStatSeqSub
-                  | ;
+topStatSeq        : topStat (semi topStat)*;
 
 topStat           : tmplDef
                   | import_
@@ -603,7 +574,7 @@ emptyAnnotations  : ;
 
 compilationUnit   : packageDcl ;
 
-packageDcl        : 'package'  qualId  semi? packageDcl?
+packageDcl        : Nl* 'package'  qualId  (semi packageDcl)?
                   | topStatSeq ;
 
 id                : idNoVDash
@@ -620,7 +591,7 @@ idNoVDash         : VARID
                   | TLD
                   ;
 
-semi              : SEMICOLON
+semi              : SEMICOLON Nl*
                   | Nl+;
 
 xmlExpr           : /*{disableNewlines();}*/ xmlContent Nl* element (Nl* element)* /*{restoreNewlinesState();}*/
