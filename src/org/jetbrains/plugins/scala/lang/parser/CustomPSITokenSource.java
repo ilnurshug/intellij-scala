@@ -11,12 +11,31 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes;
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypesEx;
 import org.jetbrains.plugins.scala.lang.lexer.ScalaXmlTokenTypes;
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilderImpl$;
+import java.util.*;
 
 public class CustomPSITokenSource extends PSITokenSource {
 
     private static final HashMap<IElementType, Integer> map = new HashMap<IElementType, Integer>();
     private int nlCount = 0;
     private boolean advance = false;
+
+    private Deque<Boolean> newlinesEnabled = null;
+
+    void disableNewlines() {
+        newlinesEnabled.push(false);
+    }
+
+    void enableNewlines() {
+        newlinesEnabled.push(true);
+    }
+
+    void restoreNewlinesState() {
+        if (newlinesEnabled.isEmpty()) {
+            System.out.println("newlinesEnabled stack is empty");
+        }
+        assert(!newlinesEnabled.isEmpty());
+        newlinesEnabled.pop();
+    }
 
     static {
         map.put(ScalaTokenTypes.tLBRACE, ScalaLangParser.LBRACE);
@@ -116,6 +135,8 @@ public class CustomPSITokenSource extends PSITokenSource {
 
     public CustomPSITokenSource(PsiBuilder builder) {
         super(builder);
+
+        newlinesEnabled = new ArrayDeque<Boolean>();
     }
 
     @Override
@@ -123,12 +144,16 @@ public class CustomPSITokenSource extends PSITokenSource {
         ProgressIndicatorProvider.checkCanceled();
 
         if (nlCount == 0) {
-            int count = advance ? 0 : ScalaPsiBuilderImpl$.MODULE$.countNewlineBeforeCurrentToken(builder);
+            int count = countNewlines();
 
             if (count == 0) {
                 advance = false;
 
-                int type = convertScalaTokenTypeToInt(builder.getTokenType());
+                final IElementType tokenType = builder.getTokenType();
+
+                proceedToken(tokenType);
+
+                int type = getANTLRTokenTypeByScalaTokenType(tokenType);
                 return nextTokenHelper(type);
             } else {
                 nlCount = count - 1;
@@ -143,7 +168,30 @@ public class CustomPSITokenSource extends PSITokenSource {
 
     }
 
-    private int convertScalaTokenTypeToInt(IElementType t) {
+    private void proceedToken(IElementType tokenType) {
+        if (tokenType == ScalaTokenTypes.tLSQBRACKET || tokenType == ScalaTokenTypes.tLPARENTHESIS) {
+            disableNewlines();
+        }
+        else if (tokenType == ScalaTokenTypes.tRSQBRACKET || tokenType == ScalaTokenTypes.tRPARENTHESIS) {
+            restoreNewlinesState();
+        }
+        else if (tokenType == ScalaTokenTypes.tLBRACE) {
+            enableNewlines();
+        }
+        else if (tokenType == ScalaTokenTypes.tRBRACE) {
+            restoreNewlinesState();
+        }
+    }
+
+    private int countNewlines() {
+        if (!newlinesEnabled.isEmpty() && !newlinesEnabled.peek()) {
+            return 0;
+        } else {
+            return advance ? 0 : ScalaPsiBuilderImpl$.MODULE$.countNewlineBeforeCurrentToken(builder);
+        }
+    }
+
+    private int getANTLRTokenTypeByScalaTokenType(IElementType t) {
         if (t == null) return Token.EOF;
 
         if (t == ScalaTokenTypes.tIDENTIFIER || t == ScalaTokenTypes.tINTERPOLATED_STRING_ID) {
@@ -152,14 +200,14 @@ public class CustomPSITokenSource extends PSITokenSource {
             char first = tokenText.charAt(0);
             char last = tokenText.charAt(len - 1);
 
-            return identifierTextToTokenType(first, last, len);
+            return getTokenTypeByIdText(first, last, len);
         }
         else {
             return map.getOrDefault(t, 1);
         }
     }
 
-    private static int identifierTextToTokenType(char first, char last, int len) {
+    private static int getTokenTypeByIdText(char first, char last, int len) {
         if (len == 1) {
             switch(first) {
                 case '+': return ScalaLangParser.OP_1;

@@ -566,7 +566,7 @@ topStat           : tmplDef
                   | packageObject
                   | ;
                     
-packaging         : 'package' Nl* qualId  Nl?  '{' Nl* /*{enableNewlines();}*/ topStatSeq Nl* '}' /*{restoreNewlinesState();}*/ ;
+packaging         : 'package' Nl* qualId  Nl?  '{' /*{enableNewlines();}*/  Nl* topStatSeq Nl* '}' /*{restoreNewlinesState();}*/ ;
 
 packageObject     : emptyAnnotations emptyModifiers 'package' Nl* 'object' Nl* objectDef ;
 
