@@ -9,7 +9,7 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.{ScalaElementTypes, ScalaLangVisitorImpl}
 
 /*
-infixType         : compoundType (  id  Nl?  compoundType)*;
+infixType         : compoundOrWildType (id  Nl? compoundOrWildType )*;
  */
 
 object InfixTypeVisitor extends VisitorHelper[InfixTypeContext] {
@@ -25,11 +25,8 @@ object InfixTypeVisitor extends VisitorHelper[InfixTypeContext] {
     var count = 0
     markerList = infixTypeMarker :: markerList
 
-    //CompoundTypeVisitor.visit(visitor, builder, context.compoundType(typeIdx), args)
-
     visitor.visitCompoundOrWildType(context.compoundOrWildType(typeIdx))
     typeIdx += 1
-
 
     var assoc: Int = 0  //this mark associativity: left - 1, right - -1
     while (typeIdx < typeCount) {
@@ -59,7 +56,6 @@ object InfixTypeVisitor extends VisitorHelper[InfixTypeContext] {
         markerList = newMarker :: markerList
       }
 
-      //CompoundTypeVisitor.visit(visitor, builder, context.compoundType(typeIdx), args)
       visitor.visitCompoundOrWildType(context.compoundOrWildType(typeIdx))
       typeIdx += 1
 

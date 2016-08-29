@@ -19,7 +19,7 @@ public abstract class CustomANTLRParserAdaptor extends ANTLRParserAdaptor {
     protected ASTNode parse(PsiBuilder builder, IElementType root, boolean buildTree) {
         ProgressIndicatorProvider.checkCanceled();
 
-        System.out.println(builder.getOriginalText());
+        //System.out.println(builder.getOriginalText());
 
         TokenSource source = new CustomPSITokenSource(builder);
 
@@ -31,9 +31,9 @@ public abstract class CustomANTLRParserAdaptor extends ANTLRParserAdaptor {
         ParseTree parseTree = null;
         PsiBuilder.Marker rollbackMarker = builder.mark();
         try {
-            long millis = System.currentTimeMillis();
+            //long millis = System.currentTimeMillis();
             parseTree = parse(parser, root);
-            System.out.println(System.currentTimeMillis()- millis);
+            //System.out.println(System.currentTimeMillis()- millis);
 
             //ParseTreeToDot conv = new ParseTreeToDot();
             //System.out.println(conv.convert(parseTree));

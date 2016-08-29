@@ -110,9 +110,9 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
     //val file = if (ScalaParserDefinition.useOldParser) (Header + "\n" + line).parse else (Header.replace('\n', ';') + ";" + line).parse
     val file = (Header + "\n" + line).parse
 
-    println(line)
-    val converter = new ASTTreeToDot()
-    println(converter.convert(file.getNode))
+    //println(line)
+    //val converter = new ASTTreeToDot()
+    //println(converter.convert(file.getNode))
 
     Compatibility.seqClass = file.depthFirst.findByType(classOf[ScClass])
     try {

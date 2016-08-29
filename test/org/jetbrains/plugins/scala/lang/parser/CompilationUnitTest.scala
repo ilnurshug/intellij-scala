@@ -72,7 +72,7 @@ class CompilationUnitTest extends SimpleTestCase {
   }
 
   def testCompilationUnit5(): Unit = {
-    doTest("""class A{ {x => 3} }""")
+    doTest("val x: Int forSome {} = null\n/*start*/x/*end*/\n//Int")
   }
 
   def testCompilationUnit6(): Unit = {

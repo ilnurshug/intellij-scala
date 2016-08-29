@@ -106,7 +106,7 @@ wildcardType      : '_' (Nl* '>:' Nl* type)? (Nl* '<:' Nl* type)? ;
 
 existentialType   : infixType Nl* existentialClause ;
 
-existentialClause : 'forSome' Nl* '{' /*{enableNewlines();}*/ Nl* existentialDcl ( semi existentialDcl)* Nl* '}' /*{restoreNewlinesState();}*/ ;
+existentialClause : 'forSome' Nl* '{' /*{enableNewlines();}*/ Nl* (existentialDcl ( semi existentialDcl)*)? Nl* '}' /*{restoreNewlinesState();}*/ ;
 
 existentialDcl    : typeDeclaration
                   | valueDeclaration;
@@ -170,10 +170,10 @@ expr1             : ifStmt
                   | returnStmt
                   | expr1Sub ;
 
-expr1Sub          : postfixExpr Nl* (
-                        '=' Nl* expr
-                      | ascription
-                      | 'match' Nl* '{' Nl* caseClauses Nl* '}'
+expr1Sub          : postfixExpr (
+                        Nl* '=' Nl* expr
+                      | Nl* ascription
+                      | Nl* 'match' Nl* '{' Nl* caseClauses Nl* '}'
                     )?;
 
 exprInParen       : '(' /*{disableNewlines();}*/ Nl* expr Nl* ')' /*{restoreNewlinesState();}*/ ;
@@ -529,10 +529,13 @@ traitDef          : id (Nl* typeParamClause)? Nl* traitTemplateOpt ;
 
 objectDef         : id Nl* classTemplateOpt ;
 
-classTemplateOpt  : ('extends'|UPPER_BOUND) Nl* classTemplate | (('extends'|UPPER_BOUND)? templateBody)? ;
+classTemplateOpt  : ('extends'|UPPER_BOUND) Nl* classTemplate
+                  | ('extends'|UPPER_BOUND)? templateBody
+                  | ;
 
-traitTemplateOpt  : (('extends'|UPPER_BOUND) Nl* traitTemplate)
-                  | (('extends'|UPPER_BOUND)? templateBody)? ;
+traitTemplateOpt  : ('extends'|UPPER_BOUND) Nl* traitTemplate
+                  | ('extends'|UPPER_BOUND)? templateBody
+                  | ;
 
 classTemplate     : (earlyDefs Nl* 'with' Nl*)?  classParents templateBody? ;
 

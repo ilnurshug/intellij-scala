@@ -21,15 +21,15 @@ public class CustomPSITokenSource extends PSITokenSource {
 
     private Deque<Boolean> newlinesEnabled = null;
 
-    void disableNewlines() {
+    private void disableNewlines() {
         newlinesEnabled.push(false);
     }
 
-    void enableNewlines() {
+    private void enableNewlines() {
         newlinesEnabled.push(true);
     }
 
-    void restoreNewlinesState() {
+    private void restoreNewlinesState() {
         if (newlinesEnabled.isEmpty()) {
             System.out.println("newlinesEnabled stack is empty");
         }

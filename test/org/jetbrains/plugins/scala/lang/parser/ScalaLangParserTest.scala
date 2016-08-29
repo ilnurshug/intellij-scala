@@ -26,7 +26,7 @@ class ScalaLangParserTest extends SimpleTestCase
     val node = builder.getTreeBuilt
 
     val converter = new ASTTreeToDot()
-    //println(converter.convert(node))
+    println(converter.convert(node))
 
     node.getPsi
   }
@@ -39,7 +39,7 @@ class ScalaLangParserTest extends SimpleTestCase
 
 
   def testProgram(): Unit = {
-    doTest("class a {\n  def b (a : A) = expr\n}")
+    doTest("object A {\n  def boo() {<caret>}\n}")
   }
 
   def testProgram0(): Unit = {
@@ -87,7 +87,7 @@ class ScalaLangParserTest extends SimpleTestCase
 
   def testProgram6() {
     doTest("""class a {
-               a.b.c
+               a.b.`def`
              }""")
   }
 
@@ -113,7 +113,7 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testProgram10(): Unit = {
-    doTest("{ \n def a() {} \n def b(){} }"/*.replace('\n',';')*/)
+    doTest("val x: Int forSome {} = null\n/*start*/x/*end*/\n//Int")
   }
 
   def testProgram11(): Unit = {

@@ -1078,6 +1078,7 @@ object ScalaPsiElementFactory {
       }
     }
     else {
+      println("here")
       val rule: String = "type"
       createElementWithContext(text, context, child, ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, rule)) match {
         case te: ScTypeElement => te
