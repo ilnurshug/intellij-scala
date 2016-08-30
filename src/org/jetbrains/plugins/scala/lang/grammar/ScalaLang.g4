@@ -657,164 +657,168 @@ xmlPatterns       : patternArgsSub ;
 
 
 // Lexer
-XML_START_TAG_START     : '<';
-XML_EMPTY_ELEMENT_END   : '/>';
-XML_TAG_END             : '>';
-XML_END_TAG_START       : '</';
-XML_COMMENT_START       : '<!--';
-XML_COMMENT_END         : '-->';
-XML_CDATA_START         : '<![CDATA[' ;
-XML_CDATA_END           : ']]>' ;
-XML_EQ                  : ASSIGN;
-XML_PI_START            : '<?';
-XML_PI_END              : '?>';
+XML_START_TAG_START
+                  : '<';
+XML_EMPTY_ELEMENT_END
+                  : '/>';
+XML_TAG_END       : '>';
+XML_END_TAG_START : '</';
+XML_COMMENT_START : '<!--';
+XML_COMMENT_END   : '-->';
+XML_CDATA_START   : '<![CDATA[' ;
+XML_CDATA_END     : ']]>' ;
+XML_EQ            : ASSIGN;
+XML_PI_START      : '<?';
+XML_PI_END        : '?>';
 SCALA_IN_XML_INJECTION_START
-                        : LBRACE ;
+                  : LBRACE ;
 SCALA_IN_XML_INJECTION_END
-                        : RBRACE ;
+                  : RBRACE ;
 XML_ATTRIBUTE_VALUE_START_DELIMITER
-                        : Q_MARK | Q_MARK_2 ;
+                  : Q_MARK | Q_MARK_2 ;
 XML_ATTRIBUTE_VALUE_END_DELIMITER
-                        : Q_MARK | Q_MARK_2 ;
+                  : Q_MARK | Q_MARK_2 ;
 
-
-XML_NAME                : PrintableChar+;
-XML_DATA_CHARACTERS     : PrintableChar+;
-XML_TAG_CHARACTERS      : PrintableChar+;
+XML_NAME          : PrintableChar+;
+XML_DATA_CHARACTERS
+                  : PrintableChar+;
+XML_TAG_CHARACTERS: PrintableChar+;
 XML_ATTRIBUTE_VALUE_TOKEN
-                        : PrintableChar+;
-XML_CHAR_ENTITY_REF     : PrintableChar+;
-XML_COMMENT_CHARACTERS  : PrintableChar+;
+                  : PrintableChar+;
+XML_CHAR_ENTITY_REF
+                  : PrintableChar+;
+XML_COMMENT_CHARACTERS
+                  : PrintableChar+;
 
+VDASH             : '|';
+SEMICOLON         : ';';
+LBRACE		      : '{';
+RBRACE		      : '}';
+LSQBRACKET	      : '[';
+RSQBRACKET	      : ']';
+LPARENTHESIS	  : '(';
+RPARENTHESIS	  : ')';
+DOT				  : '.';
+COMMA			  : ',';
+Q_MARK			  : '\'';
+Q_MARK_2		  : '"';
+COLON			  : ':';
+UNDER		      : '_';
+ASSIGN		   	  : '=';
+FUNTYPE			  : '=>';
+CHOOSE			  : '<-';
+UPPER_BOUND		  : '<:';
+LOWER_BOUND	      : '>:';
+INNER_CLASS		  : '#';
+AT		  	      : '@';
+VIEW			  : '<%';
+SLASH			  : '\\';
+ABSTRACT		  : 'abstract';
+CASE			  : 'case';
+CATCH			  : 'catch';
+CLASS			  : 'class';
+DEF				  : 'def';
+DO				  : 'do';
+ELSE			  : 'else';
+EXTENDS			  : 'extends';
+FINAL			  : 'final';
+FINALLY			  : 'finally';
+FOR				  : 'for';
+FOR_SOME		  : 'forSome';
+IF				  : 'if';
+IMPLICIT		  : 'implicit';
+IMPORT			  : 'import';
+LAZY			  : 'lazy';
+MACRO			  : 'macro';
+MATCH			  : 'match';
+NEW				  : 'new';
+NULL			  : 'null';
+OBJECT			  : 'object';
+OVERRIDE		  : 'override';
+PACKAGE			  : 'package';
+PRIVATE			  : 'private';
+PROTECTED		  : 'protected';
+RETURN			  : 'return';
+SEALED			  : 'sealed';
+SUPER			  : 'super';
+THIS			  : 'this';
+THROW			  : 'throw';
+TRAIT			  : 'trait';
+TRY				  : 'try';
+TYPE			  : 'type';
+VAL				  : 'val';
+VAR				  : 'var';
+WHILE			  : 'while';
+WITH			  : 'with';
+YIELD			  : 'yield';
+OP_1		      : '+';
+OP_2			  : '-';
+OP_3			  : '*';
+EPM				  : '!';
+TLD				  : '~';
 
-VDASH           :  '|';
-SEMICOLON       :  ';';
-LBRACE		    :  '{';
-RBRACE		    :  '}';
-LSQBRACKET	    :  '[';
-RSQBRACKET	    :  ']';
-LPARENTHESIS	:  '(';
-RPARENTHESIS	:  ')';
-DOT				:  '.';
-COMMA			:  ',';
-
-Q_MARK			:  '\'';
-Q_MARK_2		:  '"';
-
-COLON			:  ':';
-UNDER		    :  '_';
-ASSIGN			:  '=';
-FUNTYPE			:  '=>';
-CHOOSE			:  '<-';
-UPPER_BOUND		:  '<:';
-LOWER_BOUND	    :  '>:';
-INNER_CLASS		:  '#';
-AT		  	    :  '@';
-VIEW			:  '<%';
-
-SLASH			:  '\\';
-
-ABSTRACT		:  'abstract';
-CASE			:  'case';
-CATCH			:  'catch';
-CLASS			:  'class';
-DEF				:  'def';
-DO				:  'do';
-ELSE			:  'else';
-EXTENDS			:  'extends';
-FINAL			:  'final';
-FINALLY			:  'finally';
-FOR				:  'for';
-FOR_SOME		:  'forSome';
-IF				:  'if';
-IMPLICIT		:  'implicit';
-IMPORT			:  'import';
-LAZY			:  'lazy';
-MACRO			:  'macro';
-MATCH			:  'match';
-NEW				:  'new';
-NULL			:  'null';
-OBJECT			:  'object';
-OVERRIDE		:  'override';
-PACKAGE			:  'package';
-PRIVATE			:  'private';
-PROTECTED		:  'protected';
-RETURN			:  'return';
-SEALED			:  'sealed';
-SUPER			:  'super';
-THIS			:  'this';
-THROW			:  'throw';
-TRAIT			:  'trait';
-TRY				:  'try';
-TYPE			:  'type';
-VAL				:  'val';
-VAR				:  'var';
-WHILE			:  'while';
-WITH			:  'with';
-YIELD			:  'yield';
-
-OP_1		    :  '+';
-OP_2			:  '-';
-OP_3			:  '*';
-EPM				:  '!';
-TLD				:  '~';
-
-
-BooleanLiteral   :  'true' | 'false';
-CharacterLiteral :  '\'' (PrintableChar | CharEscapeSeq) '\'';
-StringLiteral    :  '"' StringElement* '"' ;
+BooleanLiteral    : 'true' | 'false';
+CharacterLiteral  : '\'' (PrintableChar | CharEscapeSeq) '\'';
+StringLiteral     : '"' StringElement* '"' ;
 MultilineStringLiteral
-                 : '"""' MultiLineChars '"""';
+                  : '"""' MultiLineChars '"""';
 
-SymbolLiteral    :  '\'' ID;
-IntegerLiteral   :  (DecimalNumeral | HexNumeral) ('L' | 'l')?;
+SymbolLiteral     : '\'' ID;
+IntegerLiteral    : (DecimalNumeral | HexNumeral) ('L' | 'l')?;
 FloatingPointLiteral
-                 :  Digit+ '.' Digit+ ExponentPart? FloatType?
-                 |  '.' Digit+ ExponentPart? FloatType?
-                 |  Digit ExponentPart FloatType?
-                 |  Digit+ ExponentPart? FloatType;
+                  : Digit+ '.' Digit+ ExponentPart? FloatType?
+                  | '.' Digit+ ExponentPart? FloatType?
+                  | Digit ExponentPart FloatType?
+                  | Digit+ ExponentPart? FloatType;
 
-Nl               :  '\r'? '\n';
+Nl                : '\r'? '\n';
 
-VARID            :  Lower Idrest ;
+VARID             : Lower Idrest ;
 
-ID               : Op
-                 | Upper Idrest
-                 | Lower Idrest ;
+ID                : Op
+                  | Upper Idrest
+                  | Lower Idrest ;
 
+WHITE_SPACE_IN_LINE
+                  : [ \t]+ ;
 
-WHITE_SPACE_IN_LINE       :  [ \t]+ ;
-
-LINE_COMMENT : '//' .*? Nl          -> channel(HIDDEN) ;
-BLOCK_COMMENT      : '/*' .*? '*/'    	-> channel(HIDDEN) ;
-DOC_COMMENT : ;
-SH_COMMENT : ;
-
+LINE_COMMENT      : '//' .*? Nl         -> channel(HIDDEN) ;
+BLOCK_COMMENT     : '/*' .*? '*/'    	-> channel(HIDDEN) ;
+DOC_COMMENT       : ;
+SH_COMMENT        : ;
 
 
 // fragments
-fragment UnicodeEscape    :	'\\' 'u' 'u'? HexDigit HexDigit HexDigit HexDigit ;
+fragment UnicodeEscape
+                  :	'\\' 'u' 'u'? HexDigit HexDigit HexDigit HexDigit ;
 
+fragment Op       : Opchar+;
+fragment Opchar   : ~[a-zA-Z0-9()[\]{}.;, \r\t\n'"$_] ;
 
-fragment Op               :  Opchar+;
-fragment Opchar           :  ~[a-zA-Z0-9()[\]{}.;, \r\t\n'"$_] ;
+fragment Idrest   : (Letter | Digit)* ('_' Op)?;
 
-fragment Idrest           :  (Letter | Digit)* ('_' Op)?;
+fragment StringElement
+                  : '\u0020'| '\u0021'|'\u0023' .. '\u007F'
+                  | CharEscapeSeq;
 
-fragment StringElement    :  '\u0020'| '\u0021'|'\u0023' .. '\u007F'
-                          |  CharEscapeSeq;
-fragment MultiLineChars   :  ('"'? '"'? .*?)* '"'*;
+fragment MultiLineChars
+                  : ('"'? '"'? .*?)* '"'*;
 
-fragment HexDigit         :  '0' .. '9'  |  'A' .. 'F'  |  'a' .. 'f' ;
-fragment FloatType        :  'F' | 'f' | 'D' | 'd';
-fragment Upper            :  'A'  ..  'Z' | '$' | '_';  // and Unicode category Lu
-fragment Lower            :  'a' .. 'z'; // and Unicode category Ll
-fragment Letter           :  Upper | Lower; // and Unicode categories Lo, Lt, Nl
-fragment ExponentPart     :  ('E' | 'e') ('+' | '-')? Digit+;
-fragment PrintableChar    : '\u0020' .. '\u007F' ;
-fragment CharEscapeSeq    : '\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\');
-fragment DecimalNumeral   :  '0' | NonZeroDigit Digit*;
-fragment HexNumeral       :  '0' 'x' HexDigit HexDigit+;
-fragment Digit            :  '0' | NonZeroDigit;
-fragment NonZeroDigit     :  '1' .. '9';
-
+fragment HexDigit : '0' .. '9'  |  'A' .. 'F'  |  'a' .. 'f' ;
+fragment FloatType: 'F' | 'f' | 'D' | 'd';
+fragment Upper    : 'A'  ..  'Z' | '$' | '_';                      // and Unicode category Lu
+fragment Lower    : 'a' .. 'z';                                    // and Unicode category Ll
+fragment Letter   : Upper | Lower;                                 // and Unicode categories Lo, Lt, Nl
+fragment ExponentPart
+                  : ('E' | 'e') ('+' | '-')? Digit+;
+fragment PrintableChar
+                  : '\u0020' .. '\u007F' ;
+fragment CharEscapeSeq
+                  : '\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\');
+fragment DecimalNumeral
+                  : '0' | NonZeroDigit Digit*;
+fragment HexNumeral
+                  : '0' 'x' HexDigit HexDigit+;
+fragment Digit    : '0' | NonZeroDigit;
+fragment NonZeroDigit
+                  : '1' .. '9';
