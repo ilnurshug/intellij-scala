@@ -26,14 +26,6 @@ trait Type {
   protected val infixType: InfixType
 
   def parse(builder: ScalaPsiBuilder, star: Boolean = false, isPattern: Boolean = false): Boolean = {
-
-    if (ScalaParserDefinition.replaceTypeParsing) {
-      println(builder.getTokenText)
-      val b = ANTLRScalaLangParserAdaptor.INSTANCE.parse(builder, "type")
-      println(b)
-      return true
-    }
-
     val typeMarker = builder.mark
     if (!infixType.parse(builder, star, isPattern)) {
       builder.getTokenType match {

@@ -1,7 +1,10 @@
 package org.jetbrains.plugins.scala.lang.parser
 
+import java.util.concurrent.Callable
+
 import com.intellij.lang.PsiBuilderFactory
 import com.intellij.psi.PsiElement
+import org.antlr.v4.runtime.ParserRuleContext
 import org.jetbrains.plugins.scala.base.SimpleTestCase
 import org.jetbrains.plugins.scala.lang.lexer.ScalaLexer
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilderImpl
@@ -13,7 +16,7 @@ import org.junit.Assert
 class ScalaLangParserTest extends SimpleTestCase
 {
 
-  def parseProgram(s: String, startRule: String) : PsiElement = {
+  def parseProgram(s: String, startRule: () => ParserRuleContext) : PsiElement = {
     val parserDefinition = new ScalaParserDefinition()
 
     val tmp = PsiBuilderFactory.getInstance.createBuilder(parserDefinition, new ScalaLexer(), s)
@@ -21,7 +24,11 @@ class ScalaLangParserTest extends SimpleTestCase
 
     val parser : ANTLRScalaLangParserAdaptor = ANTLRScalaLangParserAdaptor.INSTANCE
     val marker = builder.mark
-    parser.parse(builder, startRule)
+
+    parser.parse(builder, new Callable[ParserRuleContext] {
+      override def call(): ParserRuleContext = startRule()
+    })
+
     marker.done(ScalaElementTypes.FILE)
     val node = builder.getTreeBuilt
 
@@ -31,7 +38,7 @@ class ScalaLangParserTest extends SimpleTestCase
     node.getPsi
   }
 
-  def doTest(s: String, startRule: String = "program"): Unit = {
+  def doTest(s: String, startRule: () => ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.program): Unit = {
     val elem = parseProgram(s, startRule)
     Assert.assertEquals(s, elem.getText)
     //Assert.assertEquals(true, true)
@@ -62,7 +69,7 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testProgram2(): Unit = {
-    doTest("def (){}", "def")
+    doTest("def (){}", ANTLRScalaLangParserAdaptor.PARSER.`def`)
   }
 
   def testProgram3(): Unit = {
@@ -109,7 +116,7 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testProgram9(): Unit = {
-    doTest("a +: b +: c +: d", "pattern3")
+    doTest("a +: b +: c +: d", ANTLRScalaLangParserAdaptor.PARSER.pattern3)
   }
 
   def testProgram10(): Unit = {
@@ -117,23 +124,23 @@ class ScalaLangParserTest extends SimpleTestCase
   }
 
   def testProgram11(): Unit = {
-    doTest("val q\"(..$args) = $body\" = tt\nargs match { case r\"${a: Int}\" => 1 }", "block")
+    doTest("val q\"(..$args) = $body\" = tt\nargs match { case r\"${a: Int}\" => 1 }", ANTLRScalaLangParserAdaptor.PARSER.block)
   }
 
   def testProgram12(): Unit = {
-    doTest("1 + \n2", "simpleExpr")
+    doTest("1 + \n2", ANTLRScalaLangParserAdaptor.PARSER.simpleExpr)
   }
 
   def testProgram13(): Unit = {
-    doTest("1 + /*\n*/\n2", "simpleExpr")
+    doTest("1 + /*\n*/\n2", ANTLRScalaLangParserAdaptor.PARSER.simpleExpr)
   }
 
   def testProgram14(): Unit = {
-    doTest("""case a | b => g""", "caseClause")
+    doTest("""case a | b => g""", ANTLRScalaLangParserAdaptor.PARSER.caseClause)
   }
 
   def testProgram15(): Unit = {
-    doTest("case Some(a@Some(),_*) => a", "caseClauses")
+    doTest("case Some(a@Some(),_*) => a", ANTLRScalaLangParserAdaptor.PARSER.caseClauses)
   }
 
   def testProgram16(): Unit = {
@@ -200,10 +207,6 @@ class ScalaLangParserTest extends SimpleTestCase
       builder.advanceLexer()
     }
     assert(true)
-  }
-
-  def testExperiment3(): Unit = {
-    doTest("A \n B \n C", "testRule")
   }
 
   def testExperiment4(): Unit = {

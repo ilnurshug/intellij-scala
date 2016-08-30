@@ -590,7 +590,7 @@ idNoVDash         : VARID
                   | OP_1
                   | OP_2
                   | OP_3
-                  | EPT
+                  | EPM
                   | TLD
                   ;
 
@@ -756,7 +756,7 @@ YIELD			:  'yield';
 OP_1		    :  '+';
 OP_2			:  '-';
 OP_3			:  '*';
-EPT				:  '!';
+EPM				:  '!';
 TLD				:  '~';
 
 

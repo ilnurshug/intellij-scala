@@ -213,7 +213,7 @@ public class CustomPSITokenSource extends PSITokenSource {
                 case '+': return ScalaLangParser.OP_1;
                 case '-': return ScalaLangParser.OP_2;
                 case '*': return ScalaLangParser.OP_3;
-                case '!': return ScalaLangParser.EPT;
+                case '!': return ScalaLangParser.EPM;
                 case '~': return ScalaLangParser.TLD;
                 case '|': return ScalaLangParser.VDASH;
                 default:  return Character.isLowerCase(first) ? ScalaLangParser.VARID : ScalaLangParser.ID;

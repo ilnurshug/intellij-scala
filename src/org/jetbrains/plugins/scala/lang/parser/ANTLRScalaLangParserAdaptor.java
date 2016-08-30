@@ -5,11 +5,13 @@ import com.intellij.lang.Language;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.psi.tree.IElementType;
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.jetbrains.plugins.scala.ScalaLanguage;
 import org.jetbrains.plugins.scala.lang.ScalaLangParser;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.Callable;
 
 /**
  * Created by user on 7/20/16.
@@ -17,15 +19,15 @@ import java.lang.reflect.Method;
 public class ANTLRScalaLangParserAdaptor extends ScalaParser {
     public static final ANTLRScalaLangParserAdaptor INSTANCE = new ANTLRScalaLangParserAdaptor();
 
-    private final ScalaLangParser parser = new ScalaLangParser(null);
-    private final Language language = ScalaLanguage.Instance;
+    public static final ScalaLangParser PARSER = new ScalaLangParser(null);
+    public static final Language LANGUAGE = ScalaLanguage.Instance;
 
     private ANTLRScalaLangParserAdaptor() {
     }
 
     @Override
     public ASTNode parse(IElementType root, PsiBuilder builder) {
-        return new CustomANTLRParserAdaptor(language, parser) {
+        return new CustomANTLRParserAdaptor(LANGUAGE, PARSER) {
             @Override
             protected ParseTree parse(Parser parser, IElementType root) {
                 return ((ScalaLangParser) parser).program();
@@ -33,13 +35,12 @@ public class ANTLRScalaLangParserAdaptor extends ScalaParser {
         }.parse(root, builder);
     }
 
-    public boolean parse(PsiBuilder builder, final String rule) {
-        return new CustomANTLRParserAdaptor(language, parser) {
+    public boolean parse(PsiBuilder builder, final Callable<ParserRuleContext> rule) {
+        return new CustomANTLRParserAdaptor(LANGUAGE, PARSER) {
             @Override
             protected ParseTree parse(Parser parser, IElementType root) {
                 try {
-                    Method m = ((ScalaLangParser) parser).getClass().getMethod(rule);
-                    return (ParseTree)m.invoke(parser);
+                    return rule.call();
                 }
                 catch (Exception e) {
                     System.out.print(e.getMessage());

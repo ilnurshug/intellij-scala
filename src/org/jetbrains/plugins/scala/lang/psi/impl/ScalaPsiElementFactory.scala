@@ -4,6 +4,7 @@ package psi
 package impl
 
 import java.util
+import java.util.concurrent.Callable
 
 import com.intellij.lang.{ASTNode, PsiBuilderFactory}
 import com.intellij.openapi.project.Project
@@ -17,6 +18,7 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.IncorrectOperationException
+import org.antlr.v4.runtime.ParserRuleContext
 import org.apache.commons.lang.StringUtils
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
@@ -191,7 +193,11 @@ object ScalaPsiElementFactory {
 
   def createImplicitClauseFromTextWithContext(clauseText: String, manager: PsiManager,
                                               context: PsiElement): ScParameterClause = {
-    createElementWithContext(clauseText, context, contextLastChild(context), ImplicitParamClause.parse(_)) match {
+    createElementWithContext(clauseText, context, contextLastChild(context),
+      if (ScalaParserDefinition.useOldParser) ImplicitParamClause.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.implicitParamClause()
+      })) match {
       case clause: ScParameterClause => clause
       case _ => null
     }
@@ -199,28 +205,44 @@ object ScalaPsiElementFactory {
 
   def createImplicitClassParamClauseFromTextWithContext(clauseText: String, manager: PsiManager,
                                                         context: PsiElement): ScParameterClause = {
-    createElementWithContext(clauseText, context, contextLastChild(context), ImplicitClassParamClause.parse(_)) match {
+    createElementWithContext(clauseText, context, contextLastChild(context),
+      if (ScalaParserDefinition.useOldParser) ImplicitClassParamClause.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.implicitClassParamClause()
+      })) match {
       case clause: ScParameterClause => clause
       case _ => null
     }
   }
 
   def createEmptyClassParamClauseWithContext(manager: PsiManager, context: PsiElement): ScParameterClause = {
-    createElementWithContext("()", context, contextLastChild(context), ClassParamClause.parse(_)) match {
+    createElementWithContext("()", context, contextLastChild(context),
+      if (ScalaParserDefinition.useOldParser) ClassParamClause.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.classParamClause()
+      })) match {
       case clause: ScParameterClause => clause
       case _ => null
     }
   }
 
   def createClassParamClausesWithContext(text: String, context: PsiElement): ScParameters = {
-    createElementWithContext(text, context, contextLastChild(context), ClassParamClauses.parse(_)) match {
+    createElementWithContext(text, context, contextLastChild(context),
+      if (ScalaParserDefinition.useOldParser) ClassParamClauses.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.classParamClauses()
+      })) match {
       case parameters: ScParameters => parameters
       case _ => null
     }
   }
 
   def createConstructorFromText(text: String, context: PsiElement, child: PsiElement): ScConstructor = {
-    createElementWithContext(text, context, child, Constructor.parse(_)) match {
+    createElementWithContext(text, context, child,
+      if (ScalaParserDefinition.useOldParser) Constructor.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.constr()
+      })) match {
       case c: ScConstructor => c
       case _ => null
     }
@@ -228,7 +250,11 @@ object ScalaPsiElementFactory {
 
 
   def createParamClausesWithContext(text: String, context: PsiElement, child: PsiElement): ScParameters = {
-    createElementWithContext(text, context, child, ParamClauses.parse(_)) match {
+    createElementWithContext(text, context, child,
+      if (ScalaParserDefinition.useOldParser) ParamClauses.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.paramClauses()
+      })) match {
       case parameters: ScParameters => parameters
       case _ => null
     }
@@ -276,7 +302,11 @@ object ScalaPsiElementFactory {
 
   def createCaseClauseFromTextWithContext(clauseText: String, context: PsiElement,
                                           child: PsiElement, manager: PsiManager): ScCaseClause = {
-    createElementWithContext("case " + clauseText, context, child, CaseClause.parse(_)) match {
+    createElementWithContext("case " + clauseText, context, child,
+      if (ScalaParserDefinition.useOldParser) CaseClause.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.caseClause()
+      })) match {
       case caseClause: ScCaseClause => caseClause
       case _ => null
     }
@@ -360,7 +390,11 @@ object ScalaPsiElementFactory {
   }
 
   def createBlockExpressionWithoutBracesFromText(text: String, manager: PsiManager): ScBlockImpl = {
-    createElement(text, manager, Block.parse(_, hasBrace = false, needNode = true)) match {
+    createElement(text, manager,
+      if (ScalaParserDefinition.useOldParser) Block.parse(_, hasBrace = false, needNode = true)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.block()
+      })) match {
       case b: ScBlockImpl => b
       case _ => null
     }
@@ -926,42 +960,66 @@ object ScalaPsiElementFactory {
   }
 
   def createMethodWithContext(text: String, context: PsiElement, child: PsiElement): ScFunction = {
-    createElementWithContext(text, context, child, Def.parse(_)) match {
+    createElementWithContext(text, context, child,
+      if (ScalaParserDefinition.useOldParser) Def.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.`def`()
+      })) match {
       case fun: ScFunction => fun
       case _ => null
     }
   }
 
   def createDefinitionWithContext(text: String, context: PsiElement, child: PsiElement): ScMember = {
-    createElementWithContext(text, context, child, Def.parse(_)) match {
+    createElementWithContext(text, context, child,
+      if (ScalaParserDefinition.useOldParser) Def.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.`def`()
+      })) match {
       case memb: ScMember => memb
       case _ => null
     }
   }
 
   def createObjectWithContext(text: String, context: PsiElement, child: PsiElement): ScObject = {
-    createElementWithContext(text, context, child, TmplDef.parse(_)) match {
+    createElementWithContext(text, context, child,
+      if (ScalaParserDefinition.useOldParser) TmplDef.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.tmplDef()
+      })) match {
       case o: ScObject => o
       case _ => null
     }
   }
 
   def createTypeDefinitionWithContext(text: String, context: PsiElement, child: PsiElement): ScTypeDefinition = {
-    createElementWithContext(text, context, child, TmplDef.parse(_)) match {
+    createElementWithContext(text, context, child,
+      if (ScalaParserDefinition.useOldParser) TmplDef.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.tmplDef()
+      })) match {
       case td: ScTypeDefinition => td
       case _ => null
     }
   }
 
   def createReferenceFromText(text: String, context: PsiElement, child: PsiElement): ScStableCodeReferenceElement = {
-    createElementWithContext(text, context, child, StableId.parse(_, ScalaElementTypes.REFERENCE)) match {
+    createElementWithContext(text, context, child,
+      if (ScalaParserDefinition.useOldParser) StableId.parse(_, ScalaElementTypes.REFERENCE)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.stableIdRef()
+      })) match {
       case ref: ScStableCodeReferenceElement => ref
       case _ => null
     }
   }
 
   def createExpressionWithContextFromText(text: String, context: PsiElement, child: PsiElement): ScExpression = {
-    createElementWithContext(s"foo($text)", context, child, Expr.parse(_)) match {
+    createElementWithContext(s"foo($text)", context, child,
+      if (ScalaParserDefinition.useOldParser) Expr.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.expr()
+      })) match {
       case call: ScMethodCall =>
         val res = if (call.argumentExpressions.nonEmpty) call.argumentExpressions.head else null
         if (res != null) res.setContext(context, child)
@@ -971,7 +1029,11 @@ object ScalaPsiElementFactory {
   }
 
   def createConstructorBodyWithContextFromText(text: String, context: PsiElement, child: PsiElement): ScExpression = {
-    createElementWithContext(s"$text", context, child, ConstrExpr.parse(_)) match {
+    createElementWithContext(s"$text", context, child,
+      if (ScalaParserDefinition.useOldParser) ConstrExpr.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.constrExpr()
+      })) match {
       case expr: ScExpression =>
         expr.setContext(context, child)
         expr
@@ -1025,7 +1087,11 @@ object ScalaPsiElementFactory {
   }
 
   def createImportFromTextWithContext(text: String, context: PsiElement, child: PsiElement): ScImportStmt = {
-    createElementWithContext(text, context, child, Import.parse) match {
+    createElementWithContext(text, context, child,
+      if (ScalaParserDefinition.useOldParser) Import.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.import_()
+      })) match {
       case imp: ScImportStmt => imp
       case _ => null
     }
@@ -1071,25 +1137,22 @@ object ScalaPsiElementFactory {
   }
 
   def createTypeElementFromText(text: String, context: PsiElement, child: PsiElement): ScTypeElement = {
-    if (ScalaParserDefinition.useOldParser) {
-      createElementWithContext(text, context, child, Type.parse(_)) match {
-        case te: ScTypeElement => te
-        case _ => null
-      }
+    createElementWithContext(text, context, child,
+      if (ScalaParserDefinition.useOldParser) Type.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.`type`()
+      })) match {
+      case te: ScTypeElement => te
+      case _ => null
     }
-    else {
-      println("here")
-      val rule: String = "type"
-      createElementWithContext(text, context, child, ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, rule)) match {
-        case te: ScTypeElement => te
-        case _ => null
-      }
-    }
-
   }
 
   def createConstructorTypeElementFromText(text: String, context: PsiElement, child: PsiElement): ScTypeElement = {
-    createElementWithContext(text, context, child, Constructor.parse(_)) match {
+    createElementWithContext(text, context, child,
+      if (ScalaParserDefinition.useOldParser) Constructor.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.constr()
+      })) match {
       case constructor: ScConstructor => constructor.typeElement
       case _ => null
     }
@@ -1097,7 +1160,11 @@ object ScalaPsiElementFactory {
 
   def createTypeParameterClauseFromTextWithContext(text: String, context: PsiElement,
                                                    child: PsiElement): ScTypeParamClause = {
-    createElementWithContext(text, context, child, TypeParamClause.parse(_)) match {
+    createElementWithContext(text, context, child,
+      if (ScalaParserDefinition.useOldParser) TypeParamClause.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.typeParamClause()
+      })) match {
       case clause: ScTypeParamClause => clause
       case _ => null
     }
@@ -1119,7 +1186,11 @@ object ScalaPsiElementFactory {
   }
 
   def createPatterListFromText(text: String, context: PsiElement, child: PsiElement): ScPatternList = {
-    createElementWithContext(s"val $text = 239", context, child, Def.parse(_)) match {
+    createElementWithContext(s"val $text = 239", context, child,
+      if (ScalaParserDefinition.useOldParser) Def.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.`def`()
+      })) match {
       case patternDef: ScPatternDefinition =>
         val res = patternDef.pList
         res.setContext(context, child)
@@ -1138,21 +1209,33 @@ object ScalaPsiElementFactory {
   }
 
   def createTemplateDefinitionFromText(text: String, context: PsiElement, child: PsiElement): ScTemplateDefinition = {
-    createElementWithContext(text, context, child, TmplDef.parse(_)) match {
+    createElementWithContext(text, context, child,
+      if (ScalaParserDefinition.useOldParser) TmplDef.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.tmplDef()
+      })) match {
       case tmplDef: ScTemplateDefinition => tmplDef
       case _ => null
     }
   }
 
   def createDeclarationFromText(text: String, context: PsiElement, child: PsiElement): ScDeclaration = {
-    createElementWithContext(text, context, child, Dcl.parse(_)) match {
+    createElementWithContext(text, context, child,
+      if (ScalaParserDefinition.useOldParser) Dcl.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.dcl()
+      })) match {
       case decl: ScDeclaration => decl
       case _ => null
     }
   }
 
   def createTypeAliasDefinitionFromText(text: String, context: PsiElement, child: PsiElement): ScTypeAliasDefinition = {
-    createElementWithContext(text, context, child, Def.parse(_)) match {
+    createElementWithContext(text, context, child,
+      if (ScalaParserDefinition.useOldParser) Def.parse(_)
+      else ANTLRScalaLangParserAdaptor.INSTANCE.parse(_, new Callable[ParserRuleContext] {
+        override def call(): ParserRuleContext = ANTLRScalaLangParserAdaptor.PARSER.`def`()
+      })) match {
       case typeAlias: ScTypeAliasDefinition => typeAlias
       case _ => null
     }
